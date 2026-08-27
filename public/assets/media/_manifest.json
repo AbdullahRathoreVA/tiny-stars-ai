@@ -1,0 +1,508 @@
+[
+ {
+  "slug": "ts-01",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.45.19 PM.jpeg",
+  "natural": [
+   1536,
+   2048
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-01-1400.webp",
+    "w": 1050,
+    "h": 1400,
+    "kb": 368
+   },
+   {
+    "file": "photos/ts-01-700.webp",
+    "w": 525,
+    "h": 700,
+    "kb": 93
+   }
+  ]
+ },
+ {
+  "slug": "ts-02",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.45.20 PM (1).jpeg",
+  "natural": [
+   2048,
+   1536
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-02-1400.webp",
+    "w": 1400,
+    "h": 1050,
+    "kb": 264
+   },
+   {
+    "file": "photos/ts-02-700.webp",
+    "w": 700,
+    "h": 525,
+    "kb": 77
+   }
+  ]
+ },
+ {
+  "slug": "ts-03",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.45.20 PM.jpeg",
+  "natural": [
+   1536,
+   2048
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-03-1400.webp",
+    "w": 1050,
+    "h": 1400,
+    "kb": 468
+   },
+   {
+    "file": "photos/ts-03-700.webp",
+    "w": 525,
+    "h": 700,
+    "kb": 126
+   }
+  ]
+ },
+ {
+  "slug": "ts-04",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.45.21 PM.jpeg",
+  "natural": [
+   2048,
+   1536
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-04-1400.webp",
+    "w": 1400,
+    "h": 1050,
+    "kb": 251
+   },
+   {
+    "file": "photos/ts-04-700.webp",
+    "w": 700,
+    "h": 525,
+    "kb": 73
+   }
+  ]
+ },
+ {
+  "slug": "ts-05",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.46.23 PM.jpeg",
+  "natural": [
+   1200,
+   1600
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-05-1400.webp",
+    "w": 1050,
+    "h": 1400,
+    "kb": 81
+   },
+   {
+    "file": "photos/ts-05-700.webp",
+    "w": 525,
+    "h": 700,
+    "kb": 31
+   }
+  ]
+ },
+ {
+  "slug": "ts-06",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.46.24 PM.jpeg",
+  "natural": [
+   1200,
+   1600
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-06-1400.webp",
+    "w": 1050,
+    "h": 1400,
+    "kb": 97
+   },
+   {
+    "file": "photos/ts-06-700.webp",
+    "w": 525,
+    "h": 700,
+    "kb": 34
+   }
+  ]
+ },
+ {
+  "slug": "ts-07",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.46.30 PM.jpeg",
+  "natural": [
+   1200,
+   1600
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-07-1400.webp",
+    "w": 1050,
+    "h": 1400,
+    "kb": 231
+   },
+   {
+    "file": "photos/ts-07-700.webp",
+    "w": 525,
+    "h": 700,
+    "kb": 68
+   }
+  ]
+ },
+ {
+  "slug": "ts-08",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.46.52 PM.jpeg",
+  "natural": [
+   1280,
+   960
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-08-1400.webp",
+    "w": 1280,
+    "h": 960,
+    "kb": 151
+   },
+   {
+    "file": "photos/ts-08-700.webp",
+    "w": 700,
+    "h": 525,
+    "kb": 51
+   }
+  ]
+ },
+ {
+  "slug": "ts-09",
+  "kind": "photo",
+  "src": "WhatsApp Image 2026-08-27 at 10.46.53 PM.jpeg",
+  "natural": [
+   1280,
+   960
+  ],
+  "renditions": [
+   {
+    "file": "photos/ts-09-1400.webp",
+    "w": 1280,
+    "h": 960,
+    "kb": 142
+   },
+   {
+    "file": "photos/ts-09-700.webp",
+    "w": 700,
+    "h": 525,
+    "kb": 50
+   }
+  ]
+ },
+ {
+  "slug": "ts-10",
+  "kind": "video",
+  "natural": [
+   1024,
+   576
+  ],
+  "dur": 4.9,
+  "mb": 0.73,
+  "file": "video/ts-10.mp4",
+  "poster": "posters/ts-10.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.45.19 PM (1).mp4"
+ },
+ {
+  "slug": "ts-11",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 1.6,
+  "mb": 0.4,
+  "file": "video/ts-11.mp4",
+  "poster": "posters/ts-11.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.45.19 PM.mp4"
+ },
+ {
+  "slug": "ts-12",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 3.9,
+  "mb": 0.81,
+  "file": "video/ts-12.mp4",
+  "poster": "posters/ts-12.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.45.20 PM (1).mp4"
+ },
+ {
+  "slug": "ts-13",
+  "kind": "video",
+  "natural": [
+   1024,
+   576
+  ],
+  "dur": 7.1,
+  "mb": 1.22,
+  "file": "video/ts-13.mp4",
+  "poster": "posters/ts-13.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.45.20 PM.mp4"
+ },
+ {
+  "slug": "ts-14",
+  "kind": "video",
+  "natural": [
+   406,
+   720
+  ],
+  "dur": 10.0,
+  "mb": 0.72,
+  "file": "video/ts-14.mp4",
+  "poster": "posters/ts-14.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.25 PM.mp4"
+ },
+ {
+  "slug": "ts-15",
+  "kind": "video",
+  "natural": [
+   406,
+   720
+  ],
+  "dur": 10.0,
+  "mb": 0.77,
+  "file": "video/ts-15.mp4",
+  "poster": "posters/ts-15.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.27 PM.mp4"
+ },
+ {
+  "slug": "ts-16",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 4.7,
+  "mb": 0.65,
+  "file": "video/ts-16.mp4",
+  "poster": "posters/ts-16.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.28 PM.mp4"
+ },
+ {
+  "slug": "ts-17",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 66.7,
+  "mb": 8.32,
+  "file": "video/ts-17.mp4",
+  "poster": "posters/ts-17.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.29 PM.mp4"
+ },
+ {
+  "slug": "ts-18",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 15.6,
+  "mb": 2.03,
+  "file": "video/ts-18.mp4",
+  "poster": "posters/ts-18.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.34 PM.mp4"
+ },
+ {
+  "slug": "ts-19",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 7.5,
+  "mb": 1.22,
+  "file": "video/ts-19.mp4",
+  "poster": "posters/ts-19.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.37 PM.mp4"
+ },
+ {
+  "slug": "ts-20",
+  "kind": "video",
+  "natural": [
+   368,
+   624
+  ],
+  "dur": 0.7,
+  "mb": 0.06,
+  "file": "video/ts-20.mp4",
+  "poster": "posters/ts-20.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.38 PM.mp4"
+ },
+ {
+  "slug": "ts-21",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 32.6,
+  "mb": 3.9,
+  "file": "video/ts-21.mp4",
+  "poster": "posters/ts-21.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.42 PM.mp4"
+ },
+ {
+  "slug": "ts-22",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 4.5,
+  "mb": 0.8,
+  "file": "video/ts-22.mp4",
+  "poster": "posters/ts-22.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.43 PM.mp4"
+ },
+ {
+  "slug": "ts-23",
+  "kind": "video",
+  "natural": [
+   368,
+   624
+  ],
+  "dur": 0.9,
+  "mb": 0.06,
+  "file": "video/ts-23.mp4",
+  "poster": "posters/ts-23.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.44 PM.mp4"
+ },
+ {
+  "slug": "ts-24",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 14.6,
+  "mb": 2.17,
+  "file": "video/ts-24.mp4",
+  "poster": "posters/ts-24.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.46 PM.mp4"
+ },
+ {
+  "slug": "ts-25",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 4.8,
+  "mb": 0.95,
+  "file": "video/ts-25.mp4",
+  "poster": "posters/ts-25.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.48 PM.mp4"
+ },
+ {
+  "slug": "ts-26",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 15.8,
+  "mb": 2.71,
+  "file": "video/ts-26.mp4",
+  "poster": "posters/ts-26.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.51 PM.mp4"
+ },
+ {
+  "slug": "ts-27",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 2.5,
+  "mb": 0.34,
+  "file": "video/ts-27.mp4",
+  "poster": "posters/ts-27.webp",
+  "src": "WhatsApp Video 2026-08-27 at 10.46.55 PM.mp4"
+ },
+ {
+  "slug": "ts-28",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 2.4,
+  "mb": 0.25,
+  "file": "video/ts-28.mp4",
+  "poster": "posters/ts-28.webp",
+  "src": "WhatsApp Video 2026-08-27 at 11.15.44 PM.mp4"
+ },
+ {
+  "slug": "ts-29",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 2.0,
+  "mb": 0.22,
+  "file": "video/ts-29.mp4",
+  "poster": "posters/ts-29.webp",
+  "src": "WhatsApp Video 2026-08-27 at 11.15.45 PM.mp4"
+ },
+ {
+  "slug": "ts-30",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 3.6,
+  "mb": 0.49,
+  "file": "video/ts-30.mp4",
+  "poster": "posters/ts-30.webp",
+  "src": "WhatsApp Video 2026-08-27 at 11.15.46 PM.mp4"
+ },
+ {
+  "slug": "ts-31",
+  "kind": "video",
+  "natural": [
+   576,
+   1024
+  ],
+  "dur": 1.7,
+  "mb": 0.25,
+  "file": "video/ts-31.mp4",
+  "poster": "posters/ts-31.webp",
+  "src": "WhatsApp Video 2026-08-27 at 11.15.47 PM.mp4"
+ },
+ {
+  "slug": "ts-32",
+  "kind": "video",
+  "natural": [
+   406,
+   720
+  ],
+  "dur": 10.0,
+  "mb": 0.72,
+  "file": "video/ts-32.mp4",
+  "poster": "posters/ts-32.webp",
+  "src": "WhatsApp Video 2026-08-27 at 11.15.50 PM.mp4"
+ }
+]

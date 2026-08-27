@@ -14,3 +14,6 @@ Thumbs.db
 # the batch contains identifiable children, so it stays out of the repo
 # until written consent is confirmed.
 .media-inbox/
+
+# Vercel adapter build output
+.vercel/

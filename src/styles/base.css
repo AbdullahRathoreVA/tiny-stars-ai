@@ -902,3 +902,14 @@ strong, b { font-weight: 650; }
     min-height: 44px;
   }
 }
+
+/* ------------------------------------------------------ viewport gates ---
+   `wide-only` keeps a block out of the DOM's rendered box on small screens.
+   Used for the star-map navigation, whose canvas mount then has zero size, so
+   its IntersectionObserver never fires and three.js is never fetched on a
+   phone. Hiding it is the point, not a side effect.
+   ------------------------------------------------------------------------- */
+.wide-only { display: none; }
+@media (min-width: 900px) {
+  .wide-only { display: block; }
+}

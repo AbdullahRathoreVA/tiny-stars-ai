@@ -2,8 +2,8 @@
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import IntentPicker from '../components/IntentPicker.astro';
-import ProgramCard from '../components/ProgramCard.astro';
-import { programs } from '../data/programs';
+import AgeMatch from '../components/AgeMatch.astro';
+import MediaStrip from '../components/MediaStrip.astro';
 import { site, trustMarkers, policyFacts } from '../data/site';
 import { organizationSchema, websiteSchema } from '../lib/schema';
 import Stage3D from '../components/three/Stage3D.astro';
@@ -43,18 +43,6 @@ const values = [
     cta: 'A day at Tiny Stars',
   },
 ];
-
-const rhythm = [
-  { icon: 'sun', label: 'Arrival & welcome', note: 'Settling in, saying goodbye, finding a friend.' },
-  { icon: 'apple', label: 'Meals & snacks', note: 'Part of the published Classroom Routine.' },
-  { icon: 'bulb', label: 'Learning & discovery', note: 'Age-appropriate activities, guided by educators.' },
-  { icon: 'leaf', label: 'Outdoor & active play', note: 'Fresh air and room to move.' },
-  { icon: 'moon', label: 'Rest', note: 'Quiet time built into the day.' },
-  { icon: 'palette', label: 'Creative time', note: 'Making things, music, imagination.' },
-  { icon: 'heart', label: 'Pick-up', note: 'Tiny Stars closes at 6:00 PM.', verified: true },
-];
-
-const galleryPreview = [3, 7, 11, 14, 18, 20];
 
 const schema = [organizationSchema, websiteSchema];
 ---
@@ -145,11 +133,11 @@ const schema = [organizationSchema, websiteSchema];
     </div>
   </section>
 
-  <!-- ==================================================== INTENT PICKER -->
-  <IntentPicker />
+  <!-- ======================================================== AGE MATCH -->
+  <AgeMatch />
 
-  <!-- ========================================================= UNIVERSE -->
-  <Universe />
+  <!-- ====================================================== MEDIA STRIP -->
+  <MediaStrip />
 
   <!-- =========================================================== VALUES -->
   <section class="section" aria-labelledby="values-title">
@@ -176,41 +164,6 @@ const schema = [organizationSchema, websiteSchema];
             </a>
           </article>
         ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- ========================================================= PROGRAMS -->
-  <section class="section section--sunken" aria-labelledby="programs-title">
-    <div class="container">
-      <div class="programs__head" data-reveal>
-        <div class="section-head">
-          <p class="eyebrow">Programs</p>
-          <h2 id="programs-title">Five programs, from first steps to grade six</h2>
-          <p class="lede">
-            Every child moves through Tiny Stars at their own pace. Find the group that
-            fits yours right now.
-          </p>
-        </div>
-        <a href="/enroll/find-your-program" class="btn btn--ink">
-          <Icon name="compass" size={18} />
-          Find the right one
-        </a>
-      </div>
-
-      <div class="grid grid--3 mt-l depth-scope">
-        {programs.map((p, i) => (
-          <div data-reveal style={`--reveal-delay:${i * 60}ms`}>
-            <ProgramCard program={p} eager={i < 3} />
-          </div>
-        ))}
-
-        <a href="/programs" class="pmore card card--interactive" data-reveal style="--reveal-delay:300ms">
-          <span class="pmore__icon"><Icon name="sparkles" size={24} /></span>
-          <strong>Learning Adventures</strong>
-          <span>Optional small-group enrichment classes for ages 2–5, alongside the main program.</span>
-          <span class="pmore__cta">See all programs <Icon name="arrow" size={15} /></span>
-        </a>
       </div>
     </div>
   </section>
@@ -244,20 +197,8 @@ const schema = [organizationSchema, websiteSchema];
           </div>
         </div>
 
-        <ol class="rhythm" data-reveal>
-          {rhythm.map((r, i) => (
-            <li class="rhythm__step" style={`--reveal-delay:${i * 50}ms`}>
-              <span class="rhythm__icon"><Icon name={r.icon as any} size={17} /></span>
-              <span class="rhythm__text">
-                <strong>{r.label}</strong>
-                <small>
-                  {r.note}
-                  {r.verified && <span class="badge badge--verified">Published</span>}
-                </small>
-              </span>
-            </li>
-          ))}
-        </ol>
+        <!-- The seven-step rhythm lives on /day. Repeating it here cost most of
+             a phone screen to say what the two links below already promise. -->
       </div>
     </div>
   </section>
@@ -317,40 +258,18 @@ const schema = [organizationSchema, websiteSchema];
     </div>
   </section>
 
-  <!-- ========================================================= GALLERY -->
-  <section class="section section--sunken" aria-labelledby="gallery-title">
-    <div class="container">
-      <div class="programs__head" data-reveal>
-        <div class="section-head">
-          <p class="eyebrow">Inside Tiny Stars</p>
-          <h2 id="gallery-title">Real photographs. Real rooms. Real children.</h2>
-          <p class="lede">
-            Every image on this site comes from Tiny Stars itself — no stock photography
-            standing in for the place you'd actually be leaving your child.
-          </p>
-        </div>
-        <a href="/experience/gallery" class="btn btn--ghost">
-          <Icon name="camera" size={18} />
-          See the gallery
-        </a>
-      </div>
+  <!-- ==================================================== INTENT PICKER -->
+  <IntentPicker />
 
-      <div class="gstrip mt-l" data-reveal>
-        {galleryPreview.map((n, i) => (
-          <a href="/experience/gallery" class="gstrip__item" style={`--reveal-delay:${i * 60}ms`}>
-            <img
-              src={`/assets/images/gallery/gallery-${n}.webp`}
-              alt=""
-              width="400"
-              height="400"
-              loading="lazy"
-              decoding="async"
-            />
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <!-- ========================================================= UNIVERSE -->
+  <!-- The star-map navigation is a desktop showpiece. On a phone it was a
+       340px empty box above a list that already says the same thing, so the
+       chips above are the mobile version of it. Hidden at this width means the
+       mount is zero-sized, the observer never fires, and three.js is never
+       fetched on mobile at all. -->
+  <div class="wide-only">
+    <Universe />
+  </div>
 
   <!-- ====================================================== STAR GUIDE -->
   <section class="section guide" aria-labelledby="guide-title">
@@ -510,6 +429,30 @@ const schema = [organizationSchema, websiteSchema];
   }
   .hero__trust :global(svg) { color: var(--teal-600); }
 
+  /* ------------------------------------------------------ hero, phone --
+     The desktop hero is a two-column composition. Stacked on a phone it ran to
+     1.5 screens before a parent reached anything actionable, and the photograph
+     — the thing that says "this is a real place" — sat below the fold.
+     So on small screens: tighter rhythm, one photograph promoted to a wide
+     band right under the buttons, and the second inset figure dropped rather
+     than shrunk, because two overlapping images at 390px is noise. */
+  @media (max-width: 55rem) {
+    .hero { padding-block: var(--space-l) var(--space-m); }
+    .hero__grid { gap: var(--space-l); }
+    .hero__copy h1 { font-size: var(--step-5); margin-top: var(--space-xs); }
+    .hero__lede { margin-top: var(--space-s); font-size: var(--step-0); }
+    .hero__actions { margin-top: var(--space-m); }
+    .hero__actions .btn { flex: 1 1 100%; }
+    .hero__ask { margin-top: var(--space-s); width: 100%; }
+    .hero__trust {
+      margin-top: var(--space-m);
+      padding-top: var(--space-s);
+      gap: 0.4rem 0.9rem;
+    }
+    .hero__figure--main { aspect-ratio: 16 / 11; }
+    .hero__figure--sub { display: none; }
+  }
+
   /* hero media */
   .hero__media { position: relative; }
   .hero__figure { margin: 0; border-radius: var(--radius-xl); overflow: hidden; }
@@ -559,6 +502,26 @@ const schema = [organizationSchema, websiteSchema];
     gap: var(--space-m);
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
     margin-top: var(--space-xl);
+  }
+
+  /* On a phone these four cards ran to nearly two full screens, which is a lot
+     of scrolling to reach a trust section that says the same thing with
+     evidence. Below 700px they collapse to a two-up grid of icon, title and
+     one line; the paragraph is the page the card links to. */
+  @media (max-width: 43.75rem) {
+    /* Scoped through .values so these land after the .value__* rules further
+       down this sheet. Equal specificity means source order decides, and a
+       media query does not change that. */
+    .values {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-s);
+      margin-top: var(--space-l);
+    }
+    .values .value { padding: var(--space-s); gap: 0.3rem; }
+    .values .value h3 { font-size: var(--step-0); }
+    .values .value__body { display: none; }
+    .values .value__line { font-size: var(--step--1); font-weight: 600; }
+    .values .value__icon { width: 34px; height: 34px; }
   }
   .value {
     display: flex;
@@ -695,6 +658,14 @@ const schema = [organizationSchema, websiteSchema];
   }
   .trust__media img { width: 100%; height: 100%; object-fit: cover; }
 
+  /* The trust photograph is a mood shot next to text that carries the actual
+     evidence. On a phone it was most of a screen ahead of the claims, so it
+     steps aside and the claims start immediately. */
+  @media (max-width: 55rem) {
+    .trust__grid { gap: var(--space-l); }
+    .trust__media { display: none; }
+  }
+
   .trust__list { list-style: none; padding: 0; display: grid; gap: 0.85rem; margin-top: var(--space-m); }
   .trust__list li { display: flex; gap: 0.7rem; align-items: flex-start; }
   .trust__list :global(svg) { color: var(--teal-600); flex: none; margin-top: 0.15rem; }
@@ -750,6 +721,24 @@ const schema = [organizationSchema, websiteSchema];
   .guide__actions { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: var(--space-l); }
 
   .guide__samples { display: grid; gap: 0.5rem; list-style: none; padding: 0; align-content: center; }
+
+  /* Four stacked sample questions cost a full phone screen to demonstrate
+     something the button above already offers. Below 55rem they become a
+     horizontal rail: same four, one row. */
+  @media (max-width: 55rem) {
+    .guide__samples {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(13rem, 78%);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      margin-inline: calc(var(--space-m) * -1);
+      padding-inline: var(--space-m);
+    }
+    .guide__samples::-webkit-scrollbar { display: none; }
+    .guide__samples li { scroll-snap-align: start; }
+  }
   .guide__sample {
     display: flex;
     align-items: center;

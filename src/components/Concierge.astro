@@ -372,6 +372,9 @@ import { site } from '../data/site';
 <script>
   import { getProvider } from '../lib/ai/provider';
   import { quickActions, samplePrompts } from '../lib/ai/local';
+  // Importing registers it. PUBLIC_AI_PROVIDER=groq then selects it; anything
+  // else, including the variable being unset, keeps the offline provider.
+  import '../lib/ai/remote';
   import { agentById } from '../lib/ai/agents';
   import { escapeHtml } from '../lib/ai/guardrails';
   import { track } from '../lib/analytics';

@@ -15,7 +15,11 @@ import re
 import sys
 from collections import defaultdict
 
-DIST = "dist"
+# With the Vercel adapter configured, the prerendered HTML lands in
+# .vercel/output/static and dist/ holds only the client bundle. Audit whichever
+# one actually has the pages, so this keeps working either way.
+import os as _os
+DIST = ".vercel/output/static" if _os.path.isdir(".vercel/output/static") else "dist"
 SEP = os.sep
 
 
@@ -162,7 +166,7 @@ SECRET_PATTERNS = [
     (r'(?i)\b(api[_-]?key|secret|passwd|password|token)\s*[:=]\s*["\'][^"\']{12,}["\']', "hardcoded credential"),
 ]
 
-SKIP_DIRS = {"node_modules", ".git", "dist", ".astro"}
+SKIP_DIRS = {"node_modules", ".git", "dist", ".astro", ".vercel", ".media-inbox"}
 
 
 def scan_secrets(root="."):
@@ -204,7 +208,7 @@ def dir_size(path):
 
 def main():
     if not os.path.isdir(DIST):
-        print("dist/ not found — run `npm run build` first.")
+        print(f"{DIST}/ not found — run `npm run build` first.")
         return 1
 
     pages, assets, html_files = collect()
@@ -252,7 +256,7 @@ def main():
             print(f"   {size / 1024:7.1f} KB  {f}")
         print(f"CSS SHIPPED: {css_total / 1024:.1f} KB")
 
-    print(f"\nTOTAL dist/: {dir_size(DIST) / 1024 / 1024:.1f} MB")
+    print(f"\nTOTAL {DIST}/: {dir_size(DIST) / 1024 / 1024:.1f} MB")
     print("=" * 66)
 
     return 1 if (broken or secrets) else 0

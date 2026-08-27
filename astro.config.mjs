@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import vercel from '@astrojs/vercel/serverless';
 
 /**
  * Tiny Stars 2.0 — demo build.
@@ -14,6 +15,11 @@ const SITE = process.env.PUBLIC_SITE_URL || 'https://tinystars.ca';
 
 export default defineConfig({
   site: SITE,
+  // Static by default — all 31 pages still prerender to HTML at build time.
+  // The adapter exists so the one route that cannot be static, /api/concierge,
+  // can opt out with `export const prerender = false` and run as a function
+  // where the Groq key is readable. No page becomes server-rendered.
+  adapter: vercel(),
   trailingSlash: 'ignore',
   build: {
     inlineStylesheets: 'auto',

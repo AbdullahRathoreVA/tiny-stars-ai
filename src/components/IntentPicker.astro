@@ -78,6 +78,13 @@ const intents = [
     padding: 0;
   }
 
+  /* Two-up below 43.75rem. Six full-width chips is most of a phone screen for
+     a menu, and these labels are short enough to pair. */
+  @media (max-width: 43.75rem) {
+    .ip__list { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .ip__opt { min-height: 62px; padding: 0.6rem 0.7rem; font-size: var(--step--1); }
+  }
+
   .ip__opt {
     display: flex;
     align-items: center;

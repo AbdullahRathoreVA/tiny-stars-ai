@@ -1,0 +1,241 @@
+---
+/**
+ * "How old is your child?" — the shortest path from landing to an answer.
+ *
+ * This replaces a stacked grid of five program cards on the homepage. The grid
+ * was five screens of scrolling on a phone and made a parent do the matching
+ * themselves; six age chips do it in one tap and cost one screen.
+ *
+ * The mapping is the published age range and nothing else. No availability, no
+ * fee, no ratio — none of which Tiny Stars has published, and all of which a
+ * parent will assume is real if a website states it.
+ *
+ * Works with JavaScript off: every chip is a real link to the program page. The
+ * script upgrades it to answer in place.
+ */
+import Icon from './Icon.astro';
+import { programs } from '../data/programs';
+
+// Buckets a parent actually thinks in, mapped onto the published ranges.
+const buckets = [
+  { label: 'Under 18 mo', months: 14 },
+  { label: '18 mo – 2', months: 22 },
+  { label: '2 – 3', months: 32 },
+  { label: '3 – 5', months: 44 },
+  { label: '5 – 6', months: 64 },
+  { label: '6 – 12', months: 90 },
+];
+
+const match = (months: number) =>
+  programs.find((p) => months >= p.ageMinMonths && months < p.ageMaxMonths) ??
+  programs[programs.length - 1];
+
+const options = buckets.map((b) => {
+  const p = match(b.months);
+  return {
+    label: b.label,
+    months: b.months,
+    slug: p.slug,
+    name: p.name,
+    familiar: p.familiar,
+    ageLabel: p.ageLabel,
+    blurb: p.blurb,
+    accent: p.accent,
+  };
+});
+---
+
+<section class="section agem" aria-labelledby="agem-title">
+  <div class="container container--narrow">
+    <div class="section-head text-center" data-reveal>
+      <p class="eyebrow">Start here</p>
+      <h2 id="agem-title">How old is your child?</h2>
+      <p class="lede">One tap and we'll show you the group they'd join.</p>
+    </div>
+
+    <ul class="agem__opts" data-reveal>
+      {options.map((o) => (
+        <li>
+          <a
+            href={`/programs/${o.slug}`}
+            class="agem__opt"
+            data-age={o.months}
+            data-slug={o.slug}
+            data-name={o.name}
+            data-familiar={o.familiar}
+            data-agelabel={o.ageLabel}
+            data-blurb={o.blurb}
+            data-accent={o.accent}
+          >
+            {o.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Populated in place once a chip is chosen. Starts empty and is only
+         revealed on selection, so the section costs nothing until it is used. -->
+    <div class="agem__result" data-age-result hidden aria-live="polite">
+      <p class="agem__kicker">Most likely their group</p>
+      <h3 class="agem__name" data-age-name></h3>
+      <p class="agem__meta">
+        <span class="badge badge--verified">Published</span>
+        <span data-age-range></span>
+      </p>
+      <p class="agem__blurb" data-age-blurb></p>
+      <div class="agem__actions">
+        <a class="btn btn--primary" data-age-link href="/programs">
+          See this program <Icon name="arrow" size={16} />
+        </a>
+        <a class="btn btn--ghost" href="/enroll/book-a-tour" data-track="tour_cta_click" data-track-label="agematch">
+          <Icon name="calendar" size={17} /> Book a tour
+        </a>
+      </div>
+      <p class="agem__note">
+        Age ranges come from Tiny Stars' published programs. Whether a place is open
+        right now is something only the team can tell you.
+      </p>
+    </div>
+
+    <p class="agem__alt">
+      Not sure, or between groups?
+      <button type="button" class="linkish" data-concierge-open>Ask Star Guide</button>
+      or <a href="/enroll/find-your-program">use the full finder</a>.
+    </p>
+  </div>
+</section>
+
+<script>
+  const wrap = document.querySelector<HTMLElement>('[data-age-result]');
+  const opts = document.querySelectorAll<HTMLAnchorElement>('.agem__opt');
+
+  if (wrap && opts.length) {
+    const nameEl = wrap.querySelector<HTMLElement>('[data-age-name]')!;
+    const rangeEl = wrap.querySelector<HTMLElement>('[data-age-range]')!;
+    const blurbEl = wrap.querySelector<HTMLElement>('[data-age-blurb]')!;
+    const linkEl = wrap.querySelector<HTMLAnchorElement>('[data-age-link]')!;
+
+    opts.forEach((opt) => {
+      opt.addEventListener('click', (e) => {
+        // Modified clicks stay real navigations — a parent opening the program
+        // in a new tab should get the program.
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+
+        opts.forEach((o) => o.removeAttribute('aria-current'));
+        opt.setAttribute('aria-current', 'true');
+
+        const d = opt.dataset;
+        nameEl.textContent = `${d.name} · ${d.familiar}`;
+        rangeEl.textContent = d.agelabel ?? '';
+        blurbEl.textContent = d.blurb ?? '';
+        linkEl.href = `/programs/${d.slug}`;
+        wrap.dataset.accent = d.accent ?? '';
+        wrap.hidden = false;
+
+        window.dispatchEvent(
+          new CustomEvent('ts:program', { detail: { id: d.slug } })
+        );
+      });
+    });
+  }
+</script>
+
+<style>
+  .agem__opts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: var(--space-l) 0 0;
+  }
+  .agem__opt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Sized for a thumb first: these are the six most-tapped controls on the
+       page and they sit mid-screen where a one-handed grip lands. */
+    min-height: 52px;
+    padding: 0 1.15rem;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--cream-100);
+    color: var(--ink-800);
+    font-size: var(--step-0);
+    font-weight: 650;
+    text-decoration: none;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .agem__opt:hover { border-color: var(--coral-500); }
+  .agem__opt[aria-current='true'] {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+    color: var(--cream-50);
+  }
+
+  .agem__result {
+    margin-top: var(--space-l);
+    padding: var(--space-l);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    background: var(--cream-50);
+    box-shadow: var(--shadow-s);
+    text-align: center;
+  }
+  .agem__result[hidden] { display: none; }
+  .agem__kicker {
+    margin: 0;
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .agem__name { margin: 0.3rem 0 0; font-size: var(--step-2); }
+  .agem__meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+  .agem__blurb { margin: 0.6rem 0 0; color: var(--ink-700); }
+  .agem__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: var(--space-m);
+  }
+  .agem__note {
+    margin: var(--space-m) 0 0;
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+
+  .agem__alt {
+    margin: var(--space-m) 0 0;
+    text-align: center;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+  .linkish {
+    border: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    color: var(--coral-600);
+    font-weight: 650;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>
