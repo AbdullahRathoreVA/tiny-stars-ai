@@ -329,7 +329,8 @@ const pillars = [
   }
 
   /* unknown */
-  .unknown { display: grid; gap: var(--space-xl); align-items: start; }
+  .unknown { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
+  .unknown > * { min-width: 0; }
   .unknown__list { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
   .unknown__list li {
     display: flex; align-items: center; gap: 0.65rem;

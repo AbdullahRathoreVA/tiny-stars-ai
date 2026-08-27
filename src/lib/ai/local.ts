@@ -108,11 +108,95 @@ function routeToAgent(message: string, context: AIRequest['context']): Routed {
   return best;
 }
 
+/* ------------------------------------------------------------ small talk -- */
+
+/**
+ * Conversational turns, answered before retrieval runs.
+ *
+ * "hi" used to reach the knowledge base and come back with the careers answer,
+ * because two characters is enough bigram overlap with "hiring" to clear the
+ * relevance floor. A parent saying hello was told about resume uploads.
+ *
+ * These replies deliberately contain no fact about Tiny Stars — they orient and
+ * hand back. That keeps them outside the sourcing rules entirely, because there
+ * is nothing in them to source.
+ */
+const SMALL_TALK: { test: RegExp; reply: string; followUps: string[] }[] = [
+  {
+    test: /^\s*(hi|hii+|hey+|hello+|yo|hiya|howdy|salam|assalamu? ?alaikum|good (morning|afternoon|evening))\b(\s+(there|guys|team|all|everyone|star guide))?[\s!.,?]*$/i,
+    reply: [
+      "Hello. I'm Star Guide, the assistant for Tiny Stars. Ask me about the programs, what a day looks like, safety, or booking a tour.",
+      "One thing worth knowing up front: I only use what Tiny Stars has actually published. If something has not been published — fees, availability, ratios — I will tell you that rather than guess, and point you at someone who can answer properly.",
+    ].join('\n\n'),
+    followUps: ['What programs do you offer?', 'What happens during the day?', 'How do I book a tour?'],
+  },
+  {
+    test: /^\s*(thanks|thank you|thankyou|ty|cheers|appreciate it|got it|great|perfect|ok|okay)\b[\s!.,?]*$/i,
+    reply:
+      "Any time. If there is anything else you want to check before deciding, ask away — and if you would rather see the place in person, a tour takes about thirty minutes.",
+    followUps: ['How do I book a tour?', 'What should I ask on a tour?'],
+  },
+  {
+    test: /^\s*(bye|goodbye|see ya|see you|good ?night)\b[\s!.,?]*$/i,
+    reply:
+      'Take care. Nothing you typed here leaves your device, so you can pick this up whenever suits.',
+    followUps: ['How do I book a tour?'],
+  },
+  {
+    test: /\b(what can you do|what do you do|who are you|what are you|are you (a )?(real|human|person|bot|robot|ai)|how do you work|are you chatgpt)\b/i,
+    reply: [
+      "I'm Star Guide — software, not a person, and I will not pretend otherwise.",
+      "I answer from what Tiny Stars has published and show you where each answer came from. I can help you find the right program for your child's age, explain what a day looks like, walk through the published safety policies, and get you to a tour booking. What I cannot do is invent a fee, a vacancy or a ratio, so when those come up I hand you to the team.",
+    ].join('\n\n'),
+    followUps: ['What programs do you offer?', 'Tell me about safety', 'How do I book a tour?'],
+  },
+];
+
+function smallTalk(message: string) {
+  return SMALL_TALK.find((s) => s.test.test(message));
+}
+
 /* ------------------------------------------------------------- retrieval -- */
 
 function retrieve(message: string, agent: Agent): { entry: Entry; score: number }[] {
+  // The index does bigram fuzzy matching for typo tolerance, which is the right
+  // call for "prgrams" and the wrong one for "hi": a two-character token
+  // overlaps enough of "hiring" to look like a real match. Anything without a
+  // word of at least four characters is not a query, it is an utterance.
+  const longEnough = message.split(/\W+/).some((w) => w.length >= 4);
+  if (!longEnough) return [];
+
   const all = index.search(message, 6);
   if (!all.length) return [];
+
+  // A hit has to share at least one real word with the question. Bigram
+  // similarity alone will happily rank "hey there" against an entry about
+  // daily-report apps, and an answer on confidently the wrong subject is worse
+  // for a parent than "I don't know" — it looks like the question was
+  // understood. Requiring lexical overlap makes the fuzzy pass a tie-breaker
+  // rather than a matchmaker.
+  // Stopwords are excluded from the overlap test, or it never fires: almost
+  // every entry contains "what" and "child", so "what is the weather" would
+  // ground itself against an answer about separation anxiety.
+  const STOP = new Set([
+    'what', 'when', 'where', 'which', 'does', 'have', 'your', 'this', 'that', 'with',
+    'from', 'they', 'them', 'there', 'here', 'would', 'could', 'should', 'about',
+    'tell', 'know', 'like', 'want', 'need', 'give', 'take', 'make', 'just', 'also',
+    'much', 'many', 'more', 'some', 'any', 'you', 'the', 'and', 'for', 'are',
+    'child', 'children', 'kid', 'kids', 'please', 'thanks', 'hello',
+  ]);
+  const asked = (message.toLowerCase().match(/[a-z]{3,}/g) ?? []).filter(
+    (w) => w.length >= 4 && !STOP.has(w)
+  );
+  if (asked.length) {
+    const grounded = all.filter((r) => {
+      const hay = `${r.item.question} ${r.item.answer} ${r.item.keywords.join(' ')}`.toLowerCase();
+      return asked.some((w) => hay.includes(w));
+    });
+    if (!grounded.length) return [];
+    all.length = 0;
+    all.push(...grounded);
+  }
 
   // Prefer entries inside the agent's scope, but do not discard a much stronger
   // out-of-scope match — the router is a heuristic, not an authority.
@@ -223,6 +307,23 @@ const localProvider: AIProvider = {
     }
 
     const message = check.cleaned;
+
+    const chat = smallTalk(message);
+    if (chat) {
+      return {
+        text: chat.reply,
+        // Nothing here is a claim about the centre, so there is nothing to source.
+        trust: 'general',
+        sources: [],
+        actions: [{ label: 'Book a tour', href: '/enroll/book-a-tour', kind: 'primary' }],
+        agent: 'concierge',
+        handoff: false,
+        confidence: 1,
+        followUps: chat.followUps,
+        flags: [...check.flags, 'small-talk'],
+      };
+    }
+
     const { agent, score: routeScore } = routeToAgent(message, req.context);
     const hits = retrieve(message, agent);
     const top = hits[0];

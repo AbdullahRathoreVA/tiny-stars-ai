@@ -241,7 +241,8 @@ const metaDescription = clamp(
 </Base>
 
 <style>
-  .split { display: grid; gap: var(--space-xl); align-items: start; }
+  .split { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
+  .split > * { min-width: 0; }
   @media (min-width: 900px) {
     .split { grid-template-columns: minmax(0, 1fr) minmax(0, 21rem); gap: var(--space-2xl); }
     .split__side { position: sticky; top: calc(var(--header-h) + 1.5rem); }

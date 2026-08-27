@@ -177,18 +177,23 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     align-items: center;
     gap: 0.6rem;
     min-height: var(--header-h);
+    /* Flex items default to min-width:auto and refuse to shrink below their
+       content. Without these the header can silently widen the whole document,
+       which is exactly what happened above — so the floor is set once here
+       rather than trusting every future addition to be narrow enough. */
+    min-width: 0;
   }
+  .hdr__bar > * { min-width: 0; }
+  .brand__text { min-width: 0; overflow: hidden; }
+  .brand__text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   @media (min-width: 1060px) { .hdr__bar { gap: var(--space-m); } }
 
   /* The brand's sub-label is the least useful pixel on a narrow row; the
      "Preview" wording is one of the most important, so it goes last. */
-  @media (max-width: 400px) {
+  @media (max-width: 520px) {
     .brand__text small { display: none; }
   }
-  @media (max-width: 339px) {
-    .preview-tag span { display: none; }
-    .preview-tag { padding-inline: 0.45rem; }
-  }
+
 
   /* ---- brand ---- */
   .brand {
@@ -198,7 +203,11 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     min-height: 44px;
     text-decoration: none;
     color: var(--ink-900);
-    flex: none;
+    /* Shrinkable, not fixed. On a 280px screen the wordmark is the only thing
+       in the row with slack in it; `flex: none` here meant the row grew instead
+       and took the whole document with it. */
+    flex: 0 1 auto;
+    min-width: 0;
   }
   .brand__mark {
     display: grid;
@@ -453,13 +462,32 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
   }
 
   /* ---- breakpoints ---- */
-  @media (min-width: 400px) {
+  /* The header CTA needs about 150px, and the row already carries the brand,
+     the preview tag, search and the menu. Showing it from 400px pushed the
+     document ~100px wider than the screen on any 390-430px phone, which is
+     most of them: the page then rendered in a narrow column with a dead strip
+     down the right. The mobile bar carries "Book a tour" below this width, so
+     nothing is lost by waiting for the room. */
+  @media (min-width: 640px) {
     .hdr__cta { display: inline-flex; }
   }
   @media (min-width: 1060px) {
     .primary { display: block; }
     .icon-btn--menu { display: none; }
     .brand--sm .brand__text { display: flex; }
+  }
+
+  /* The demo badge is the least load-bearing thing in the row, so it gives up
+     width first: the word at 420px, the badge itself at 340px. These live at
+     the end of the sheet on purpose — Astro's scope attribute puts them on
+     equal specificity with the base rules above, so source order is what
+     decides, and higher up they simply lost. */
+  @media (max-width: 420px) {
+    .preview-tag span { display: none; }
+    .preview-tag { padding-inline: 0.45rem; }
+  }
+  @media (max-width: 340px) {
+    .preview-tag { display: none; }
   }
 </style>
 

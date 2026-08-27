@@ -266,7 +266,8 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
 </Base>
 
 <style>
-  .tour { display: grid; gap: var(--space-xl); align-items: start; }
+  .tour { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
+  .tour > * { min-width: 0; }
   @media (min-width: 980px) {
     .tour { grid-template-columns: minmax(0, 1fr) minmax(0, 21rem); gap: var(--space-2xl); }
     .tour__side { position: sticky; top: calc(var(--header-h) + 1.5rem); }

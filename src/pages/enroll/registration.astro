@@ -239,7 +239,8 @@ const schema = [
 </Base>
 
 <style>
-  .reg { display: grid; gap: var(--space-xl); align-items: start; }
+  .reg { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
+  .reg > * { min-width: 0; }
   @media (min-width: 980px) {
     .reg { grid-template-columns: minmax(0, 1fr) minmax(0, 21rem); gap: var(--space-2xl); }
     .reg__side { position: sticky; top: calc(var(--header-h) + 1.5rem); }

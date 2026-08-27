@@ -167,7 +167,11 @@ const schema = [
   .phero-shell > :global(.stage3d--fill) { z-index: 0; opacity: 0.5; }
   .phero-shell > :global(section) { position: relative; z-index: 1; }
 
-  .vt { display: grid; gap: var(--space-xl); align-items: start; }
+  /* minmax(0, 1fr), not the implicit `auto`: the room list sets a min-content
+     width of ~570px, which the single-column stack then inherited and pushed
+     through the whole document. */
+  .vt { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
+  .vt > * { min-width: 0; }
   @media (min-width: 940px) {
     .vt { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: var(--space-2xl); }
     .vt__nav { position: sticky; top: calc(var(--header-h) + 1.5rem); }
@@ -205,7 +209,7 @@ const schema = [
   }
   .vt__nav a[data-current='true'] .vt__n { background: var(--coral-500); color: #fff; }
 
-  .vt__stops { display: grid; gap: var(--space-2xl); }
+  .vt__stops { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl); }
 
   .stop { scroll-margin-top: calc(var(--header-h) + 2rem); }
   .stop__head { max-width: 56ch; }

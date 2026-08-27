@@ -275,7 +275,8 @@ const closing = policyFacts.find((p) => p.id === 'closing-time')!;
   :global(.way__go) { flex: none; opacity: 0.4; }
   .way:hover :global(.way__go) { opacity: 0.8; }
 
-  .visit { display: grid; gap: var(--space-xl); align-items: start; }
+  .visit { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
+  .visit > * { min-width: 0; }
   @media (min-width: 900px) { .visit { grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); gap: var(--space-2xl); } }
 
   .addr {

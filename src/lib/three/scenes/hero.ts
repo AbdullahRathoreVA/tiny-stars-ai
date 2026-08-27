@@ -183,15 +183,21 @@ class HeroStage extends Stage {
 
     // Re-seat every floater against the frustum this viewport actually has.
     const halfFov = (this.camera.fov * Math.PI) / 360;
-    // Portrait means the copy is full-width underneath, so the sides stop being
-    // a safe place to put anything — push the cast to the top and bottom bands.
+
+    // On a phone the hero copy is full-width: the eyebrow, the headline, the
+    // lede and two buttons fill the frame edge to edge, so there is no margin
+    // left to put an object in. Pushing them to the top and bottom bands was
+    // not enough — they still landed on the headline, which is the one line
+    // that has to be readable in three seconds. So in portrait the objects are
+    // hidden outright and the starfield carries the atmosphere alone.
     const portrait = aspect < 1;
     for (const f of this.floaters) {
+      f.object.visible = !portrait;
+      if (portrait) continue;
       const dist = this.camera.position.z - f.z;
       const halfH = Math.tan(halfFov) * dist;
       const halfW = halfH * aspect;
-      const ny = portrait ? Math.sign(f.anchor.y) * Math.max(Math.abs(f.anchor.y), 0.82) : f.anchor.y;
-      f.home.set(f.anchor.x * halfW, ny * halfH, f.z);
+      f.home.set(f.anchor.x * halfW, f.anchor.y * halfH, f.z);
       f.object.position.copy(f.home);
     }
   }
