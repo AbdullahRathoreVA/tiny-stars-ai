@@ -262,5 +262,7 @@ Still to wire up before launch, all of them deliberate gaps rather than oversigh
 ## Assets
 
 All photography, video and PDFs are Tiny Stars' own, mirrored from tinystars.ca. There is no
-stock imagery anywhere. The gallery contains no children — the centre's own photographs are
-of the spaces, and we would not publish images of children without authorization.
+stock imagery anywhere. The `/experience/gallery` set is spaces only. The "Inside Tiny Stars"
+media added later does show children at the centre; it was supplied by Tiny Stars, and
+`SHOW_CHILDREN` in [`src/data/media.ts`](src/data/media.ts) turns all of it off in one edit if
+a family asks. One supplied clip is AI-generated and is labelled as such wherever it appears.
