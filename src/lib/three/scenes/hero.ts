@@ -33,7 +33,16 @@ import {
 
 interface Floater {
   object: THREE_NS.Object3D;
-  /** Base position, orbited around. */
+  /**
+   * Where the object sits as a fraction of the visible frustum at its own
+   * depth, -1..1 from centre. Authoring in screen space rather than world units
+   * is what keeps the composition in the margins at every viewport: a fixed
+   * world x that clears the headline at 1440px drifts into it at 1024px.
+   */
+  anchor: { x: number; y: number };
+  /** Z the object sits at. Fixed; only x/y respond to the viewport. */
+  z: number;
+  /** Base position, orbited around. Recomputed from `anchor` on every layout. */
   home: THREE_NS.Vector3;
   drift: number;
   spin: number;
@@ -67,29 +76,48 @@ class HeroStage extends Stage {
 
     // --- floating objects ------------------------------------------------
     // A curated set, not a scatter. Each one is a thing a child would recognise.
-    const cast: { make: () => THREE_NS.Object3D; at: [number, number, number]; scale: number }[] = [
+    // Anchors keep the middle band clear. The headline is the one thing on this
+    // page that has to be read in three seconds, and an opaque star drifting
+    // through "A place where" costs more than the ornament is worth — so the
+    // cast is pinned to the margins and to the space behind the photograph.
+    type Spec = {
+      make: () => THREE_NS.Object3D;
+      anchor: [number, number];
+      z: number;
+      scale: number;
+    };
+    const cast: Spec[] = [
       {
         make: () => new T.Mesh(starGeometry(T, 5, 1, 0.44, 0.22), lit(T, PALETTE.gold400)),
-        at: [-4.4, 1.9, -1.2],
-        scale: 0.62,
+        anchor: [-0.86, 0.78],
+        z: -2.6,
+        scale: 0.42,
       },
-      { make: () => book(T, PALETTE.coral500), at: [4.6, 1.3, -2.4], scale: 0.85 },
-      { make: () => blocks(T, [PALETTE.teal400, PALETTE.marigold, PALETTE.blush]), at: [-5.1, -1.9, -2.8], scale: 0.5 },
-      { make: () => balloon(T, PALETTE.blush), at: [5.2, -1.6, -1.8], scale: 0.72 },
+      { make: () => book(T, PALETTE.coral500), anchor: [0.72, 0.42], z: -2.4, scale: 0.85 },
+      {
+        make: () => blocks(T, [PALETTE.teal400, PALETTE.marigold, PALETTE.blush]),
+        anchor: [-0.88, -0.72],
+        z: -2.8,
+        scale: 0.44,
+      },
+      { make: () => balloon(T, PALETTE.blush), anchor: [0.82, -0.48], z: -1.8, scale: 0.72 },
       {
         make: () => new T.Mesh(leafGeometry(T, 1.1), soft(T, { color: PALETTE.teal600 })),
-        at: [-3.2, -2.6, -0.6],
-        scale: 0.7,
+        anchor: [-0.8, -0.9],
+        z: -1.6,
+        scale: 0.5,
       },
-      { make: () => brush(T, PALETTE.violet), at: [3.4, -2.5, -0.9], scale: 0.6 },
+      { make: () => brush(T, PALETTE.violet), anchor: [0.56, -0.78], z: -0.9, scale: 0.6 },
       {
         make: () => new T.Mesh(starGeometry(T, 5, 1, 0.44, 0.2), lit(T, PALETTE.coral300)),
-        at: [4.1, 2.7, -3.6],
+        anchor: [0.62, 0.84],
+        z: -3.6,
         scale: 0.34,
       },
       {
         make: () => new T.Mesh(starGeometry(T, 5, 1, 0.44, 0.2), lit(T, PALETTE.teal400)),
-        at: [-4.9, 2.9, -3.9],
+        anchor: [-0.66, 0.92],
+        z: -3.9,
         scale: 0.28,
       },
     ];
@@ -100,13 +128,14 @@ class HeroStage extends Stage {
 
     cast.slice(0, budget).forEach((spec, i) => {
       const object = spec.make();
-      object.position.set(...spec.at);
       object.scale.setScalar(spec.scale);
       object.rotation.set(rand() * 0.6 - 0.3, rand() * Math.PI * 2, rand() * 0.4 - 0.2);
       this.scene.add(object);
       this.floaters.push({
         object,
-        home: object.position.clone(),
+        anchor: { x: spec.anchor[0], y: spec.anchor[1] },
+        z: spec.z,
+        home: new T.Vector3(),
         drift: 0.16 + rand() * 0.13,
         spin: (rand() - 0.5) * 0.18,
         phase: rand() * Math.PI * 2,
@@ -151,6 +180,20 @@ class HeroStage extends Stage {
     // instead of cropping the objects at the edges.
     const aspect = w / Math.max(1, h);
     this.camera.position.z = aspect < 0.9 ? 13 : aspect < 1.4 ? 11 : 9;
+
+    // Re-seat every floater against the frustum this viewport actually has.
+    const halfFov = (this.camera.fov * Math.PI) / 360;
+    // Portrait means the copy is full-width underneath, so the sides stop being
+    // a safe place to put anything — push the cast to the top and bottom bands.
+    const portrait = aspect < 1;
+    for (const f of this.floaters) {
+      const dist = this.camera.position.z - f.z;
+      const halfH = Math.tan(halfFov) * dist;
+      const halfW = halfH * aspect;
+      const ny = portrait ? Math.sign(f.anchor.y) * Math.max(Math.abs(f.anchor.y), 0.82) : f.anchor.y;
+      f.home.set(f.anchor.x * halfW, ny * halfH, f.z);
+      f.object.position.copy(f.home);
+    }
   }
 
   /* --------------------------------------------------------------- frame */

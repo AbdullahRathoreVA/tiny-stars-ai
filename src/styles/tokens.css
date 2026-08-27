@@ -81,9 +81,13 @@
     'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
 
-  /* Fluid type scale — 1.200 minor third at small, 1.250 at large */
-  --step--2: clamp(0.72rem, 0.70rem + 0.10vw, 0.78rem);
-  --step--1: clamp(0.84rem, 0.81rem + 0.15vw, 0.92rem);
+  /* Fluid type scale — 1.200 minor third at small, 1.250 at large.
+     The two small steps are floored at 12.8px and 14px rather than following
+     the ratio down. A parent reading this one-handed on a phone at night is
+     the design target, and below ~14px supporting copy stops being read at
+     all — which costs more than the tighter rhythm was worth. */
+  --step--2: clamp(0.80rem, 0.78rem + 0.10vw, 0.84rem);
+  --step--1: clamp(0.875rem, 0.84rem + 0.16vw, 0.92rem);
   --step-0:  clamp(1.00rem, 0.96rem + 0.20vw, 1.09rem);
   --step-1:  clamp(1.19rem, 1.12rem + 0.34vw, 1.42rem);
   --step-2:  clamp(1.41rem, 1.29rem + 0.60vw, 1.85rem);

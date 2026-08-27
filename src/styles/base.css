@@ -885,3 +885,20 @@ strong, b { font-weight: 650; }
   min-height: 28px;
   padding-block: 0.25rem;
 }
+
+/* On a touch screen the same links get the full 44px. 28px clears WCAG 2.5.8
+   (24px) but not a thumb held over a sleeping child, and these are the links
+   that carry a parent from a card into the page that answers the question. */
+@media (pointer: coarse) {
+  .value__cta,
+  .jstep__cta,
+  .hcard__cta,
+  .pcard__cta,
+  .rlink__cta,
+  .doc__cta,
+  .dcard__cta,
+  .mega__feature-cta,
+  .pmore__cta {
+    min-height: 44px;
+  }
+}

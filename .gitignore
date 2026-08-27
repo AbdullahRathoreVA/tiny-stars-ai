@@ -9,3 +9,8 @@ dist/
 Thumbs.db
 .vscode/
 .idea/
+
+# Incoming client media awaiting a publishing decision. Never committed:
+# the batch contains identifiable children, so it stays out of the repo
+# until written consent is confirmed.
+.media-inbox/

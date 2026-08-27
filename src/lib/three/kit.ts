@@ -292,6 +292,32 @@ export function puzzle(T: THREE, color: number): THREE_NS.Group {
 /* ------------------------------------------------------------- starfield -- */
 
 /**
+ * Round, soft-edged sprite for point stars. One 64px texture per starfield
+ * regardless of star count.
+ *
+ * Deliberately not cached across scenes: the starfield material is per-instance
+ * (`ownsResources`), and `Stage.dispose` releases every texture hanging off a
+ * material it owns. A shared sprite would be disposed out from under any other
+ * scene still using it.
+ */
+function pointSprite(T: THREE): THREE_NS.Texture {
+  const S = 64;
+  const cnv = document.createElement('canvas');
+  cnv.width = cnv.height = S;
+  const ctx = cnv.getContext('2d')!;
+  const grad = ctx.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.45, 'rgba(255,255,255,0.85)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, S, S);
+
+  const tex = new T.CanvasTexture(cnv);
+  tex.colorSpace = T.SRGBColorSpace;
+  return tex;
+}
+
+/**
  * A points-based starfield. One geometry, one material, additive-free so it
  * stays warm rather than blown out.
  */
@@ -327,6 +353,11 @@ export function starfield(
     opacity: 0.85,
     depthWrite: false,
     toneMapped: false,
+    // A bare point sprite is an axis-aligned square. Against the dark sections
+    // that passes for a distant star, but on the cream hero it reads as specks
+    // of dust or JPEG noise. The soft round mask is what makes it a star.
+    map: pointSprite(T),
+    alphaTest: 0.02,
   });
 
   const points = new T.Points(g, material);
