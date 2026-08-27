@@ -1,0 +1,293 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProgramCard from '../../components/ProgramCard.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { programs, enrichment, priorityLabels } from '../../data/programs';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([{ name: 'Programs', href: '/programs' }]),
+];
+---
+
+<Base
+  title="Programs by age | Tiny Stars Daycare"
+  description="Five age-based programs at Tiny Stars Daycare in Grande Prairie, from 12-month-olds through to out-of-school care for ages 6–12, plus enrichment classes."
+  image="/assets/images/programs/toddler.webp"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Programs"
+    title="Five programs, twelve months to twelve years"
+    lede="Children move between groups as they grow. Here is every program Tiny Stars runs, what age it covers, and how the centre describes it in its own words."
+    crumbs={[{ name: 'Programs', href: '/programs' }]}
+  >
+    <div class="cluster">
+      <a href="/enroll/find-your-program" class="btn btn--primary">
+        <Icon name="compass" size={18} />
+        Find the right program
+      </a>
+      <a href="/enroll/book-a-tour" class="btn btn--ghost" data-track="tour_cta_click" data-track-label="programs-hero">
+        Book a tour
+      </a>
+    </div>
+  </PageHero>
+
+  <!-- ------------------------------------------------------ age ruler -->
+  <section class="section section--tight" aria-labelledby="ruler-title">
+    <div class="container">
+      <h2 id="ruler-title" class="visually-hidden">Programs by age range</h2>
+      <div class="ruler" data-reveal>
+        {programs.map((p) => (
+          <a
+            href={`/programs/${p.slug}`}
+            class="ruler__band"
+            data-accent={p.accent}
+            style={`--span:${p.ageMaxMonths - p.ageMinMonths}`}
+          >
+            <span class="ruler__name">{p.name}</span>
+            <span class="ruler__age">{p.ageLabel}</span>
+          </a>
+        ))}
+      </div>
+      <p class="ruler__note text-muted">
+        Bands are sized by the span of each age range — the out-of-school years cover
+        the most ground.
+      </p>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- cards -->
+  <section class="section section--tight" aria-labelledby="all-title">
+    <div class="container">
+      <h2 id="all-title" class="visually-hidden">All programs</h2>
+      <div class="grid grid--3">
+        {programs.map((p, i) => (
+          <div data-reveal style={`--reveal-delay:${i * 60}ms`}>
+            <ProgramCard program={p} eager={i < 3} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------- enrichment -->
+  <section class="section section--sunken" aria-labelledby="enrich-title">
+    <div class="container">
+      <div class="enrich" data-reveal>
+        <figure class="enrich__media">
+          <img
+            src={enrichment.image}
+            alt="Children taking part in a Learning Adventures enrichment class at Tiny Stars"
+            width="560"
+            height="420"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <div class="enrich__copy">
+          <p class="eyebrow eyebrow--teal">Alongside the main program</p>
+          <h2 id="enrich-title">{enrichment.name}</h2>
+          <p class="badge badge--coral">{enrichment.ageLabel}</p>
+          <p class="lede mt-s">{enrichment.official}</p>
+          <div class="source-note mt-m">
+            <Icon name="check-circle" size={15} />
+            <span>Source: {enrichment.officialSource}</span>
+          </div>
+          <div class="notice notice--info mt-m">
+            <Icon name="info" size={18} />
+            <span>
+              <strong>Which classes run, and when?</strong>
+              That isn't published on the Tiny Stars site. Ask on your tour — enrichment
+              offerings tend to change through the year.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------- comparison -->
+  <section class="section" aria-labelledby="cmp-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Side by side</p>
+        <h2 id="cmp-title">Compare the programs</h2>
+        <p class="lede">
+          What each group focuses on, based on how Tiny Stars describes it. Scroll
+          sideways on a phone.
+        </p>
+      </div>
+
+      <div class="overflow-guard mt-l" data-reveal>
+        <table class="cmp">
+          <caption class="visually-hidden">
+            Tiny Stars programs compared by age range and area of focus
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Program</th>
+              <th scope="col">Ages</th>
+              <th scope="col">Focus</th>
+              <th scope="col">In their words</th>
+            </tr>
+          </thead>
+          <tbody>
+            {programs.map((p) => (
+              <tr>
+                <th scope="row">
+                  <a href={`/programs/${p.slug}`}>{p.name}</a>
+                  <small>{p.familiar}</small>
+                </th>
+                <td class="cmp__age">{p.ageLabel}</td>
+                <td>
+                  <span class="cmp__tags">
+                    {p.priorities.map((pr) => (
+                      <span class="badge">{priorityLabels[pr].label}</span>
+                    ))}
+                  </span>
+                </td>
+                <td class="cmp__quote">{p.official}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="notice notice--warn mt-l" data-reveal>
+        <Icon name="alert" size={18} />
+        <span>
+          <strong>Deliberately not in this table:</strong>
+          fees, availability, group sizes and educator ratios. Tiny Stars hasn't published
+          them, so putting numbers here would mean making them up.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Still not sure which group fits?"
+    lede="Three questions — your child's age, what matters most to you, and when you'd want to start — and we'll point you at the right program and the right next move."
+    primary={{
+      label: 'Find your program',
+      href: '/enroll/find-your-program',
+      desc: 'Takes about 30 seconds',
+    }}
+    secondary={[
+      { label: 'Book a tour', href: '/enroll/book-a-tour', desc: 'See the rooms in person' },
+      { label: 'Ask Star Guide', href: '/families/faq', desc: 'Or just ask a question' },
+      { label: 'How enrolment works', href: '/enroll/guide', desc: 'What the paperwork asks' },
+    ]}
+  />
+</Base>
+
+<style>
+  /* ---------------------------------------------------------- ruler -- */
+  .ruler {
+    display: flex;
+    gap: 0.35rem;
+    border-radius: var(--radius-m);
+    overflow: hidden;
+  }
+  .ruler__band {
+    flex: var(--span, 1) 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 1rem 0.9rem;
+    min-height: 84px;
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    background: var(--soft);
+    color: var(--ink);
+    border: 1px solid transparent;
+    transition: transform var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+  }
+  .ruler__band:hover { transform: translateY(-3px); border-color: var(--strong); color: var(--ink); }
+
+  .ruler__band[data-accent='blush']    { --soft: var(--blush-100);    --strong: var(--blush-500);    --ink: var(--blush-700); }
+  .ruler__band[data-accent='marigold'] { --soft: var(--marigold-100); --strong: var(--marigold-500); --ink: var(--marigold-700); }
+  .ruler__band[data-accent='teal']     { --soft: var(--teal-100);     --strong: var(--teal-400);     --ink: var(--teal-700); }
+  .ruler__band[data-accent='violet']   { --soft: var(--violet-100);   --strong: var(--violet-500);   --ink: var(--violet-700); }
+  .ruler__band[data-accent='sky']      { --soft: var(--sky-100);      --strong: var(--sky-500);      --ink: var(--sky-700); }
+
+  .ruler__name {
+    font-weight: 700;
+    font-size: var(--step--1);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ruler__age { font-size: var(--step--2); opacity: 0.8; }
+  .ruler__note { margin-top: var(--space-s); font-size: var(--step--2); }
+
+  @media (max-width: 760px) {
+    .ruler { flex-wrap: wrap; }
+    .ruler__band { flex: 1 1 45%; }
+  }
+
+  /* ------------------------------------------------------ enrichment -- */
+  .enrich { display: grid; gap: var(--space-xl); align-items: center; }
+  .enrich__media {
+    margin: 0;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-l);
+    aspect-ratio: 4 / 3;
+  }
+  .enrich__media img { width: 100%; height: 100%; object-fit: cover; }
+  .enrich__copy h2 { font-size: var(--step-3); margin-block: 0.5rem 0.75rem; }
+
+  @media (min-width: 880px) {
+    .enrich { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); }
+  }
+
+  /* ------------------------------------------------------ comparison -- */
+  .cmp {
+    width: 100%;
+    min-width: 46rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--step--1);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    overflow: hidden;
+  }
+  .cmp th, .cmp td {
+    padding: 0.95rem 1.1rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  .cmp thead th {
+    background: var(--cream-200);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--ink-700);
+    white-space: nowrap;
+  }
+  .cmp tbody tr:last-child th, .cmp tbody tr:last-child td { border-bottom: 0; }
+  .cmp tbody tr:hover { background: var(--cream-100); }
+  .cmp tbody th { font-weight: 650; white-space: nowrap; }
+  .cmp tbody th a {
+    display: inline-block;
+    padding-block: 0.25rem;
+    min-height: 26px;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+  }
+  .cmp tbody th a:hover { text-decoration: underline; }
+  .cmp tbody th small { display: block; font-weight: 450; font-size: var(--step--2); color: var(--text-muted); }
+  .cmp__age { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .cmp__tags { display: flex; flex-wrap: wrap; gap: 0.3rem; max-width: 15rem; }
+  .cmp__quote { color: var(--text-muted); line-height: var(--leading-normal); min-width: 20rem; }
+</style>

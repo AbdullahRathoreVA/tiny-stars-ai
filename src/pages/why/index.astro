@@ -1,0 +1,279 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { site, trustMarkers } from '../../data/site';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+/**
+ * Every quoted passage on this page is taken verbatim from tinystars.ca.
+ * The connecting copy is editorial, and says nothing operational.
+ */
+const beliefs = [
+  {
+    icon: 'heart',
+    belief: 'Every child deserves a safe, loving, and inspiring environment to grow.',
+    source: 'tinystars.ca — Who We Are',
+    means:
+      'It is a statement about the floor, not the ceiling. Safety and affection come first; everything else is built on top of them.',
+    experience:
+      'A space set up for discovery, creativity and — in their words — endless fun, where each day is a new adventure.',
+  },
+  {
+    icon: 'people',
+    belief: 'Teachers should be people who truly love children.',
+    source: 'tinystars.ca — About Us',
+    means:
+      'Hiring for warmth, not just for qualifications. Tiny Stars positions educators as family-like figures in a child’s development rather than as supervisors.',
+    experience:
+      'Educators who guide little learners with care and passion, and who nurture early friendships rather than just managing a room.',
+  },
+  {
+    icon: 'bulb',
+    belief: 'Daycare should be more than daycare.',
+    source: 'tinystars.ca — More Than Daycare',
+    means:
+      'A thoughtfully designed curriculum that runs from the first lessons in sharing and teamwork to the milestone of writing their own name.',
+    experience:
+      'Preparation not only for kindergarten, but for a bright and confident start to all the adventures that follow.',
+  },
+  {
+    icon: 'shield',
+    belief: 'Your child should be in caring and capable hands from goodbye to hello.',
+    source: 'tinystars.ca — Health and Safety',
+    means:
+      'The whole day is accounted for — not just the parts a visitor would see. Cleanliness and safety are held to a stated standard.',
+    experience:
+      'A child who comes home not only safe and happy, but who has grown a little more with every new experience.',
+  },
+];
+---
+
+<Base
+  title="Why Tiny Stars | Our story and philosophy"
+  description="What Tiny Stars Daycare believes about early childhood, in the centre's own words — plus a clear account of what is published and what only the team can confirm."
+  image="/assets/images/sections/talent-and-trust.webp"
+  schema={[organizationSchema, breadcrumbSchema([{ name: 'Why Tiny Stars', href: '/why' }])]}
+>
+  <PageHero
+    eyebrow="Why Tiny Stars"
+    title="A family-owned centre, and what it stands for"
+    lede="Tiny Stars is licensed, insured and family owned in Grande Prairie. Here is what the centre says it believes — quoted, sourced, and separated from anything we might have been tempted to add."
+    crumbs={[{ name: 'Why Tiny Stars', href: '/why' }]}
+    image="/assets/images/sections/talent-and-trust.webp"
+    imageAlt="Educators and children together at Tiny Stars Daycare"
+  >
+    <ul class="markers">
+      {trustMarkers.map((t) => (
+        <li>
+          <Icon name={t.icon as any} size={16} />
+          {t.label}
+        </li>
+      ))}
+    </ul>
+  </PageHero>
+
+  <!-- ------------------------------------------------------- beliefs -->
+  <section class="section" aria-labelledby="beliefs-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Belief → what it means → what you'd experience</p>
+        <h2 id="beliefs-title">Four things Tiny Stars says out loud</h2>
+        <p class="lede">
+          Marketing copy is easy to write and hard to check. So each belief below is a
+          direct quote, followed by what it would actually mean day to day.
+        </p>
+      </div>
+
+      <div class="beliefs mt-xl">
+        {beliefs.map((b, i) => (
+          <article class="belief" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+            <span class="belief__icon"><Icon name={b.icon as any} size={22} /></span>
+
+            <blockquote class="belief__quote">
+              <p>“{b.belief}”</p>
+              <footer>
+                <Icon name="check-circle" size={14} />
+                {b.source}
+              </footer>
+            </blockquote>
+
+            <div class="belief__cols">
+              <div>
+                <h3>What it means</h3>
+                <p>{b.means}</p>
+              </div>
+              <div>
+                <h3>What you'd experience</h3>
+                <p>{b.experience}</p>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------- team -->
+  <section class="section section--sunken" aria-labelledby="team-title">
+    <div class="container">
+      <div class="team">
+        <figure class="team__media" data-reveal>
+          <img
+            src="/assets/images/sections/classrooms-and-learning.webp"
+            alt="A classroom at Tiny Stars Daycare"
+            width="600"
+            height="700"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <div data-reveal>
+          <p class="eyebrow eyebrow--teal">The people</p>
+          <h2 id="team-title">We're not going to invent a team page</h2>
+          <p class="lede mt-s">
+            Plenty of daycare websites show smiling stock photographs captioned with made-up
+            credentials. Tiny Stars hasn't published staff names, photographs or
+            qualifications — so this page doesn't have any.
+          </p>
+          <p class="mt-m">
+            What Tiny Stars does say is that it hires educators who “truly love children,”
+            that its staff are experienced, and that teachers become family-like figures in
+            a child's development. Everything beyond that is a question for a real
+            conversation.
+          </p>
+
+          <div class="notice notice--info mt-m">
+            <Icon name="question" size={18} />
+            <span>
+              <strong>Worth asking on your tour:</strong>
+              who would be in my child's room, how long have they been here, what
+              qualifications do they hold, and how often does the room's team change?
+            </span>
+          </div>
+
+          <div class="cluster mt-m">
+            <a href="/enroll/book-a-tour" class="btn btn--teal" data-track="tour_cta_click" data-track-label="why-team">
+              Meet them on a tour
+            </a>
+            <a href="/why/questions" class="btn btn--quiet">
+              More questions worth asking <Icon name="arrow" size={15} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- place -->
+  <section class="section" aria-labelledby="place-title">
+    <div class="container container--narrow text-center">
+      <p class="eyebrow eyebrow--plain mx-auto" data-reveal>One centre, one community</p>
+      <h2 id="place-title" data-reveal>Grande Prairie, and nowhere else</h2>
+      <p class="lede mt-s mx-auto" data-reveal>
+        Tiny Stars operates a single location at {site.address.street}. It is family
+        owned — which means the people making the decisions are the people you'll meet.
+      </p>
+      <div class="cluster mt-l" style="justify-content:center" data-reveal>
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapsQuery)}`}
+          target="_blank"
+          rel="noopener"
+          class="btn btn--ghost"
+          data-track="directions_click"
+        >
+          <Icon name="pin" size={17} />
+          {site.address.full}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="See how much of this is actually written down"
+    lede="The Trust Centre lists every published policy, what each one covers, and — just as importantly — what Tiny Stars hasn't published."
+    primary={{ label: 'Open the Trust Centre', href: '/why/trust-centre', desc: 'Policies, safety, sources' }}
+    secondary={[
+      { label: 'A day at Tiny Stars', href: '/day', desc: 'The shape of the day' },
+      { label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' },
+      { label: 'Programs by age', href: '/programs', desc: '12 months to 12 years' },
+    ]}
+  />
+</Base>
+
+<style>
+  .markers { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; }
+  .markers li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--radius-pill);
+    background: var(--teal-50);
+    border: 1px solid color-mix(in oklab, var(--teal-600) 22%, transparent);
+    color: var(--teal-700);
+    font-size: var(--step--1);
+    font-weight: 650;
+  }
+
+  .beliefs { display: grid; gap: var(--space-m); }
+  .belief {
+    display: grid;
+    gap: var(--space-m);
+    padding: var(--space-l);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .belief__icon {
+    display: grid; place-items: center;
+    width: 48px; height: 48px;
+    border-radius: var(--radius-m);
+    background: var(--coral-50);
+    color: var(--coral-600);
+  }
+  .belief__quote { margin: 0; }
+  .belief__quote p {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-snug);
+    color: var(--ink-900);
+    text-wrap: balance;
+  }
+  .belief__quote footer {
+    display: flex; align-items: center; gap: 0.4rem;
+    margin-top: 0.6rem;
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+  .belief__quote footer :global(svg) { color: var(--ok-600); }
+
+  .belief__cols { display: grid; gap: var(--space-m); }
+  .belief__cols h3 {
+    font-family: var(--font-sans);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    margin-bottom: 0.4rem;
+  }
+  .belief__cols p { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); }
+
+  @media (min-width: 780px) {
+    .belief { grid-template-columns: 48px minmax(0, 1fr); align-items: start; }
+    .belief__icon { grid-row: span 2; }
+    .belief__cols { grid-template-columns: 1fr 1fr; gap: var(--space-l); }
+  }
+
+  .team { display: grid; gap: var(--space-xl); align-items: center; }
+  .team__media {
+    margin: 0; border-radius: var(--radius-xl); overflow: hidden;
+    box-shadow: var(--shadow-l); aspect-ratio: 5 / 6;
+  }
+  .team__media img { width: 100%; height: 100%; object-fit: cover; }
+  @media (min-width: 900px) {
+    .team { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: var(--space-3xl); }
+  }
+</style>

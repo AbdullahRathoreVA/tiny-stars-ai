@@ -1,0 +1,308 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+/**
+ * The Family Hub is deliberately useful before enrolment as well as after.
+ * Guides marked `general` are our own early-childhood content; anything pointing
+ * at a Tiny Stars fact links to the published source instead of restating it.
+ */
+const stages = [
+  {
+    id: 'deciding',
+    label: 'Still deciding',
+    icon: 'compass',
+    lede: 'You are comparing centres and trying to work out which one is right.',
+    items: [
+      { title: 'Questions parents forget to ask', desc: 'Nine questions that reveal the most about any centre.', href: '/why/questions', kind: 'Guide' },
+      { title: 'Tour checklist', desc: 'What to watch for, and what to ask out loud.', href: '/enroll/tour-guide', kind: 'Checklist' },
+      { title: 'Trust Centre', desc: 'Every published Tiny Stars policy, with sources.', href: '/why/trust-centre', kind: 'Reference' },
+      { title: 'Find your program', desc: 'Three questions, one clear next step.', href: '/enroll/find-your-program', kind: 'Tool' },
+    ],
+  },
+  {
+    id: 'enrolling',
+    label: 'Enrolling',
+    icon: 'route',
+    lede: 'You have decided, and now there is paperwork.',
+    items: [
+      { title: 'Enrolment guide', desc: 'All eleven sections of the registration package, explained first.', href: '/enroll/guide', kind: 'Guide' },
+      { title: 'Parent Handbook', desc: 'Policies, procedures and expectations. Read before signing.', href: '/assets/pdf/parent-handbook.pdf', kind: 'PDF' },
+      { title: 'Waitlist', desc: 'What it is, what it is not, and what happens next.', href: '/enroll/waitlist', kind: 'Reference' },
+      { title: 'Start registration', desc: 'Guided, in six steps, with your progress kept as you go.', href: '/enroll/registration', kind: 'Tool' },
+    ],
+  },
+  {
+    id: 'starting',
+    label: 'Starting out',
+    icon: 'sun',
+    lede: 'The first day is booked and you are quietly terrified.',
+    items: [
+      { title: 'First-day preparation', desc: 'What actually helps in the week before, and on the morning itself.', href: '#first-day', kind: 'Guide' },
+      { title: 'Settling in', desc: 'What separation distress normally looks like, and when to worry.', href: '#settling', kind: 'Guide' },
+      { title: 'Classroom Routine', desc: 'The published daily schedule — activities, meals, play, rest.', href: '/assets/pdf/classroom-routine.pdf', kind: 'PDF' },
+      { title: 'A day at Tiny Stars', desc: 'The shape of the day, in the order it happens.', href: '/day', kind: 'Reference' },
+    ],
+  },
+  {
+    id: 'enrolled',
+    label: 'Already with us',
+    icon: 'star',
+    lede: 'Day-to-day life once your child is settled.',
+    items: [
+      { title: 'Documents & policies', desc: 'All four published documents in one place.', href: '/families/documents', kind: 'Reference' },
+      { title: 'Questions & answers', desc: 'Searchable, each answer labelled by source.', href: '/families/faq', kind: 'Reference' },
+      { title: 'Parent Portal preview', desc: 'What a family portal could look like. Demonstration only.', href: '/parent', kind: 'Preview' },
+      { title: 'Contact the centre', desc: 'Phone, email and directions.', href: '/contact', kind: 'Reference' },
+    ],
+  },
+];
+
+const firstDay = [
+  'Visit once more before the start date if you can — familiarity does more than any conversation.',
+  'Talk about it simply and positively, without over-promising ("you will love it" can backfire).',
+  'Shift wake-up and bedtime a few days early so the first morning is not also a sleep-deprived one.',
+  'Label everything. Then label the things you forgot to label.',
+  'Confirm exactly what to bring with the centre — the supply list is not published online.',
+  'Plan a short first day if the centre allows it, and clear your own morning.',
+];
+
+const settling = [
+  'Distress at the door is normal and usually eases within the first two weeks.',
+  'A short, predictable goodbye works better than a long one — and far better than slipping away unseen.',
+  'The same routine every morning is the single most effective thing you can control.',
+  'Ask your educator how long the crying actually lasted. It is very often a matter of minutes.',
+  'Expect a wobble around week three, once the novelty wears off. It usually passes.',
+  'If distress is not easing after a few weeks, say so early rather than waiting it out.',
+];
+---
+
+<Base
+  title="Family Hub | Guides and resources"
+  description="Practical guides for families at every stage — choosing a centre, enrolling, preparing for the first day, settling in — plus every document Tiny Stars Daycare publishes."
+  schema={[
+    organizationSchema,
+    breadcrumbSchema([{ name: 'Family Hub', href: '/families/hub' }]),
+  ]}
+>
+  <PageHero
+    eyebrow="Family Hub"
+    title="Whatever stage you're at"
+    lede="Guides that are genuinely useful whether or not you choose Tiny Stars — because a site that only helps you once you've signed up isn't much of a resource."
+    crumbs={[{ name: 'Family Hub', href: '/families/hub' }]}
+  />
+
+  <!-- --------------------------------------------------------- stages -->
+  <section class="section section--tight" aria-labelledby="stages-title">
+    <div class="container">
+      <h2 id="stages-title" class="visually-hidden">Resources by stage</h2>
+
+      <div class="stagenav" role="tablist" aria-label="Choose your stage">
+        {stages.map((s, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`st-${s.id}`}
+            aria-controls={`stp-${s.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            class="stagetab"
+          >
+            <Icon name={s.icon as any} size={18} />
+            <span>{s.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {stages.map((s, i) => (
+        <section
+          role="tabpanel"
+          id={`stp-${s.id}`}
+          aria-labelledby={`st-${s.id}`}
+          class="stagepanel"
+          tabindex="0"
+          hidden={i !== 0}
+        >
+          <p class="stagepanel__lede">{s.lede}</p>
+          <div class="grid grid--2 mt-m">
+            {s.items.map((it) => (
+              <a href={it.href} class="hcard">
+                <span class="hcard__kind">{it.kind}</span>
+                <strong>{it.title}</strong>
+                <span class="hcard__desc">{it.desc}</span>
+                <span class="hcard__cta">Open <Icon name="arrow" size={15} /></span>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------ first day -->
+  <section class="section section--sunken" id="first-day" aria-labelledby="fd-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <span class="badge badge--general">General guidance</span>
+        <h2 id="fd-title" class="mt-s">Preparing for the first day</h2>
+        <p class="lede">
+          None of this is Tiny Stars policy — it's what tends to help most families, from
+          any centre. Confirm the specifics with the team.
+        </p>
+      </div>
+      <ul class="tips mt-l" data-reveal>
+        {firstDay.map((t, i) => (
+          <li><span class="tips__n">{i + 1}</span><span>{t}</span></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------------- settling -->
+  <section class="section" id="settling" aria-labelledby="set-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <span class="badge badge--general">General guidance</span>
+        <h2 id="set-title" class="mt-s">Settling in, and the crying at the door</h2>
+        <p class="lede">
+          Almost every parent finds this the hardest part. It is also the part that gets
+          better fastest.
+        </p>
+      </div>
+      <ul class="tips mt-l" data-reveal>
+        {settling.map((t, i) => (
+          <li><span class="tips__n">{i + 1}</span><span>{t}</span></li>
+        ))}
+      </ul>
+
+      <div class="notice notice--info mt-l" data-reveal>
+        <Icon name="info" size={20} />
+        <span>
+          <strong>This is general early-childhood guidance, not advice about your child.</strong>
+          If something feels genuinely wrong — not hard, but wrong — talk to the centre
+          early, and to your doctor if you are worried about development.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Nothing here answering your question?"
+    lede="Ask the concierge, search everything, or go straight to a person. All three take about the same amount of effort."
+    primary={{ label: 'Questions & answers', href: '/families/faq', desc: 'Searchable, with sources' }}
+    secondary={[
+      { label: 'Documents & policies', href: '/families/documents', desc: 'All four published documents' },
+      { label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' },
+      { label: 'Call the director', href: site.phone.href, desc: site.phone.label },
+    ]}
+  />
+</Base>
+
+<style>
+  .stagenav {
+    display: flex;
+    gap: 0.3rem;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+  .stagenav::-webkit-scrollbar { display: none; }
+  .stagetab {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1.1rem;
+    min-height: 50px;
+    flex: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--text-muted);
+    font-size: var(--step--1);
+    font-weight: 650;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .stagetab:hover { color: var(--ink-900); }
+  .stagetab[aria-selected='true'] { color: var(--coral-700); border-bottom-color: var(--coral-500); }
+
+  .stagepanel { padding-top: var(--space-l); }
+  .stagepanel[hidden] { display: none; }
+  .stagepanel__lede { font-size: var(--step-1); color: var(--text-muted); max-width: 52ch; }
+
+  .hcard {
+    display: flex; flex-direction: column; gap: 0.4rem;
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    text-decoration: none; color: inherit;
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+  }
+  .hcard:hover { transform: translateY(-4px); box-shadow: var(--shadow-m); color: inherit; }
+  .hcard__kind {
+    align-self: flex-start;
+    font-size: 0.64rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--coral-700);
+  }
+  .hcard strong { font-size: var(--step-1); font-family: var(--font-display); font-weight: 650; }
+  .hcard__desc { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); flex: 1; }
+  .hcard__cta {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: var(--step--1); font-weight: 650; color: var(--coral-700);
+  }
+  .hcard__cta :global(svg) { transition: transform var(--dur-fast) var(--ease-out); }
+  .hcard:hover .hcard__cta :global(svg) { transform: translateX(3px); }
+
+  .tips { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .tips li {
+    display: flex; gap: 0.85rem; align-items: flex-start;
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    font-size: var(--step--1);
+    line-height: var(--leading-normal);
+  }
+  .tips__n {
+    display: grid; place-items: center;
+    width: 26px; height: 26px; flex: none;
+    border-radius: var(--radius-pill);
+    background: var(--cream-300);
+    color: var(--ink-700);
+    font-size: 0.72rem; font-weight: 700;
+  }
+</style>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.stagetab'));
+  const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')!)!);
+
+  function select(i: number, focus = true) {
+    tabs.forEach((t, n) => {
+      const on = n === i;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      panels[n].hidden = !on;
+    });
+    if (focus) tabs[i].focus();
+  }
+
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(i, false));
+    t.addEventListener('keydown', (e) => {
+      const map: Record<string, number> = {
+        ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1,
+      };
+      const next = map[e.key];
+      if (next === undefined) return;
+      e.preventDefault();
+      select((next + tabs.length) % tabs.length);
+    });
+  });
+</script>

@@ -1,0 +1,208 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { registrationSections, documents, site } from '../../data/site';
+import { byTopic } from '../../data/knowledge';
+import { breadcrumbSchema, organizationSchema, faqSchema } from '../../lib/schema';
+
+/**
+ * Every section listed here appears in the real Tiny Stars registration package.
+ * The "what to have ready" notes are practical guidance, clearly framed as such —
+ * they never claim to be Tiny Stars requirements.
+ */
+const sectionNotes: Record<string, string> = {
+  'Parent/Guardian Information': 'Both parents or guardians, if both will be involved in pick-up and decisions.',
+  'Emergency Contacts': 'At least two people who are not you, who can actually get here during the day.',
+  'Authorized Pick-up Persons': 'Anyone allowed to collect your child. Worth agreeing this with family before you fill it in.',
+  'Physician, Medications, Allergies': 'Your doctor’s details, plus anything the centre must know about — allergies especially.',
+  'Previous Childcare': 'Where your child has been before, if anywhere.',
+  'School Information': 'Only relevant for the school-age programs.',
+  'Food Services': 'How meals are handled for your child. Bring any dietary restrictions to the conversation.',
+  'Consents & Permissions': 'Photographs, outings, and similar. Read rather than skim — this is the part people regret skipping.',
+  'Fees Agreement': 'The financial terms. Fees are not published online, so this is where you see them in writing.',
+  'Aggressive Behavior Policy': 'How the centre responds to biting, hitting and similar. Reviewed and signed.',
+  'Parent Signature Pack': 'The signatures that make the rest binding.',
+};
+
+const enrollEntries = byTopic('enrollment');
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([
+    { name: 'Enrol', href: '/enroll' },
+    { name: 'Enrolment guide', href: '/enroll/guide' },
+  ]),
+  faqSchema(enrollEntries),
+].filter(Boolean) as Record<string, unknown>[];
+---
+
+<Base
+  title="Enrolment guide | Tiny Stars Daycare"
+  description="Every section of the Tiny Stars registration package explained in advance, plus what to have ready — so nothing in the enrolment paperwork catches you by surprise."
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Enrolment guide"
+    title="Eleven sections, and what each one wants"
+    lede="Registration paperwork is where most families lose an evening. Here is the whole package laid out in advance, so you can gather things once instead of three times."
+    crumbs={[
+      { name: 'Enrol', href: '/enroll' },
+      { name: 'Enrolment guide', href: '/enroll/guide' },
+    ]}
+  />
+
+  <section class="section section--tight">
+    <div class="container container--narrow">
+      <div class="notice notice--info" data-reveal>
+        <Icon name="check-circle" size={20} />
+        <span>
+          <strong>This list is taken from the real Tiny Stars registration package.</strong>
+          The section names are theirs. The notes under each one are practical suggestions
+          from us, not Tiny Stars requirements.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight" aria-labelledby="sections-title">
+    <div class="container container--narrow">
+      <h2 id="sections-title" class="visually-hidden">Registration package sections</h2>
+
+      <ol class="pkg">
+        {registrationSections.map((s, i) => (
+          <li class="pkg__item" data-reveal style={`--reveal-delay:${i * 35}ms`}>
+            <span class="pkg__n">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h3>{s}</h3>
+              {sectionNotes[s] && <p>{sectionNotes[s]}</p>}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--sunken" aria-labelledby="ready-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Save yourself a second evening</p>
+        <h2 id="ready-title">What to have within reach</h2>
+        <p class="lede">General preparation, not a Tiny Stars checklist — confirm the exact requirements with the team.</p>
+      </div>
+
+      <ul class="ready mt-l" data-reveal>
+        {[
+          'Two emergency contacts who can be here within the hour',
+          'Your doctor’s name and phone number',
+          'A written list of allergies and any medication',
+          'Names of everyone allowed to collect your child',
+          'Your preferred start date and weekly schedule',
+          'Any previous childcare arrangement details',
+        ].map((r) => (
+          <li>
+            <Icon name="check-circle" size={17} />
+            <span>{r}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="read-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Before you sign anything</p>
+        <h2 id="read-title">Read these first</h2>
+      </div>
+      <div class="grid grid--2 mt-l">
+        {documents.map((d, i) => (
+          <a href={d.file} class="card card--interactive doc" data-reveal style={`--reveal-delay:${i * 50}ms`} data-track="document_download" data-track-label={d.slug}>
+            <span class="doc__icon"><Icon name="file" size={22} /></span>
+            <span class="doc__body">
+              <strong>{d.title}</strong>
+              <span class="doc__desc">{d.description}</span>
+              <span class="doc__cta">Open PDF <Icon name="download" size={14} /></span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--sunken" aria-labelledby="eq-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Enrolment questions</p>
+        <h2 id="eq-title">What families ask at this point</h2>
+      </div>
+      <div class="qa mt-l" data-reveal>
+        {enrollEntries.map((e) => (
+          <details class="q" id={e.id}>
+            <summary>
+              <span>{e.question}</span>
+              <span class={`badge badge--${e.trust}`}>
+                {e.trust === 'verified' ? 'Published' : e.trust === 'general' ? 'General' : 'Ask the team'}
+              </span>
+              <Icon name="chevron-down" size={18} class="q__caret" />
+            </summary>
+            <div class="q__body">
+              <p>{e.answer}</p>
+              {e.source && (
+                <p class="source-note mt-s"><Icon name="check-circle" size={14} /><span>Source: {e.source}</span></p>
+              )}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Ready to start?"
+    lede="The guided registration walks the same ground in smaller pieces — and you can stop halfway without losing what you typed."
+    primary={{ label: 'Start registration', href: '/enroll/registration', desc: 'Guided, in six steps' }}
+    secondary={[
+      { label: 'Book a tour first', href: '/enroll/book-a-tour', desc: 'Most families do this before registering' },
+      { label: 'Join the waitlist', href: '/enroll/waitlist', desc: 'If your program is full' },
+      { label: 'Call the director', href: site.phone.href, desc: site.phone.label },
+    ]}
+  />
+</Base>
+
+<style>
+  .pkg { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .pkg__item {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--space-s);
+    align-items: start;
+    padding: var(--space-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .pkg__n {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 700;
+    color: var(--sand-500);
+    letter-spacing: -0.02em;
+    padding-top: 0.1rem;
+  }
+  .pkg h3 { font-size: var(--step-0); font-family: var(--font-sans); font-weight: 700; letter-spacing: 0; }
+  .pkg p { margin-top: 0.3rem; font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); }
+
+  .ready { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .ready li {
+    display: flex; gap: 0.7rem; align-items: center;
+    padding: 0.9rem 1.15rem;
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    font-size: var(--step--1);
+  }
+  .ready :global(svg) { color: var(--teal-600); flex: none; }
+
+</style>

@@ -1,0 +1,147 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Concierge from '../components/Concierge.astro';
+import SearchDialog from '../components/SearchDialog.astro';
+import MobileBar from '../components/MobileBar.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Overrides the default OG image. Must be an absolute path under /assets. */
+  image?: string;
+  /** JSON-LD objects. Only pass schema backed by verified facts. */
+  schema?: Record<string, unknown>[];
+  /** Hides the mobile action bar (used on flows that own the bottom of the screen). */
+  bareMobile?: boolean;
+  /** Adds noindex regardless of build mode — for demo-only routes. */
+  noindex?: boolean;
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description,
+  image = '/assets/images/sections/who-we-are.webp',
+  schema = [],
+  bareMobile = false,
+  noindex = false,
+  bodyClass = '',
+} = Astro.props;
+
+const INDEXABLE = import.meta.env.PUBLIC_INDEXABLE === 'true';
+const blockIndex = noindex || !INDEXABLE;
+
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
+const fullTitle = title.includes('Tiny Stars') ? title : `${title} · Tiny Stars Daycare`;
+---
+
+<!doctype html>
+<html lang="en-CA" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    {blockIndex && <meta name="robots" content="noindex, nofollow" />}
+    {!blockIndex && <meta name="robots" content="index, follow, max-image-preview:large" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="en_CA" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <meta name="theme-color" content="#fdf8f2" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/assets/images/favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@400..700&display=swap"
+    />
+
+    {schema.map((s) => (
+      <script type="application/ld+json" set:html={JSON.stringify(s)} />
+    ))}
+
+    <script is:inline>
+      // Remove the no-JS guard immediately so reveal animations can take over
+      // without a flash of already-visible content.
+      document.documentElement.classList.remove('no-js');
+    </script>
+  </head>
+
+  <body class={bodyClass}>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <Header />
+
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+
+    <Footer />
+
+    {!bareMobile && <MobileBar />}
+    <Concierge />
+    <SearchDialog />
+
+
+    <script>
+      import { track, bindDeclarativeTracking } from '../lib/analytics';
+
+      track('page_view');
+      bindDeclarativeTracking();
+
+      // --- scroll reveal ---------------------------------------------------
+      const reveals = document.querySelectorAll<HTMLElement>('[data-reveal]');
+      if (reveals.length) {
+        if (!('IntersectionObserver' in window)) {
+          reveals.forEach((el) => el.classList.add('is-revealed'));
+        } else {
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-revealed');
+                io.unobserve(entry.target);
+              });
+            },
+            { rootMargin: '0px 0px -8% 0px', threshold: 0.06 }
+          );
+          reveals.forEach((el) => io.observe(el));
+        }
+      }
+
+      // --- global search shortcut ------------------------------------------
+      document.addEventListener('keydown', (e) => {
+        const k = e.key.toLowerCase();
+        const inField =
+          document.activeElement instanceof HTMLElement &&
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+        if ((e.metaKey || e.ctrlKey) && k === 'k') {
+          e.preventDefault();
+          document.dispatchEvent(new CustomEvent('ts:search-open'));
+        } else if (k === '/' && !inField && !e.metaKey && !e.ctrlKey && !e.altKey) {
+          e.preventDefault();
+          document.dispatchEvent(new CustomEvent('ts:search-open'));
+        }
+      });
+    </script>
+  </body>
+</html>

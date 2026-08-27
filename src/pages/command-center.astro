@@ -1,0 +1,692 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { agents, liveAgents, futureAgents } from '../lib/ai/agents';
+import { knowledge, verifiedCount, unknownCount, topicLabels } from '../data/knowledge';
+
+const generalCount = knowledge.length - verifiedCount - unknownCount;
+
+const topicCounts = Object.entries(topicLabels).map(([id, label]) => ({
+  id,
+  label,
+  n: knowledge.filter((k) => k.topic === id).length,
+}));
+---
+
+<Base
+  title="Agent Command Centre | Tiny Stars"
+  description="An internal view of the Tiny Stars intelligence layer: which agents are live, how a question is routed, and what is actually being measured."
+  noindex={true}
+  bareMobile={true}
+  bodyClass="cc-page"
+>
+  <div class="cc">
+    <div class="starfield" aria-hidden="true">
+      <span style="--s:2px;left:11%;top:14%;--d:5s;--o:.4"></span>
+      <span style="--s:3px;left:34%;top:8%;--d:4.4s;--delay:1.2s;--o:.35"></span>
+      <span style="--s:2px;left:68%;top:18%;--d:5.8s;--delay:.6s;--o:.3"></span>
+      <span style="--s:3px;left:88%;top:10%;--d:4.9s;--delay:1.9s;--o:.4"></span>
+    </div>
+
+    <div class="container container--wide">
+      <!-- ------------------------------------------------------ header -->
+      <header class="cc__head">
+        <div>
+          <p class="cc__eyebrow">
+            <Icon name="network" size={15} />
+            Internal view
+          </p>
+          <h1>The intelligence behind Tiny Stars</h1>
+          <p class="cc__lede">
+            Not a dashboard for show. This is the actual architecture serving the concierge
+            on this site — which agents run, what they are allowed to say, and what is
+            genuinely being measured right now.
+          </p>
+        </div>
+        <a href="/" class="btn btn--on-dark btn--sm">
+          <Icon name="arrow" size={15} class="flip" /> Back to the site
+        </a>
+      </header>
+
+      <!-- ------------------------------------------------------- stats -->
+      <section class="ccstats" aria-label="System summary">
+        <div class="ccstat">
+          <span class="ccstat__n">{liveAgents.length}</span>
+          <span class="ccstat__l">Agents running</span>
+          <span class="ccstat__d">Routing live traffic on this site</span>
+        </div>
+        <div class="ccstat">
+          <span class="ccstat__n">{futureAgents.length}</span>
+          <span class="ccstat__l">Designed, not built</span>
+          <span class="ccstat__d">Interfaces exist; each needs a real integration</span>
+        </div>
+        <div class="ccstat ccstat--ok">
+          <span class="ccstat__n">{verifiedCount}</span>
+          <span class="ccstat__l">Sourced answers</span>
+          <span class="ccstat__d">Traceable to a Tiny Stars page or document</span>
+        </div>
+        <div class="ccstat ccstat--warn">
+          <span class="ccstat__n">{unknownCount}</span>
+          <span class="ccstat__l">Deliberate unknowns</span>
+          <span class="ccstat__d">Hand off to a person rather than guess</span>
+        </div>
+      </section>
+
+      <div class="ccgrid">
+        <!-- --------------------------------------------------- routing -->
+        <section class="ccpanel ccpanel--wide" aria-labelledby="route-title">
+          <header class="ccpanel__head">
+            <h2 id="route-title"><Icon name="route" size={18} /> How a question is routed</h2>
+            <p>Type anything. This runs the real router — no simulation.</p>
+          </header>
+
+          <form class="ccprobe" data-probe>
+            <label class="visually-hidden" for="probe">Try a question</label>
+            <input
+              type="text"
+              id="probe"
+              class="ccprobe__input"
+              placeholder="My child is 2 and I'm worried about daycare"
+              autocomplete="off"
+            />
+            <button type="submit" class="btn btn--primary btn--sm">Route it</button>
+          </form>
+
+          <div class="ccpipe" data-pipe>
+            {[
+              { id: 'input', label: 'Visitor message', icon: 'chat' },
+              { id: 'guard', label: 'Guardrails', icon: 'shield' },
+              { id: 'router', label: 'Intent router', icon: 'route' },
+              { id: 'agent', label: 'Specialist agent', icon: 'sparkles' },
+              { id: 'know', label: 'Verified knowledge', icon: 'book' },
+              { id: 'out', label: 'Answer + source', icon: 'check-circle' },
+            ].map((s, i) => (
+              <div class="ccnode" data-node={s.id}>
+                <span class="ccnode__icon"><Icon name={s.icon as any} size={16} /></span>
+                <span class="ccnode__label">{s.label}</span>
+                <span class="ccnode__value" data-node-value>—</span>
+                {i < 5 && <span class="ccnode__arrow" aria-hidden="true"><Icon name="chevron" size={14} /></span>}
+              </div>
+            ))}
+          </div>
+
+          <div class="ccout" data-probe-out hidden></div>
+        </section>
+
+        <!-- ---------------------------------------------------- agents -->
+        <section class="ccpanel" aria-labelledby="agents-title">
+          <header class="ccpanel__head">
+            <h2 id="agents-title"><Icon name="users" size={18} /> Agents</h2>
+            <p>Each one owns a slice of the knowledge base.</p>
+          </header>
+
+          <ul class="ccagents">
+            {agents.map((a) => (
+              <li class={`ccagent ccagent--${a.accent}${a.live ? '' : ' ccagent--future'}`}>
+                <span class="ccagent__icon"><Icon name={a.icon as any} size={16} /></span>
+                <div class="ccagent__body">
+                  <p class="ccagent__name">
+                    {a.name}
+                    <span class={`ccdot ${a.live ? 'ccdot--live' : 'ccdot--idle'}`} aria-hidden="true"></span>
+                    <span class="visually-hidden">{a.live ? 'Running' : 'Not built'}</span>
+                  </p>
+                  <p class="ccagent__role">{a.role}</p>
+                  <p class="ccagent__desc">{a.description}</p>
+                  {a.needs && <p class="ccagent__needs"><Icon name="info" size={12} /> Needs: {a.needs}</p>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <!-- -------------------------------------------------- knowledge -->
+        <section class="ccpanel" aria-labelledby="kb-title">
+          <header class="ccpanel__head">
+            <h2 id="kb-title"><Icon name="book" size={18} /> Knowledge base</h2>
+            <p>{knowledge.length} entries, each with a trust level.</p>
+          </header>
+
+          <div class="ccbars">
+            <div class="ccbar">
+              <span class="ccbar__label">Published by Tiny Stars <b>{verifiedCount}</b></span>
+              <span class="ccbar__track"><span class="ccbar__fill ccbar__fill--ok" style={`width:${(verifiedCount / knowledge.length) * 100}%`}></span></span>
+            </div>
+            <div class="ccbar">
+              <span class="ccbar__label">General guidance <b>{generalCount}</b></span>
+              <span class="ccbar__track"><span class="ccbar__fill ccbar__fill--info" style={`width:${(generalCount / knowledge.length) * 100}%`}></span></span>
+            </div>
+            <div class="ccbar">
+              <span class="ccbar__label">Handed to a person <b>{unknownCount}</b></span>
+              <span class="ccbar__track"><span class="ccbar__fill ccbar__fill--warn" style={`width:${(unknownCount / knowledge.length) * 100}%`}></span></span>
+            </div>
+          </div>
+
+          <ul class="cctopics">
+            {topicCounts.map((t) => (
+              <li><span>{t.label}</span><b>{t.n}</b></li>
+            ))}
+          </ul>
+        </section>
+
+        <!-- ----------------------------------------------------- events -->
+        <section class="ccpanel ccpanel--wide" aria-labelledby="ev-title">
+          <header class="ccpanel__head">
+            <h2 id="ev-title"><Icon name="activity" size={18} /> This session</h2>
+            <p>
+              Real events from your own browsing, held in memory only. Nothing was sent
+              anywhere, and nothing is invented.
+            </p>
+          </header>
+
+          <div class="ccfunnel" data-funnel>
+            {[
+              { key: 'page_view', label: 'Pages viewed' },
+              { key: 'program_view', label: 'Programs opened' },
+              { key: 'concierge_open', label: 'Concierge opened' },
+              { key: 'concierge_question', label: 'Questions asked' },
+              { key: 'tour_cta_click', label: 'Tour CTA clicks' },
+              { key: 'tour_flow_start', label: 'Tour flows started' },
+              { key: 'tour_flow_complete', label: 'Tour flows completed' },
+              { key: 'enrollment_start', label: 'Registrations started' },
+              { key: 'search_query', label: 'Searches run' },
+              { key: 'phone_click', label: 'Phone taps' },
+            ].map((m) => (
+              <div class="ccmetric" data-metric={m.key}>
+                <span class="ccmetric__n">NOT MEASURED</span>
+                <span class="ccmetric__l">{m.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <h3 class="ccsub">Event stream</h3>
+          <ol class="ccstream" data-stream>
+            <li class="ccstream__empty">Nothing recorded yet this session. Browse the site and come back.</li>
+          </ol>
+        </section>
+
+        <!-- --------------------------------------------------- provider -->
+        <section class="ccpanel" aria-labelledby="prov-title">
+          <header class="ccpanel__head">
+            <h2 id="prov-title"><Icon name="lock" size={18} /> Provider & guardrails</h2>
+            <p>What is generating the words, and what stops it.</p>
+          </header>
+
+          <dl class="ccdl" data-provider>
+            <div><dt>Active provider</dt><dd data-prov-id>—</dd></div>
+            <div><dt>Network required</dt><dd data-prov-net>—</dd></div>
+            <div><dt>Cost per turn</dt><dd data-prov-cost>—</dd></div>
+          </dl>
+
+          <h3 class="ccsub">Enforced on every turn</h3>
+          <ul class="ccrules">
+            {[
+              'Prompt-injection phrases stripped, not obeyed',
+              'Emails, phone numbers and addresses redacted before routing',
+              'Medical, legal and competitor questions refused with a handoff',
+              'Any fee, ratio or availability claim without a source is blocked',
+              'A claimed booking or submission is blocked outright',
+            ].map((r) => (
+              <li><Icon name="check" size={14} /> {r}</li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      <footer class="ccfoot">
+        <p>
+          <strong>Why this page exists.</strong>
+          A childcare site is exactly the wrong place for an assistant that improvises.
+          The architecture above is built so the honest answer — “that is not published,
+          here is who can tell you” — is the cheapest path through the system, not the
+          exception.
+        </p>
+        <a href="/about-this-demo" class="btn btn--on-dark btn--sm">About this preview</a>
+      </footer>
+    </div>
+  </div>
+</Base>
+
+<style>
+  /* The one deliberately dark surface on the site: this is an internal ops view,
+     not a family-facing page, and the contrast makes that immediately legible. */
+  .cc {
+    position: relative;
+    min-height: 100dvh;
+    padding-block: var(--space-l) var(--space-2xl);
+    background:
+      radial-gradient(70rem 34rem at 78% -10%, color-mix(in oklab, var(--violet-500) 20%, transparent), transparent 60%),
+      radial-gradient(60rem 30rem at 10% 5%, color-mix(in oklab, var(--teal-400) 14%, transparent), transparent 55%),
+      var(--ink-900);
+    color: var(--cream-300);
+    overflow: hidden;
+  }
+
+  .cc__head {
+    position: relative;
+    display: flex; flex-wrap: wrap; gap: var(--space-m);
+    align-items: flex-start; justify-content: space-between;
+    margin-bottom: var(--space-xl);
+  }
+  .cc__eyebrow {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    font-size: var(--step--2); font-weight: 700;
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    color: var(--gold-400);
+  }
+  .cc h1 { color: var(--cream-50); font-size: var(--step-4); margin-top: 0.5rem; }
+  .cc__lede { margin-top: 0.75rem; max-width: 58ch; color: var(--cream-400); font-size: var(--step-0); line-height: var(--leading-normal); }
+  .flip { transform: rotate(180deg); }
+
+  /* stats */
+  .ccstats {
+    position: relative;
+    display: grid; gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    margin-bottom: var(--space-l);
+  }
+  .ccstat {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: color-mix(in oklab, #fff 6%, transparent);
+    border: 1px solid color-mix(in oklab, #fff 12%, transparent);
+  }
+  .ccstat__n {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--step-4);
+    font-weight: 650;
+    color: var(--cream-50);
+    line-height: 1;
+  }
+  .ccstat--ok .ccstat__n { color: #7bd39a; }
+  .ccstat--warn .ccstat__n { color: var(--gold-400); }
+  .ccstat__l { display: block; font-size: var(--step--1); font-weight: 650; margin-top: 0.4rem; color: var(--cream-200); }
+  .ccstat__d { display: block; font-size: var(--step--2); color: var(--ink-400); margin-top: 0.2rem; line-height: 1.45; }
+
+  /* grid */
+  .ccgrid { position: relative; display: grid; gap: 0.75rem; grid-template-columns: 1fr; }
+  @media (min-width: 900px) {
+    .ccgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ccpanel--wide { grid-column: span 2; }
+  }
+
+  .ccpanel {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: color-mix(in oklab, #fff 4%, transparent);
+    border: 1px solid color-mix(in oklab, #fff 11%, transparent);
+  }
+  .ccpanel__head { margin-bottom: var(--space-m); }
+  .ccpanel__head h2 {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--cream-50);
+  }
+  .ccpanel__head h2 :global(svg) { color: var(--gold-400); }
+  .ccpanel__head p { font-size: var(--step--2); color: var(--ink-400); margin-top: 0.3rem; line-height: 1.5; }
+  .ccsub {
+    font-family: var(--font-sans);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--ink-400);
+    margin: var(--space-m) 0 0.6rem;
+  }
+
+  /* probe */
+  .ccprobe { display: flex; gap: 0.5rem; margin-bottom: var(--space-m); }
+  .ccprobe__input {
+    flex: 1; min-width: 0;
+    padding: 0.6rem 0.9rem;
+    min-height: 44px;
+    border-radius: var(--radius-s);
+    border: 1px solid color-mix(in oklab, #fff 18%, transparent);
+    background: color-mix(in oklab, #000 22%, transparent);
+    color: var(--cream-100);
+    font-size: var(--step--1);
+  }
+  .ccprobe__input::placeholder { color: var(--ink-400); }
+  .ccprobe__input:focus { outline: none; border-color: var(--gold-400); }
+
+  /* pipeline */
+  .ccpipe { display: grid; gap: 0.4rem; }
+  @media (min-width: 720px) { .ccpipe { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.3rem; } }
+
+  .ccnode {
+    position: relative;
+    display: flex; flex-direction: column; gap: 0.25rem;
+    padding: 0.7rem 0.8rem;
+    border-radius: var(--radius-s);
+    background: color-mix(in oklab, #000 20%, transparent);
+    border: 1px solid color-mix(in oklab, #fff 10%, transparent);
+    transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out);
+  }
+  .ccnode[data-active='true'] {
+    border-color: var(--gold-400);
+    background: color-mix(in oklab, var(--gold-400) 12%, transparent);
+  }
+  .ccnode[data-blocked='true'] {
+    border-color: var(--coral-500);
+    background: color-mix(in oklab, var(--coral-500) 15%, transparent);
+  }
+  .ccnode__icon { color: var(--ink-400); }
+  .ccnode[data-active='true'] .ccnode__icon { color: var(--gold-400); }
+  .ccnode__label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-400); font-weight: 700; }
+  .ccnode__value { font-size: var(--step--2); color: var(--cream-200); font-weight: 600; line-height: 1.35; word-break: break-word; }
+  .ccnode__arrow { display: none; }
+  @media (min-width: 720px) {
+    .ccnode__arrow {
+      display: grid; place-items: center;
+      position: absolute; right: -0.55rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-400);
+      z-index: 1;
+    }
+  }
+
+  .ccout {
+    margin-top: var(--space-m);
+    padding: var(--space-m);
+    border-radius: var(--radius-m);
+    background: color-mix(in oklab, #000 24%, transparent);
+    border: 1px solid color-mix(in oklab, #fff 10%, transparent);
+    font-size: var(--step--1);
+    line-height: var(--leading-normal);
+    color: var(--cream-200);
+  }
+  .ccout p + p { margin-top: 0.6em; }
+
+  /* agents */
+  .ccagents { list-style: none; padding: 0; display: grid; gap: 0.4rem; max-height: 34rem; overflow-y: auto; }
+  .ccagent {
+    display: flex; gap: 0.7rem; align-items: flex-start;
+    padding: 0.75rem 0.85rem;
+    border-radius: var(--radius-s);
+    background: color-mix(in oklab, #000 18%, transparent);
+    border: 1px solid color-mix(in oklab, #fff 8%, transparent);
+  }
+  .ccagent--future { opacity: 0.62; }
+  .ccagent__icon {
+    display: grid; place-items: center;
+    width: 30px; height: 30px; flex: none;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, #fff 8%, transparent);
+    color: var(--gold-400);
+  }
+  .ccagent--teal .ccagent__icon { color: #6fd0bd; }
+  .ccagent--violet .ccagent__icon { color: #b39ae8; }
+  .ccagent--sky .ccagent__icon { color: #7cb8e0; }
+  .ccagent--blush .ccagent__icon { color: #ef9ab5; }
+  .ccagent--coral .ccagent__icon { color: var(--coral-300); }
+  .ccagent__name {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: var(--step--1); font-weight: 700; color: var(--cream-50);
+  }
+  .ccdot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .ccdot--live { background: #7bd39a; box-shadow: 0 0 0 3px color-mix(in oklab, #7bd39a 22%, transparent); }
+  .ccdot--idle { background: var(--ink-400); }
+  .ccagent__role { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-400); font-weight: 700; }
+  .ccagent__desc { font-size: var(--step--2); color: var(--cream-400); line-height: 1.5; margin-top: 0.25rem; }
+  .ccagent__needs {
+    display: flex; gap: 0.35rem; align-items: flex-start;
+    font-size: 0.68rem; color: var(--gold-400); margin-top: 0.35rem; line-height: 1.45;
+  }
+  .ccagent__needs :global(svg) { flex: none; margin-top: 0.15rem; }
+
+  /* knowledge bars */
+  .ccbars { display: grid; gap: 0.7rem; }
+  .ccbar__label { display: flex; justify-content: space-between; font-size: var(--step--2); color: var(--cream-400); margin-bottom: 0.3rem; }
+  .ccbar__label b { color: var(--cream-50); }
+  .ccbar__track { display: block; height: 7px; border-radius: var(--radius-pill); background: color-mix(in oklab, #fff 9%, transparent); overflow: hidden; }
+  .ccbar__fill { display: block; height: 100%; border-radius: inherit; }
+  .ccbar__fill--ok { background: #7bd39a; }
+  .ccbar__fill--info { background: #7cb8e0; }
+  .ccbar__fill--warn { background: var(--gold-400); }
+
+  .cctopics { list-style: none; padding: 0; display: grid; gap: 0.2rem; margin-top: var(--space-m); }
+  .cctopics li {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, #000 16%, transparent);
+    font-size: var(--step--2);
+    color: var(--cream-400);
+  }
+  .cctopics b { color: var(--cream-50); font-variant-numeric: tabular-nums; }
+
+  /* funnel */
+  .ccfunnel { display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); }
+  .ccmetric {
+    padding: 0.8rem 0.9rem;
+    border-radius: var(--radius-s);
+    background: color-mix(in oklab, #000 18%, transparent);
+    border: 1px solid color-mix(in oklab, #fff 8%, transparent);
+  }
+  .ccmetric__n {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--ink-400);
+  }
+  .ccmetric[data-has='true'] .ccmetric__n {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    letter-spacing: 0;
+    color: var(--cream-50);
+  }
+  .ccmetric__l { display: block; font-size: var(--step--2); color: var(--cream-400); margin-top: 0.2rem; }
+
+  /* stream */
+  .ccstream {
+    list-style: none; padding: 0;
+    display: grid; gap: 0.25rem;
+    max-height: 16rem; overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+  .ccstream li {
+    display: flex; gap: 0.75rem; align-items: baseline;
+    padding: 0.4rem 0.65rem;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, #000 20%, transparent);
+    color: var(--cream-400);
+  }
+  .ccstream__empty { font-family: var(--font-sans); color: var(--ink-400) !important; font-size: var(--step--2); }
+  .ccstream time { color: var(--ink-400); flex: none; }
+  .ccstream b { color: var(--gold-400); font-weight: 600; }
+  .ccstream span { color: var(--ink-400); margin-left: auto; }
+
+  /* provider */
+  .ccdl { display: grid; gap: 0.4rem; }
+  .ccdl > div {
+    display: flex; justify-content: space-between; gap: var(--space-s);
+    padding: 0.55rem 0.7rem;
+    border-radius: var(--radius-xs);
+    background: color-mix(in oklab, #000 18%, transparent);
+  }
+  .ccdl dt { font-size: var(--step--2); color: var(--ink-400); }
+  .ccdl dd { margin: 0; font-size: var(--step--2); font-weight: 700; color: var(--cream-50); }
+
+  .ccrules { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+  .ccrules li {
+    display: flex; gap: 0.5rem; align-items: flex-start;
+    font-size: var(--step--2); color: var(--cream-400); line-height: 1.5;
+  }
+  .ccrules :global(svg) { color: #7bd39a; flex: none; margin-top: 0.2rem; }
+
+  /* foot */
+  .ccfoot {
+    position: relative;
+    display: flex; flex-wrap: wrap; gap: var(--space-m);
+    align-items: center; justify-content: space-between;
+    margin-top: var(--space-l);
+    padding-top: var(--space-m);
+    border-top: 1px solid color-mix(in oklab, #fff 10%, transparent);
+  }
+  .ccfoot p { font-size: var(--step--2); color: var(--ink-400); max-width: 62ch; line-height: 1.6; }
+  .ccfoot strong { color: var(--cream-200); }
+</style>
+
+<!--
+  Runtime-injected markup does not receive Astro's scoping attribute, so any rule
+  that styles HTML created by the script below must be global. Keeping those rules
+  in their own block makes that requirement explicit rather than accidental.
+-->
+<style is:global>
+  .ccout__meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+</style>
+
+<script>
+  import { getProvider } from '../lib/ai/provider';
+  import { agentById } from '../lib/ai/agents';
+  import { checkInput, escapeHtml } from '../lib/ai/guardrails';
+  import { getEvents, onEvent, countOf, type EventName } from '../lib/analytics';
+
+  /* ------------------------------------------------------------ provider */
+  const provider = getProvider();
+  const set = (sel: string, value: string) => {
+    const el = document.querySelector(sel);
+    if (el) el.textContent = value;
+  };
+  set('[data-prov-id]', provider.label);
+  set('[data-prov-net]', provider.requiresNetwork ? 'Yes' : 'No — runs offline');
+  set('[data-prov-cost]', provider.costPerTurn === 'free' ? 'Free' : 'Metered');
+
+  /* --------------------------------------------------------------- probe */
+  const form = document.querySelector<HTMLFormElement>('[data-probe]')!;
+  const input = form.querySelector<HTMLInputElement>('#probe')!;
+  const out = document.querySelector<HTMLElement>('[data-probe-out]')!;
+  const nodes = new Map<string, HTMLElement>();
+  document.querySelectorAll<HTMLElement>('[data-node]').forEach((n) => nodes.set(n.dataset.node!, n));
+
+  function paintNode(id: string, value: string, state: 'active' | 'blocked' | 'idle' = 'active') {
+    const node = nodes.get(id);
+    if (!node) return;
+    const valueEl = node.querySelector<HTMLElement>('[data-node-value]');
+    if (valueEl) valueEl.textContent = value;
+    node.dataset.active = String(state === 'active');
+    node.dataset.blocked = String(state === 'blocked');
+  }
+
+  function resetNodes() {
+    nodes.forEach((n) => {
+      n.dataset.active = 'false';
+      n.dataset.blocked = 'false';
+      const v = n.querySelector<HTMLElement>('[data-node-value]');
+      if (v) v.textContent = '—';
+    });
+  }
+
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
+
+    resetNodes();
+    out.hidden = true;
+
+    // Walk the pipeline visibly, one stage at a time.
+    paintNode('input', message.length > 42 ? message.slice(0, 42) + '…' : message);
+    await wait(220);
+
+    const guard = checkInput(message);
+    paintNode(
+      'guard',
+      guard.flags.length ? guard.flags.join(', ') : 'clean',
+      guard.safe ? 'active' : 'blocked'
+    );
+    await wait(220);
+
+    const res = await provider.respond({
+      message,
+      history: [],
+      context: { path: location.pathname },
+    });
+
+    const agent = agentById(res.agent);
+    paintNode('router', `${agent.role} · ${Math.round(res.confidence * 100)}%`);
+    await wait(200);
+    paintNode('agent', agent.name);
+    await wait(200);
+    paintNode(
+      'know',
+      res.sources.length ? res.sources.map((s) => s.label).join(' · ') : 'no source found',
+      res.sources.length ? 'active' : 'blocked'
+    );
+    await wait(200);
+    paintNode('out', res.handoff ? 'handed to a person' : 'answered', res.handoff ? 'blocked' : 'active');
+
+    const TRUST: Record<string, string> = {
+      verified: 'From Tiny Stars',
+      general: 'General guidance',
+      unknown: 'Not published',
+    };
+
+    out.innerHTML = `
+      <div class="ccout__meta">
+        <span class="badge badge--${res.trust}">${TRUST[res.trust]}</span>
+        <span class="badge">${escapeHtml(agent.name)}</span>
+        <span class="badge">confidence ${Math.round(res.confidence * 100)}%</span>
+        ${res.handoff ? '<span class="badge badge--unknown">Human handoff</span>' : ''}
+        ${res.flags.map((f) => `<span class="badge badge--demo">${escapeHtml(f)}</span>`).join('')}
+      </div>
+      ${escapeHtml(res.text)
+        .split(/\n{2,}/)
+        .map((p) => `<p>${p.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>`)
+        .join('')}`;
+    out.hidden = false;
+  });
+
+  /* -------------------------------------------------------------- events */
+  const METRICS: EventName[] = [
+    'page_view', 'program_view', 'concierge_open', 'concierge_question',
+    'tour_cta_click', 'tour_flow_start', 'tour_flow_complete',
+    'enrollment_start', 'search_query', 'phone_click',
+  ];
+
+  function refreshMetrics() {
+    METRICS.forEach((key) => {
+      const el = document.querySelector<HTMLElement>(`[data-metric="${key}"]`);
+      if (!el) return;
+      const n = countOf(key);
+      const value = el.querySelector<HTMLElement>('.ccmetric__n');
+      if (!value) return;
+      // NOT MEASURED, never a fabricated zero.
+      if (n === null) {
+        value.textContent = 'NOT MEASURED';
+        el.dataset.has = 'false';
+      } else {
+        value.textContent = String(n);
+        el.dataset.has = 'true';
+      }
+    });
+  }
+
+  const stream = document.querySelector<HTMLElement>('[data-stream]')!;
+
+  function renderStream() {
+    const events = getEvents().slice(-40).reverse();
+    if (!events.length) return;
+    stream.innerHTML = events
+      .map((e) => {
+        const t = new Date(e.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return `<li><time>${t}</time><b>${e.name}</b><span>${e.path}</span></li>`;
+      })
+      .join('');
+  }
+
+  refreshMetrics();
+  renderStream();
+  onEvent(() => {
+    refreshMetrics();
+    renderStream();
+  });
+</script>

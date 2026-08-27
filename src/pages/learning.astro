@@ -1,0 +1,265 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import NextStep from '../components/NextStep.astro';
+import Icon from '../components/Icon.astro';
+import { breadcrumbSchema, organizationSchema } from '../lib/schema';
+
+/**
+ * Careful framing throughout: Tiny Stars' own statements are quoted and sourced;
+ * everything else is general early-childhood education content, labelled as such.
+ * No developmental outcome is promised, and no clinical claim appears anywhere.
+ */
+const strands = [
+  {
+    icon: 'chat',
+    title: 'Language',
+    what: 'From single words to sentences, and from pointing to asking.',
+    looks:
+      'Narration during ordinary moments does most of the work — an adult describing what is happening while it happens.',
+  },
+  {
+    icon: 'people',
+    title: 'Social skills',
+    what: 'Taking turns, reading a face, joining a game already in progress.',
+    looks:
+      'Conflict is part of the curriculum, not a failure of it. Learning to recover from one is the skill.',
+  },
+  {
+    icon: 'puzzle',
+    title: 'Problem solving',
+    what: 'Trying, failing, adjusting, trying again — without an adult jumping in first.',
+    looks:
+      'The pause before an adult helps is where most of the learning happens.',
+  },
+  {
+    icon: 'palette',
+    title: 'Creativity',
+    what: 'Making things that were not there before, and deciding they are finished.',
+    looks:
+      'Process over product. A page of brown paint can represent more learning than a tidy craft.',
+  },
+  {
+    icon: 'activity',
+    title: 'Motor skills',
+    what: 'Big movements first, small ones later — climbing before scissors, scissors before letters.',
+    looks:
+      'Handwriting readiness is built at the climbing frame long before it reaches a pencil.',
+  },
+  {
+    icon: 'star',
+    title: 'Independence',
+    what: 'Coats, shoes, cups, tidying up, asking for help by name.',
+    looks:
+      'Low shelves, reachable hooks and unhurried transitions do more than any lesson.',
+  },
+];
+
+const quotes = [
+  {
+    text: 'A well-rounded approach to early learning, with age-appropriate activities that support cognitive, social, and emotional growth.',
+    source: 'tinystars.ca — Learning & Development',
+  },
+  {
+    text: 'From those first lessons in sharing and teamwork to the exciting milestone of writing their own name, our early learners are guided every step of the way.',
+    source: 'tinystars.ca — More Than Daycare',
+  },
+  {
+    text: 'With a thoughtfully designed curriculum, we prepare children not only for kindergarten, but for a bright and confident start to all the adventures that follow.',
+    source: 'tinystars.ca — More Than Daycare',
+  },
+];
+---
+
+<Base
+  title="The learning journey | Tiny Stars Daycare"
+  description="What children are actually building at Tiny Stars Daycare: language, social skills, problem solving, creativity and independence, with sourced curriculum statements."
+  image="/assets/images/sections/learning-and-development.webp"
+  schema={[organizationSchema, breadcrumbSchema([{ name: 'Learning journey', href: '/learning' }])]}
+>
+  <PageHero
+    eyebrow="Learning & development"
+    title="What they're actually building"
+    lede="Early learning rarely looks like learning. Here is what is going on underneath the noise — and what Tiny Stars says about its own approach."
+    crumbs={[{ name: 'Learning journey', href: '/learning' }]}
+    image="/assets/images/sections/learning-and-development.webp"
+    imageAlt="A learning space at Tiny Stars Daycare"
+  />
+
+  <!-- ------------------------------------------------ what tiny stars says -->
+  <section class="section section--tight" aria-labelledby="says-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">In their own words</p>
+        <h2 id="says-title">What Tiny Stars says about learning</h2>
+        <p class="lede">Three statements from the centre's own pages, quoted rather than paraphrased.</p>
+      </div>
+
+      <div class="grid grid--3 mt-l">
+        {quotes.map((q, i) => (
+          <blockquote class="lquote" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+            <Icon name="star" size={20} class="lquote__mark" />
+            <p>{q.text}</p>
+            <footer><Icon name="check-circle" size={14} /> {q.source}</footer>
+          </blockquote>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ strands -->
+  <section class="section section--sunken" aria-labelledby="strands-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow eyebrow--teal">General early-childhood education</p>
+        <h2 id="strands-title">Six strands running through the day</h2>
+        <p class="lede">
+          This is general guidance about how young children learn, not a description of
+          Tiny Stars' specific curriculum. It is here so you know what to look for when
+          you visit any centre.
+        </p>
+      </div>
+
+      <div class="grid grid--3 mt-l">
+        {strands.map((s, i) => (
+          <article class="strand" data-reveal style={`--reveal-delay:${i * 55}ms`}>
+            <span class="strand__icon"><Icon name={s.icon as any} size={20} /></span>
+            <h3>{s.title}</h3>
+            <p class="strand__what">{s.what}</p>
+            <p class="strand__looks"><strong>Worth watching for:</strong> {s.looks}</p>
+          </article>
+        ))}
+      </div>
+
+      <div class="notice notice--warn mt-l" data-reveal>
+        <Icon name="alert" size={18} />
+        <span>
+          <strong>No outcomes are promised here.</strong>
+          Children develop at wildly different rates, and any centre — or website —
+          guaranteeing a developmental result is overselling. If you have a specific
+          concern about your child's development, your doctor or a qualified professional
+          is the right place to take it.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------- readiness -->
+  <section class="section" aria-labelledby="ready-title">
+    <div class="container">
+      <div class="ready">
+        <figure class="ready__media" data-reveal>
+          <img
+            src="/assets/images/sections/social-and-academic-skills.webp"
+            alt="Children's learning materials arranged at Tiny Stars Daycare"
+            width="640"
+            height="700"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <div data-reveal>
+          <p class="eyebrow">School readiness</p>
+          <h2 id="ready-title">The things that actually matter on day one of kindergarten</h2>
+          <p class="lede mt-s">
+            Not letters and numbers. Teachers will tell you the list is much more ordinary
+            than parents expect.
+          </p>
+
+          <ul class="rlist mt-m">
+            {[
+              'Separating from a parent without falling apart',
+              'Following a two-step instruction',
+              'Asking an adult for help, out loud',
+              'Managing a coat, shoes and a lunch box',
+              'Sitting with a group for a few minutes',
+              'Recovering from a disappointment',
+            ].map((r) => (
+              <li><Icon name="check-circle" size={17} /> <span>{r}</span></li>
+            ))}
+          </ul>
+
+          <p class="text-muted mt-m" style="font-size:var(--step--2)">
+            General guidance. Tiny Stars states that its curriculum prepares children for
+            kindergarten and beyond — ask on your tour how that works in practice.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Ask what learning looks like in your child's room"
+    lede="Every age group does this differently. The room your child would actually be in is the one worth asking about."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: 'Ask the educators directly' }}
+    secondary={[
+      { label: 'Programs by age', href: '/programs', desc: 'Twelve months to twelve years' },
+      { label: 'A day at Tiny Stars', href: '/day', desc: 'Where learning sits in the day' },
+      { label: 'Classroom Routine (PDF)', href: '/assets/pdf/classroom-routine.pdf', desc: 'The published schedule' },
+    ]}
+  />
+</Base>
+
+<style>
+  .lquote {
+    position: relative;
+    margin: 0;
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  :global(.lquote__mark) { color: var(--gold-400); fill: currentColor; stroke-width: 1.2; margin-bottom: 0.6rem; }
+  .lquote p {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    line-height: var(--leading-snug);
+    color: var(--ink-800);
+  }
+  .lquote footer {
+    display: flex; align-items: center; gap: 0.4rem;
+    margin-top: var(--space-s);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+  .lquote footer :global(svg) { color: var(--ok-600); flex: none; }
+
+  .strand {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .strand__icon {
+    display: grid; place-items: center;
+    width: 44px; height: 44px;
+    border-radius: var(--radius-m);
+    background: var(--teal-50);
+    color: var(--teal-700);
+    margin-bottom: 0.25rem;
+  }
+  .strand h3 { font-size: var(--step-1); }
+  .strand__what { font-size: var(--step--1); color: var(--ink-700); line-height: var(--leading-normal); }
+  .strand__looks { font-size: var(--step--2); color: var(--text-muted); line-height: var(--leading-normal); }
+  .strand__looks strong { color: var(--ink-700); }
+
+  .ready { display: grid; gap: var(--space-xl); align-items: center; }
+  .ready__media { margin: 0; border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-l); aspect-ratio: 4 / 4.4; }
+  .ready__media img { width: 100%; height: 100%; object-fit: cover; }
+  @media (min-width: 900px) {
+    .ready { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: var(--space-3xl); }
+  }
+
+  .rlist { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .rlist li {
+    display: flex; gap: 0.7rem; align-items: center;
+    padding: 0.85rem 1.1rem;
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    font-size: var(--step--1);
+  }
+  .rlist :global(svg) { color: var(--teal-600); flex: none; }
+</style>

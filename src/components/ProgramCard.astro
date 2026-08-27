@@ -1,0 +1,127 @@
+---
+import Icon from './Icon.astro';
+import type { Program } from '../data/programs';
+
+interface Props {
+  program: Program;
+  eager?: boolean;
+}
+
+const { program: p, eager = false } = Astro.props;
+---
+
+<a href={`/programs/${p.slug}`} class="pcard" data-accent={p.accent} data-track="program_view" data-track-label={p.slug}>
+  <span class="pcard__media">
+    <img
+      src={p.image}
+      alt={`Children in the ${p.name} program at Tiny Stars`}
+      width="480"
+      height="320"
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+    />
+    <span class="pcard__age">{p.ageLabel}</span>
+  </span>
+
+  <span class="pcard__body">
+    <span class="pcard__head">
+      <strong class="pcard__name">{p.name}</strong>
+      <span class="pcard__familiar">{p.familiar}</span>
+    </span>
+    <span class="pcard__blurb">{p.blurb}</span>
+    <span class="pcard__cta">
+      Explore this program
+      <Icon name="arrow" size={15} />
+    </span>
+  </span>
+</a>
+
+<style>
+  .pcard {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow-xs);
+    transition:
+      transform var(--dur) var(--ease-out),
+      box-shadow var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out);
+  }
+  .pcard:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-l);
+    border-color: var(--accent, var(--border-strong));
+    color: inherit;
+  }
+
+  .pcard[data-accent='blush']    { --accent: var(--blush-500);    --accent-soft: var(--blush-100);    --accent-ink: var(--blush-700); }
+  .pcard[data-accent='marigold'] { --accent: var(--marigold-500); --accent-soft: var(--marigold-100); --accent-ink: var(--marigold-700); }
+  .pcard[data-accent='teal']     { --accent: var(--teal-400);     --accent-soft: var(--teal-100);     --accent-ink: var(--teal-700); }
+  .pcard[data-accent='violet']   { --accent: var(--violet-500);   --accent-soft: var(--violet-100);   --accent-ink: var(--violet-700); }
+  .pcard[data-accent='sky']      { --accent: var(--sky-500);      --accent-soft: var(--sky-100);      --accent-ink: var(--sky-700); }
+
+  .pcard__media { position: relative; display: block; aspect-ratio: 3 / 2; overflow: hidden; background: var(--cream-200); }
+  .pcard__media img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-slower) var(--ease-out);
+  }
+  .pcard:hover .pcard__media img { transform: scale(1.045); }
+
+  .pcard__age {
+    position: absolute;
+    left: 0.75rem; bottom: 0.75rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--cream-50) 92%, transparent);
+    backdrop-filter: blur(6px);
+    font-size: var(--step--2);
+    font-weight: 700;
+    color: var(--accent-ink, var(--ink-800));
+    box-shadow: var(--shadow-xs);
+  }
+
+  .pcard__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: var(--space-m);
+    flex: 1;
+  }
+  .pcard__head { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+  .pcard__name {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: 650;
+    letter-spacing: var(--tracking-snug);
+  }
+  .pcard__familiar {
+    font-size: var(--step--2);
+    font-weight: 650;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent-ink, var(--text-muted));
+  }
+  .pcard__blurb {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    line-height: var(--leading-normal);
+    flex: 1;
+  }
+  .pcard__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--step--1);
+    font-weight: 650;
+    color: var(--accent-ink, var(--coral-700));
+    margin-top: 0.25rem;
+  }
+  .pcard__cta :global(svg) { transition: transform var(--dur-fast) var(--ease-out); }
+  .pcard:hover .pcard__cta :global(svg) { transform: translateX(3px); }
+</style>

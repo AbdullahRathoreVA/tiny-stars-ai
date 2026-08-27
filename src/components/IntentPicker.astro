@@ -1,0 +1,149 @@
+---
+import Icon from './Icon.astro';
+
+/**
+ * The concierge moment on the homepage.
+ *
+ * Deliberately not a chat popup: it is a single question with real answers, and
+ * choosing one actually changes the page beneath it. Session-only, no tracking of
+ * who chose what beyond an anonymous count.
+ */
+
+const intents = [
+  { id: 'childcare', label: 'I need childcare', icon: 'heart', href: '/enroll/find-your-program' },
+  { id: 'comparing', label: 'I’m comparing centres', icon: 'compass', href: '/why/questions' },
+  { id: 'programs', label: 'Show me the programs', icon: 'puzzle', href: '/programs' },
+  { id: 'tour', label: 'I want to book a tour', icon: 'calendar', href: '/enroll/book-a-tour' },
+  { id: 'question', label: 'I have a question', icon: 'question', href: '#ask' },
+  { id: 'family', label: 'We’re already a Tiny Stars family', icon: 'star', href: '/families/hub' },
+  { id: 'career', label: 'I’m looking for a job', icon: 'users', href: '/careers' },
+];
+---
+
+<section class="ip" id="intent" aria-labelledby="ip-title">
+  <div class="container">
+    <div class="ip__inner">
+      <div class="ip__ask">
+        <p class="eyebrow eyebrow--plain">Start here</p>
+        <h2 id="ip-title">What brings you to Tiny Stars?</h2>
+        <p class="ip__sub">
+          Tell us in one tap and we’ll take you straight to what you need — no forms, nothing stored.
+        </p>
+      </div>
+
+      <ul class="ip__list">
+        {intents.map((i) => (
+          <li>
+            <a href={i.href} class="ip__opt" data-intent={i.id} data-intent-label={i.label}>
+              <span class="ip__opt-icon"><Icon name={i.icon as any} size={19} /></span>
+              <span class="ip__opt-label">{i.label}</span>
+              <Icon name="arrow" size={16} class="ip__opt-arrow" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ip {
+    position: relative;
+    padding-block: var(--space-xl);
+    background: var(--bg-raised);
+    border-block: 1px solid var(--border);
+  }
+
+  .ip__inner {
+    display: grid;
+    gap: var(--space-l);
+  }
+
+  .ip__ask h2 {
+    font-size: var(--step-3);
+    margin-top: 0.35rem;
+  }
+  .ip__sub {
+    margin-top: 0.6rem;
+    color: var(--text-muted);
+    font-size: var(--step--1);
+    max-width: 34ch;
+  }
+
+  .ip__list {
+    display: grid;
+    gap: 0.6rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    list-style: none;
+    padding: 0;
+  }
+
+  .ip__opt {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1rem;
+    min-height: 56px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-m);
+    background: var(--cream-100);
+    color: var(--ink-800);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--step--1);
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      background-color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+  .ip__opt:hover {
+    border-color: var(--coral-500);
+    background: var(--coral-50);
+    color: var(--ink-900);
+    transform: translateY(-2px);
+  }
+  .ip__opt-icon {
+    display: grid; place-items: center;
+    width: 36px; height: 36px;
+    flex: none;
+    border-radius: var(--radius-s);
+    background: var(--cream-200);
+    color: var(--coral-700);
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .ip__opt:hover .ip__opt-icon { background: var(--coral-100); }
+  .ip__opt-label { flex: 1; line-height: 1.3; }
+  :global(.ip__opt-arrow) { flex: none; opacity: 0; transform: translateX(-4px); transition: all var(--dur-fast) var(--ease-out); }
+  .ip__opt:hover :global(.ip__opt-arrow) { opacity: 0.7; transform: none; }
+  /* Touch devices never hover, so the affordance must be permanent there. */
+  @media (hover: none) { :global(.ip__opt-arrow) { opacity: 0.55; transform: none; } }
+
+  @media (min-width: 900px) {
+    .ip__inner { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); gap: var(--space-2xl); align-items: start; }
+  }
+</style>
+
+<script>
+  import { track } from '../lib/analytics';
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-intent]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      const id = el.dataset.intent!;
+      track('intent_selected', { intent: id });
+
+      // Session-only. Cleared when the tab closes; never leaves the browser.
+      try {
+        sessionStorage.setItem('ts:intent', id);
+      } catch {
+        /* private mode — personalisation is a nicety, not a requirement */
+      }
+
+      if (el.getAttribute('href') === '#ask') {
+        e.preventDefault();
+        document.dispatchEvent(
+          new CustomEvent('ts:concierge-open', { detail: { ask: '' } })
+        );
+      }
+    });
+  });
+</script>

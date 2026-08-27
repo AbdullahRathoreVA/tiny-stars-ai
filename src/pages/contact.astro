@@ -1,0 +1,415 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site, policyFacts } from '../data/site';
+import { breadcrumbSchema, organizationSchema } from '../lib/schema';
+
+const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapsQuery)}`;
+const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(site.mapsQuery)}`;
+const closing = policyFacts.find((p) => p.id === 'closing-time')!;
+---
+
+<Base
+  title="Contact Tiny Stars Daycare | Grande Prairie, Alberta"
+  description="Call (780) 230-1599, email info@tinystars.ca, or visit Tiny Stars Daycare at 10629 West Side Drive, Grande Prairie, Alberta T8V 8E6."
+  schema={[organizationSchema, breadcrumbSchema([{ name: 'Contact', href: '/contact' }])]}
+>
+  <PageHero
+    eyebrow="Contact"
+    title="Talk to an actual person"
+    lede="One centre, one phone number, and a director who answers it. Most questions this website cannot answer take about two minutes on the phone."
+    crumbs={[{ name: 'Contact', href: '/contact' }]}
+  />
+
+  <!-- ------------------------------------------------------- channels -->
+  <section class="section section--tight" aria-labelledby="ways-title">
+    <div class="container">
+      <h2 id="ways-title" class="visually-hidden">Ways to get in touch</h2>
+
+      <div class="ways">
+        <a href={site.phone.href} class="way way--primary" data-track="phone_click">
+          <span class="way__icon"><Icon name="phone" size={24} /></span>
+          <span class="way__body">
+            <small>Fastest — the director</small>
+            <strong>{site.phone.label}</strong>
+            <span>Fees, availability and ratios all live here, not on the website.</span>
+          </span>
+          <Icon name="arrow" size={20} class="way__go" />
+        </a>
+
+        <a href={`mailto:${site.email.general}`} class="way" data-track="email_click">
+          <span class="way__icon"><Icon name="mail" size={22} /></span>
+          <span class="way__body">
+            <small>General enquiries</small>
+            <strong>{site.email.general}</strong>
+            <span>Good for anything that isn't urgent.</span>
+          </span>
+          <Icon name="arrow" size={18} class="way__go" />
+        </a>
+
+        <a href={`mailto:${site.email.director}`} class="way" data-track="email_click">
+          <span class="way__icon"><Icon name="users" size={22} /></span>
+          <span class="way__body">
+            <small>The director</small>
+            <strong>{site.email.director}</strong>
+            <span>For enrolment, concerns, or anything sensitive.</span>
+          </span>
+          <Icon name="arrow" size={18} class="way__go" />
+        </a>
+
+        <a href="/enroll/book-a-tour" class="way" data-track="tour_cta_click" data-track-label="contact">
+          <span class="way__icon"><Icon name="calendar" size={22} /></span>
+          <span class="way__body">
+            <small>Best of all</small>
+            <strong>Book a 30-minute tour</strong>
+            <span>Ask everything in one go, in the room itself.</span>
+          </span>
+          <Icon name="arrow" size={18} class="way__go" />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------------- visit -->
+  <section class="section section--tight" aria-labelledby="visit-title">
+    <div class="container">
+      <div class="visit">
+        <div data-reveal>
+          <p class="eyebrow">Visit</p>
+          <h2 id="visit-title">Where to find us</h2>
+
+          <address class="addr">
+            <Icon name="pin" size={20} />
+            <span>
+              {site.address.street}<br />
+              {site.address.city}, {site.address.region} {site.address.postalCode}<br />
+              {site.address.country}
+            </span>
+          </address>
+
+          <div class="cluster mt-m">
+            <a href={directionsUrl} target="_blank" rel="noopener" class="btn btn--primary" data-track="directions_click">
+              <Icon name="route" size={18} /> Get directions
+            </a>
+            <a href={mapsUrl} target="_blank" rel="noopener" class="btn btn--ghost">
+              <Icon name="pin" size={17} /> View on the map
+            </a>
+          </div>
+
+          <div class="hours mt-l">
+            <h3>Hours</h3>
+            <dl>
+              <div>
+                <dt>Closing time</dt>
+                <dd>6:00 PM <span class="badge badge--verified">Published</span></dd>
+              </div>
+              <div>
+                <dt>Opening time</dt>
+                <dd class="text-muted">Not published <span class="badge badge--unknown">Ask the team</span></dd>
+              </div>
+              <div>
+                <dt>Holiday closures</dt>
+                <dd class="text-muted">Not published <span class="badge badge--unknown">Ask the team</span></dd>
+              </div>
+            </dl>
+            <p class="source-note mt-s">
+              <Icon name="check-circle" size={14} />
+              <span>{closing.source}</span>
+            </p>
+          </div>
+
+          <div class="notice notice--warn mt-m">
+            <Icon name="clock" size={18} />
+            <span>
+              <strong>Running late for pick-up?</strong>
+              Fees are $1.00 per minute from 6:01–6:15 PM and $2.00 per minute from
+              6:16–6:30 PM, per child, paid to the educator who stays. Call ahead if you can.
+            </span>
+          </div>
+        </div>
+
+        <div class="visit__map" data-reveal>
+          <!-- No third-party map embed: it would load trackers on a childcare site
+               before a visitor has consented to anything. A static card links out. -->
+          <div class="mapcard">
+            <div class="mapcard__grid" aria-hidden="true">
+              <div class="starfield">
+                <span style="--s:3px;left:24%;top:30%;--d:4.5s;--o:.6"></span>
+                <span style="--s:2px;left:64%;top:62%;--d:5.5s;--delay:1s;--o:.45"></span>
+              </div>
+              <span class="mapcard__pin"><Icon name="pin" size={30} /></span>
+            </div>
+            <div class="mapcard__body">
+              <strong>{site.address.street}</strong>
+              <span>{site.address.city}, {site.address.regionCode} {site.address.postalCode}</span>
+              <a href={directionsUrl} target="_blank" rel="noopener" class="btn btn--ink btn--sm btn--block mt-s" data-track="directions_click">
+                Open in Maps <Icon name="arrow" size={15} />
+              </a>
+              <p class="mapcard__note">
+                We don't embed a live map here — it would load third-party tracking
+                before you've agreed to any. This link opens your own maps app instead.
+              </p>
+            </div>
+          </div>
+
+          <div class="socials mt-m">
+            <p class="socials__title">Follow the centre</p>
+            <div class="cluster">
+              <a href={site.social.facebook} target="_blank" rel="noopener me" class="btn btn--ghost btn--sm">Facebook</a>
+              <a href={site.social.instagram} target="_blank" rel="noopener me" class="btn btn--ghost btn--sm">Instagram</a>
+              <a href={site.social.tiktok} target="_blank" rel="noopener me" class="btn btn--ghost btn--sm">TikTok</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------------- form -->
+  <section class="section section--sunken" aria-labelledby="msg-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Send a message</p>
+        <h2 id="msg-title">If a call doesn't suit</h2>
+        <p class="lede">Tell us roughly what you need and the team will pick it up.</p>
+      </div>
+
+      <div class="notice notice--demo mt-m" data-reveal>
+        <Icon name="sparkles" size={20} />
+        <span>
+          <strong>Preview form — nothing is sent.</strong>
+          On the live site this posts to the Tiny Stars contact endpoint. Here it validates
+          and shows you what would happen, then stops.
+        </span>
+      </div>
+
+      <form class="panel cform mt-l" data-contact novalidate>
+        <p class="visually-hidden" role="status" aria-live="polite" data-cf-announce></p>
+
+        <div class="field">
+          <label class="field__label" for="cf-name">Your name</label>
+          <input class="input" type="text" id="cf-name" name="name" autocomplete="name" required />
+          <p class="field__error"></p>
+        </div>
+
+        <div class="cform__row">
+          <div class="field">
+            <label class="field__label" for="cf-email">Email</label>
+            <input class="input" type="email" id="cf-email" name="email" autocomplete="email" inputmode="email" required />
+            <p class="field__error"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="cf-phone">Phone <span class="text-subtle">(optional)</span></label>
+            <input class="input" type="tel" id="cf-phone" name="phone" autocomplete="tel" inputmode="tel" />
+            <p class="field__error"></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="cf-topic">What's this about?</label>
+          <select class="select" id="cf-topic" name="topic" required>
+            <option value="">Choose…</option>
+            <option>Availability and fees</option>
+            <option>Booking a tour</option>
+            <option>Enrolment and registration</option>
+            <option>The waitlist</option>
+            <option>A question about a policy</option>
+            <option>Careers</option>
+            <option>Something else</option>
+          </select>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="cf-msg">Your message</label>
+          <span class="field__hint">Please don't include your child's health details here — bring those to the registration package or a call.</span>
+          <textarea class="textarea" id="cf-msg" name="message" maxlength="1200" required></textarea>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="cform__foot">
+          <p class="cform__privacy">
+            <Icon name="lock" size={14} />
+            We'd only use this to reply. Nothing is shared, and nothing is sent in this preview.
+          </p>
+          <button type="submit" class="btn btn--primary">Send message</button>
+        </div>
+
+        <div class="cform__done" data-cf-done hidden></div>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .ways { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+  .way {
+    display: flex; align-items: center; gap: var(--space-s);
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    text-decoration: none; color: inherit;
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+  }
+  .way:hover { transform: translateY(-3px); box-shadow: var(--shadow-m); border-color: var(--border-strong); color: inherit; }
+  .way--primary {
+    background: var(--coral-50);
+    border-color: color-mix(in oklab, var(--coral-500) 35%, transparent);
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 900px) { .way--primary { grid-column: span 2; } }
+  .way__icon {
+    display: grid; place-items: center;
+    width: 52px; height: 52px; flex: none;
+    border-radius: var(--radius-m);
+    background: var(--cream-200);
+    color: var(--coral-700);
+  }
+  .way--primary .way__icon { background: var(--coral-100); }
+  .way__body { flex: 1; display: grid; gap: 0.1rem; min-width: 0; }
+  .way__body small { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-subtle); }
+  .way__body strong { font-family: var(--font-display); font-size: var(--step-1); font-weight: 650; word-break: break-word; }
+  .way__body > span { font-size: var(--step--2); color: var(--text-muted); line-height: 1.5; }
+  :global(.way__go) { flex: none; opacity: 0.4; }
+  .way:hover :global(.way__go) { opacity: 0.8; }
+
+  .visit { display: grid; gap: var(--space-xl); align-items: start; }
+  @media (min-width: 900px) { .visit { grid-template-columns: minmax(0, 1fr) minmax(0, 22rem); gap: var(--space-2xl); } }
+
+  .addr {
+    display: flex; gap: 0.7rem; align-items: flex-start;
+    margin-top: var(--space-m);
+    font-style: normal;
+    font-size: var(--step-1);
+    line-height: var(--leading-snug);
+  }
+  .addr :global(svg) { color: var(--coral-600); flex: none; margin-top: 0.2rem; }
+
+  .hours h3 { font-family: var(--font-sans); font-size: var(--step-0); font-weight: 700; letter-spacing: 0; margin-bottom: 0.6rem; }
+  .hours dl { display: grid; gap: 0.3rem; }
+  .hours dl > div {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; align-items: center;
+    padding: 0.65rem 0.9rem;
+    border-radius: var(--radius-s);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .hours dt { font-size: var(--step--1); color: var(--text-muted); }
+  .hours dd { margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: var(--step--1); font-weight: 650; }
+  .hours .source-note :global(svg) { color: var(--ok-600); }
+
+  .mapcard { border-radius: var(--radius-l); overflow: hidden; border: 1px solid var(--border); background: var(--bg-raised); }
+  .mapcard__grid {
+    position: relative;
+    height: 11rem;
+    display: grid; place-items: center;
+    background:
+      linear-gradient(135deg, var(--ink-800), var(--ink-900));
+    background-image:
+      linear-gradient(color-mix(in oklab, #fff 6%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, #fff 6%, transparent) 1px, transparent 1px),
+      linear-gradient(135deg, var(--ink-800), var(--ink-900));
+    background-size: 28px 28px, 28px 28px, 100% 100%;
+  }
+  .mapcard__pin {
+    display: grid; place-items: center;
+    width: 60px; height: 60px;
+    border-radius: var(--radius-pill);
+    background: var(--coral-500);
+    color: #fff;
+    box-shadow: 0 0 0 10px color-mix(in oklab, var(--coral-500) 22%, transparent);
+  }
+  .mapcard__body { padding: var(--space-m); display: grid; gap: 0.15rem; }
+  .mapcard__body strong { font-size: var(--step-0); }
+  .mapcard__body > span { font-size: var(--step--1); color: var(--text-muted); }
+  .mapcard__note { font-size: var(--step--2); color: var(--text-subtle); line-height: 1.5; margin-top: 0.6rem; }
+
+  .socials__title { font-size: var(--step--2); font-weight: 700; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--text-subtle); margin-bottom: 0.5rem; }
+
+  .cform { padding: var(--space-l) var(--space-m); }
+  @media (min-width: 640px) { .cform { padding: var(--space-l); } }
+  .cform__row { display: grid; gap: var(--space-m); }
+  @media (min-width: 560px) { .cform__row { grid-template-columns: 1fr 1fr; } .cform__row .field + .field { margin-top: 0; } }
+  .cform__foot {
+    display: flex; flex-wrap: wrap; gap: var(--space-s);
+    align-items: center; justify-content: space-between;
+    margin-top: var(--space-l); padding-top: var(--space-m);
+    border-top: 1px solid var(--border);
+  }
+  .cform__privacy { display: flex; align-items: center; gap: 0.4rem; font-size: var(--step--2); color: var(--text-muted); max-width: 34ch; }
+  .cform__done { margin-top: var(--space-m); }
+</style>
+
+<script>
+  import { track } from '../lib/analytics';
+
+  const form = document.querySelector<HTMLFormElement>('[data-contact]')!;
+  const done = form.querySelector<HTMLElement>('[data-cf-done]')!;
+  const announce = form.querySelector<HTMLElement>('[data-cf-announce]')!;
+
+  function fieldError(el: HTMLElement, msg: string) {
+    el.setAttribute('aria-invalid', 'true');
+    const slot = el.closest('.field')?.querySelector<HTMLElement>('.field__error');
+    if (slot) slot.textContent = msg;
+  }
+
+  function clearError(el: HTMLElement) {
+    el.removeAttribute('aria-invalid');
+    const slot = el.closest('.field')?.querySelector<HTMLElement>('.field__error');
+    if (slot) slot.textContent = '';
+  }
+
+  form.addEventListener('input', (e) => clearError(e.target as HTMLElement));
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const controls = Array.from(
+      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('[required]')
+    );
+
+    let firstBad: HTMLElement | null = null;
+    controls.forEach((el) => {
+      clearError(el);
+      const value = el.value.trim();
+      if (!value) {
+        fieldError(el, 'This one is needed.');
+        firstBad ??= el;
+      } else if (el.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
+        fieldError(el, 'That email address does not look complete.');
+        firstBad ??= el;
+      }
+    });
+
+    if (firstBad) {
+      announce.textContent = 'Some details still need attention.';
+      firstBad.focus();
+      firstBad.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
+
+    track('concierge_handoff', { via: 'contact-form' });
+
+    form.querySelectorAll('.field, .cform__foot').forEach((el) => ((el as HTMLElement).hidden = true));
+    done.hidden = false;
+    done.innerHTML = `
+      <div class="done__icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+      </div>
+      <span class="badge badge--demo">Preview — nothing was sent</span>
+      <h3 style="font-size:var(--step-2);margin-top:.7rem">Your message would go to the Tiny Stars team</h3>
+      <p class="text-muted" style="margin-top:.5rem;font-size:var(--step--1);line-height:var(--leading-normal)">
+        On the live site this posts to the centre's contact endpoint. Because this is a
+        preview, nothing left your browser. To reach the team right now, call
+        <a href="tel:+17802301599">(780) 230-1599</a>.
+      </p>
+      <div class="cluster" style="margin-top:var(--space-m)">
+        <a class="btn btn--primary" href="tel:+17802301599" data-track="phone_click">Call the director</a>
+        <a class="btn btn--ghost" href="/enroll/book-a-tour">Book a tour instead</a>
+      </div>`;
+    announce.textContent = 'Preview complete. Nothing was sent.';
+    done.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+</script>

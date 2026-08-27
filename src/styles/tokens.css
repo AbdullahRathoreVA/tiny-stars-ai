@@ -1,0 +1,175 @@
+/* ==========================================================================
+   Tiny Stars — Design tokens
+   --------------------------------------------------------------------------
+   Personality: warm · premium · playful · trustworthy.
+   Deliberately NOT: pastel template, cartoon, corporate SaaS, neon AI.
+
+   The palette is anchored on two ideas:
+     1. Parchment, not white. Every surface is warm. Pure #fff appears nowhere.
+     2. Night sky, not black. Text is a deep indigo — the "stars" in Tiny Stars.
+   ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------- colour */
+
+  /* Warm neutral ramp — the ground everything sits on */
+  --cream-50:  #fffdfa;
+  --cream-100: #fdf8f2;
+  --cream-200: #f7efe4;
+  --cream-300: #eee2d2;
+  --cream-400: #ddcbb6;
+  --sand-500:  #b3a08a;
+  --sand-600:  #8a7965;
+
+  /* Ink — deep indigo night sky */
+  --ink-900: #17162b;
+  --ink-800: #22203c;
+  --ink-700: #33314f;
+  --ink-600: #4a4767;
+  --ink-500: #6a6785;
+  --ink-400: #8f8ca6;
+
+  /* Primary — warm coral. Used for action, never for decoration alone. */
+  --coral-50:  #fff2ee;
+  --coral-100: #ffe0d6;
+  --coral-300: #ff9f80;
+  --coral-500: #f4703f;
+  --coral-600: #dd5a2a;
+  --coral-700: #b8451d;
+
+  /* Secondary — grounded teal. Trust, safety, calm. */
+  --teal-50:  #eef7f5;
+  --teal-100: #d5ebe6;
+  --teal-400: #4fa896;
+  --teal-600: #2d7a6c;
+  --teal-700: #1f5a50;
+
+  /* Star gold — sparing, for the brand motif only */
+  --gold-200: #ffe9b0;
+  --gold-400: #f2be4c;
+  --gold-600: #c9922a;
+
+  /* Program accents */
+  --blush-100:  #fde8ee;  --blush-500:  #e0678b;
+  --blush-700:  #a83f60;
+  --marigold-100: #fdf0d9; --marigold-500: #e5992a; --marigold-700: #a86a12;
+  --violet-100: #f0ebfb;  --violet-500: #8163cf;  --violet-700: #563d99;
+  --sky-100:    #e6f2fb;  --sky-500:    #3d8fc9;  --sky-700:    #23628e;
+
+  /* Semantic */
+  --ok-100: #e3f3e8;  --ok-600: #2f7d4a;
+  --warn-100: #fdf0d9; --warn-600: #a86a12;
+  --info-100: #e6f2fb; --info-600: #23628e;
+
+  /* Surfaces */
+  --bg:            var(--cream-100);
+  --bg-raised:     var(--cream-50);
+  --bg-sunken:     var(--cream-200);
+  --bg-inverse:    var(--ink-900);
+  --border:        color-mix(in oklab, var(--ink-900) 12%, transparent);
+  --border-strong: color-mix(in oklab, var(--ink-900) 22%, transparent);
+
+  /* Text */
+  --text:        var(--ink-900);
+  --text-muted:  var(--ink-500);
+  --text-subtle: var(--ink-400);
+  --text-invert: var(--cream-100);
+
+  /* ------------------------------------------------------------ typography */
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  /* Fluid type scale — 1.200 minor third at small, 1.250 at large */
+  --step--2: clamp(0.72rem, 0.70rem + 0.10vw, 0.78rem);
+  --step--1: clamp(0.84rem, 0.81rem + 0.15vw, 0.92rem);
+  --step-0:  clamp(1.00rem, 0.96rem + 0.20vw, 1.09rem);
+  --step-1:  clamp(1.19rem, 1.12rem + 0.34vw, 1.42rem);
+  --step-2:  clamp(1.41rem, 1.29rem + 0.60vw, 1.85rem);
+  --step-3:  clamp(1.68rem, 1.48rem + 0.99vw, 2.40rem);
+  --step-4:  clamp(2.00rem, 1.68rem + 1.58vw, 3.13rem);
+  --step-5:  clamp(2.38rem, 1.89rem + 2.44vw, 4.07rem);
+  --step-6:  clamp(2.83rem, 2.09rem + 3.68vw, 5.29rem);
+
+  --leading-tight: 1.08;
+  --leading-snug: 1.25;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.72;
+
+  --tracking-tight: -0.022em;
+  --tracking-snug: -0.012em;
+  --tracking-wide: 0.08em;
+
+  /* ---------------------------------------------------------------- space */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs:  0.75rem;
+  --space-s:   1rem;
+  --space-m:   1.5rem;
+  --space-l:   2rem;
+  --space-xl:  3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --section:   clamp(3.5rem, 2.2rem + 6.4vw, 7.5rem);
+
+  /* --------------------------------------------------------------- shape */
+  --radius-xs: 6px;
+  --radius-s:  10px;
+  --radius-m:  16px;
+  --radius-l:  24px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  /* Warm shadows — tinted with the ink hue, never neutral grey */
+  --shadow-xs: 0 1px 2px color-mix(in oklab, var(--ink-900) 6%, transparent);
+  --shadow-s:
+    0 1px 2px color-mix(in oklab, var(--ink-900) 5%, transparent),
+    0 2px 6px color-mix(in oklab, var(--ink-900) 5%, transparent);
+  --shadow-m:
+    0 2px 4px color-mix(in oklab, var(--ink-900) 4%, transparent),
+    0 8px 20px color-mix(in oklab, var(--ink-900) 8%, transparent);
+  --shadow-l:
+    0 4px 8px color-mix(in oklab, var(--ink-900) 4%, transparent),
+    0 18px 44px color-mix(in oklab, var(--ink-900) 11%, transparent);
+  --shadow-xl:
+    0 8px 16px color-mix(in oklab, var(--ink-900) 5%, transparent),
+    0 32px 72px color-mix(in oklab, var(--ink-900) 14%, transparent);
+
+  /* --------------------------------------------------------------- motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 140ms;
+  --dur: 240ms;
+  --dur-slow: 420ms;
+  --dur-slower: 700ms;
+
+  /* ---------------------------------------------------------------- layout */
+  --measure: 68ch;
+  --measure-narrow: 54ch;
+  --container: 1240px;
+  --container-wide: 1440px;
+  --container-narrow: 780px;
+  --gutter: clamp(1.15rem, 0.6rem + 2.4vw, 2.5rem);
+
+  --header-h: 74px;
+
+  /* ----------------------------------------------------------------- z */
+  --z-sticky: 20;
+  --z-header: 40;
+  --z-mobilebar: 45;
+  --z-concierge: 60;
+  --z-overlay: 70;
+  --z-toast: 90;
+}
+
+/* Reduced motion: collapse durations but keep state changes instant + visible. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur: 1ms;
+    --dur-slow: 1ms;
+    --dur-slower: 1ms;
+  }
+}

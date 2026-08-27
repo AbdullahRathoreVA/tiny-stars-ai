@@ -1,0 +1,518 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import {
+  demoChild,
+  demoParent,
+  todayCards,
+  timeline,
+  announcements,
+  calendar,
+  messages,
+  portalDocuments,
+  DEMO_NOTICE,
+} from '../data/demo/portal';
+
+const tabs = [
+  { id: 'today', label: 'Today', icon: 'sun' },
+  { id: 'updates', label: 'Updates', icon: 'activity' },
+  { id: 'messages', label: 'Messages', icon: 'chat', badge: messages.filter((m) => m.unread).length },
+  { id: 'calendar', label: 'Calendar', icon: 'calendar' },
+  { id: 'documents', label: 'Documents', icon: 'file' },
+];
+---
+
+<Base
+  title="Parent Portal preview | Tiny Stars Daycare"
+  description="A preview of what a Tiny Stars family portal could look like: daily updates, messages, announcements, calendar and documents. Demonstration only, using invented sample data."
+  noindex={true}
+  bodyClass="portal-page"
+>
+  <!-- ------------------------------------------------------ demo banner -->
+  <div class="demoband" role="note">
+    <div class="container container--wide">
+      <Icon name="alert" size={18} />
+      <p>
+        <strong>Demonstration only.</strong>
+        {DEMO_NOTICE} Tiny Stars has not announced a parent portal — this shows what one
+        could look like.
+      </p>
+      <a href="/about-this-demo">What is this?</a>
+    </div>
+  </div>
+
+  <div class="portal">
+    <div class="container container--wide">
+      <!-- header -->
+      <header class="phead">
+        <div class="phead__who">
+          <span class="pavatar" aria-hidden="true">{demoChild.initials}</span>
+          <div>
+            <p class="phead__greet">{demoParent.greeting}, {demoParent.firstName}</p>
+            <h1>{demoChild.firstName}’s day</h1>
+            <p class="phead__meta">
+              {demoChild.program} · {demoChild.room} · {demoChild.ageLabel}
+              <span class="badge badge--demo">Sample child</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="phead__actions">
+          <a href={site.phone.href} class="btn btn--ghost btn--sm" data-track="phone_click">
+            <Icon name="phone" size={16} /> Call the centre
+          </a>
+        </div>
+      </header>
+
+      <!-- tabs -->
+      <div class="ptabs" role="tablist" aria-label="Portal sections">
+        {tabs.map((t, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`tab-${t.id}`}
+            aria-controls={`panel-${t.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            class="ptab"
+            data-tab={t.id}
+          >
+            <Icon name={t.icon as any} size={17} />
+            <span>{t.label}</span>
+            {t.badge ? <span class="ptab__badge">{t.badge}</span> : null}
+          </button>
+        ))}
+      </div>
+
+      <!-- ------------------------------------------------------- today -->
+      <section role="tabpanel" id="panel-today" aria-labelledby="tab-today" class="ppanel" tabindex="0">
+        <div class="pcards">
+          {todayCards.map((c) => (
+            <article class={`pcard pcard--${c.tone}`}>
+              <span class="pcard__icon"><Icon name={c.icon as any} size={19} /></span>
+              <p class="pcard__label">{c.label}</p>
+              <p class="pcard__value">{c.value}</p>
+              <p class="pcard__detail">{c.detail}</p>
+            </article>
+          ))}
+        </div>
+
+        <div class="notice notice--demo mt-l">
+          <Icon name="info" size={18} />
+          <span>
+            <strong>These are invented examples.</strong>
+            They are here to show the shape of a daily update — how much detail is useful,
+            and how it reads at 5pm on a phone.
+          </span>
+        </div>
+      </section>
+
+      <!-- ----------------------------------------------------- updates -->
+      <section role="tabpanel" id="panel-updates" aria-labelledby="tab-updates" class="ppanel" tabindex="0" hidden>
+        <ol class="ptimeline">
+          {timeline.map((u) => (
+            <li class={`pt pt--${u.kind}`}>
+              <span class="pt__time">{u.time}</span>
+              <div class="pt__body">
+                <p class="pt__meta">
+                  {u.from}
+                  {u.kind === 'milestone' && <span class="badge badge--verified">Milestone</span>}
+                  {u.kind === 'reminder' && <span class="badge badge--unknown">Needs you</span>}
+                </p>
+                <p>{u.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <h2 class="psub">Announcements</h2>
+        <div class="pann">
+          {announcements.map((a) => (
+            <article class={`pann__item${a.pinned ? ' pann__item--pinned' : ''}`}>
+              <p class="pann__date">{a.date}{a.pinned && <span class="badge badge--coral">Pinned</span>}</p>
+              <h3>{a.title}</h3>
+              <p>{a.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------- messages -->
+      <section role="tabpanel" id="panel-messages" aria-labelledby="tab-messages" class="ppanel" tabindex="0" hidden>
+        <div class="pmsgs">
+          {messages.map((m) => (
+            <article class={`pmsg${m.unread ? ' pmsg--unread' : ''}`}>
+              <div class="pmsg__head">
+                <strong>{m.from}</strong>
+                <span class="pmsg__role">{m.role}</span>
+                <span class="pmsg__time">{m.time}</span>
+              </div>
+              <p>{m.text}</p>
+            </article>
+          ))}
+        </div>
+
+        <div class="preply">
+          <label class="field__label" for="preply">Reply</label>
+          <textarea class="textarea" id="preply" placeholder="This is a preview — messages are not sent." disabled></textarea>
+          <p class="field__hint mt-s">
+            Disabled on purpose. A real portal would need authentication before any family
+            could read or write a message about a child.
+          </p>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------------------- calendar -->
+      <section role="tabpanel" id="panel-calendar" aria-labelledby="tab-calendar" class="ppanel" tabindex="0" hidden>
+        <ul class="pcal">
+          {calendar.map((c) => (
+            <li class={`pcal__item${c.soon ? ' pcal__item--soon' : ''}`}>
+              <span class="pcal__date">
+                <strong>{c.day}</strong>
+                <small>{c.weekday}</small>
+              </span>
+              <span class="pcal__body">
+                <strong>{c.title}</strong>
+                <small>{c.note}</small>
+              </span>
+              {c.soon && <span class="badge badge--coral">This week</span>}
+            </li>
+          ))}
+        </ul>
+        <div class="notice notice--demo mt-l">
+          <Icon name="info" size={18} />
+          <span>
+            <strong>Sample events.</strong>
+            Tiny Stars has not published a calendar — these are illustrative, including
+            the closure date.
+          </span>
+        </div>
+      </section>
+
+      <!-- --------------------------------------------------- documents -->
+      <section role="tabpanel" id="panel-documents" aria-labelledby="tab-documents" class="ppanel" tabindex="0" hidden>
+        <div class="pdocs">
+          {portalDocuments.map((d) => (
+            <a
+              href={d.href}
+              class={`pdoc${d.real ? '' : ' pdoc--sample'}`}
+              aria-disabled={d.real ? undefined : 'true'}
+            >
+              <span class="pdoc__icon"><Icon name="file" size={19} /></span>
+              <span class="pdoc__body">
+                <strong>{d.title}</strong>
+                <small>{d.meta}</small>
+              </span>
+              {d.real ? (
+                <span class="badge badge--verified">Real document</span>
+              ) : (
+                <span class="badge badge--demo">Sample</span>
+              )}
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ------------------------------------------------------ what's real -->
+  <section class="section section--sunken" aria-labelledby="real-title">
+    <div class="container container--narrow">
+      <div class="section-head">
+        <p class="eyebrow">Being clear about this</p>
+        <h2 id="real-title">What is real on this page, and what is not</h2>
+      </div>
+
+      <div class="isnt mt-l">
+        <div class="isnt__col isnt__col--is">
+          <h3><Icon name="check-circle" size={18} /> Real</h3>
+          <ul>
+            <li>The four policy documents — those are genuinely Tiny Stars'</li>
+            <li>The interface, the interactions and the architecture behind them</li>
+            <li>The privacy stance: no photographs, no health data, no surname</li>
+          </ul>
+        </div>
+        <div class="isnt__col isnt__col--isnt">
+          <h3><Icon name="alert" size={18} /> Invented</h3>
+          <ul>
+            <li>The child, the parent, every note, message and event</li>
+            <li>The idea that Tiny Stars currently offers a parent portal</li>
+            <li>Every date and time shown</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="notice notice--info mt-l">
+        <Icon name="lock" size={20} />
+        <span>
+          <strong>A real version would need authentication before anything loads.</strong>
+          Records about a child must sit behind a login, per-family authorization and an
+          audit trail. That is why this preview has no login screen at all — a fake one
+          would suggest security that is not there.
+        </span>
+      </div>
+
+      <div class="cluster mt-l" style="justify-content:center">
+        <a href="/families/hub" class="btn btn--primary">Family Hub</a>
+        <a href="/command-center" class="btn btn--ghost">See the architecture</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .demoband {
+    background: var(--violet-100);
+    border-bottom: 1px solid color-mix(in oklab, var(--violet-700) 25%, transparent);
+    color: var(--violet-700);
+    padding-block: 0.65rem;
+  }
+  .demoband .container {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.75rem;
+  }
+  .demoband p { font-size: var(--step--2); flex: 1; min-width: 14rem; line-height: 1.5; }
+  .demoband a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    min-height: 28px;
+    margin: -0.3rem -0.5rem;
+    border-radius: var(--radius-xs);
+    color: inherit;
+    font-weight: 700;
+    font-size: var(--step--2);
+    white-space: nowrap;
+  }
+  .demoband a:hover { background: color-mix(in oklab, var(--violet-700) 12%, transparent); }
+  .demoband :global(svg) { flex: none; }
+
+  .portal { padding-block: var(--space-l) var(--space-2xl); }
+
+  .phead {
+    display: flex; flex-wrap: wrap; gap: var(--space-m);
+    align-items: center; justify-content: space-between;
+    margin-bottom: var(--space-l);
+  }
+  .phead__who { display: flex; align-items: center; gap: var(--space-s); }
+  .pavatar {
+    display: grid; place-items: center;
+    width: 58px; height: 58px; flex: none;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(150deg, var(--coral-300), var(--coral-500));
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 650;
+    box-shadow: var(--shadow-s);
+  }
+  .phead__greet { font-size: var(--step--1); color: var(--text-muted); }
+  .phead h1 { font-size: var(--step-3); }
+  .phead__meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+    font-size: var(--step--2); color: var(--text-muted); margin-top: 0.25rem;
+  }
+
+  .ptabs {
+    display: flex;
+    gap: 0.3rem;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+  .ptabs::-webkit-scrollbar { display: none; }
+  .ptab {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.7rem 1rem;
+    min-height: 48px;
+    flex: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--text-muted);
+    font-size: var(--step--1);
+    font-weight: 650;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .ptab:hover { color: var(--ink-900); }
+  .ptab[aria-selected='true'] { color: var(--coral-700); border-bottom-color: var(--coral-500); }
+  .ptab__badge {
+    display: grid; place-items: center;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    border-radius: var(--radius-pill);
+    background: var(--coral-500); color: #fff;
+    font-size: 0.65rem; font-weight: 700;
+  }
+
+  .ppanel { padding-top: var(--space-l); }
+  .ppanel[hidden] { display: none; }
+  .psub { font-size: var(--step-2); margin: var(--space-xl) 0 var(--space-m); }
+
+  /* today cards */
+  .pcards { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+  .pcard {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .pcard__icon {
+    display: grid; place-items: center;
+    width: 40px; height: 40px;
+    border-radius: var(--radius-s);
+    background: var(--cream-200);
+    color: var(--ink-700);
+    margin-bottom: 0.6rem;
+  }
+  .pcard--ok .pcard__icon { background: var(--ok-100); color: var(--ok-600); }
+  .pcard--soft .pcard__icon { background: var(--violet-100); color: var(--violet-700); }
+  .pcard__label {
+    font-size: var(--step--2); font-weight: 700;
+    letter-spacing: var(--tracking-wide); text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .pcard__value { font-family: var(--font-display); font-size: var(--step-1); font-weight: 650; margin-top: 0.1rem; }
+  .pcard__detail { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); margin-top: 0.4rem; }
+
+  /* timeline */
+  .ptimeline { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .pt {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: var(--space-s);
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .pt--milestone { border-color: color-mix(in oklab, var(--ok-600) 30%, transparent); background: var(--ok-100); }
+  .pt--reminder { border-color: color-mix(in oklab, var(--warn-600) 30%, transparent); background: var(--warn-100); }
+  .pt__time { font-size: var(--step--2); font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums; padding-top: 0.15rem; }
+  .pt__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: var(--step--2); color: var(--text-subtle); margin-bottom: 0.2rem; }
+  .pt__body p:last-child { font-size: var(--step--1); line-height: var(--leading-normal); }
+  @media (max-width: 560px) { .pt { grid-template-columns: 1fr; gap: 0.2rem; } }
+
+  /* announcements */
+  .pann { display: grid; gap: 0.75rem; }
+  .pann__item {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .pann__item--pinned { border-color: color-mix(in oklab, var(--coral-500) 40%, transparent); }
+  .pann__date { display: flex; align-items: center; gap: 0.5rem; font-size: var(--step--2); color: var(--text-subtle); }
+  .pann__item h3 { font-size: var(--step-1); margin-block: 0.35rem 0.4rem; }
+  .pann__item p:last-child { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); }
+
+  /* messages */
+  .pmsgs { display: grid; gap: 0.75rem; }
+  .pmsg {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .pmsg--unread { border-left: 3px solid var(--coral-500); }
+  .pmsg__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; margin-bottom: 0.45rem; }
+  .pmsg__head strong { font-size: var(--step-0); }
+  .pmsg__role { font-size: var(--step--2); color: var(--text-subtle); }
+  .pmsg__time { font-size: var(--step--2); color: var(--text-subtle); margin-left: auto; }
+  .pmsg p { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); }
+  .preply { margin-top: var(--space-l); }
+
+  /* calendar */
+  .pcal { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .pcal__item {
+    display: flex; align-items: center; gap: var(--space-s);
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .pcal__item--soon { border-color: color-mix(in oklab, var(--coral-500) 35%, transparent); }
+  .pcal__date {
+    display: grid; place-items: center;
+    width: 48px; height: 48px; flex: none;
+    border-radius: var(--radius-s);
+    background: var(--cream-200);
+  }
+  .pcal__date strong { font-family: var(--font-display); font-size: var(--step-1); line-height: 1; }
+  .pcal__date small { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+  .pcal__body { flex: 1; display: grid; }
+  .pcal__body strong { font-size: var(--step--1); }
+  .pcal__body small { font-size: var(--step--2); color: var(--text-muted); }
+
+  /* documents */
+  .pdocs { display: grid; gap: 0.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+  .pdoc {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .pdoc:hover { border-color: var(--ink-700); transform: translateY(-2px); color: inherit; }
+  .pdoc--sample { opacity: 0.6; pointer-events: none; }
+  .pdoc__icon {
+    display: grid; place-items: center;
+    width: 40px; height: 40px; flex: none;
+    border-radius: var(--radius-s);
+    background: var(--violet-100); color: var(--violet-700);
+  }
+  .pdoc__body { flex: 1; display: grid; min-width: 0; }
+  .pdoc__body strong { font-size: var(--step--1); }
+  .pdoc__body small { font-size: var(--step--2); color: var(--text-muted); }
+
+  /* what's real */
+  .isnt { display: grid; gap: var(--space-m); }
+  @media (min-width: 720px) { .isnt { grid-template-columns: 1fr 1fr; } }
+  .isnt__col { padding: var(--space-m); border-radius: var(--radius-l); border: 1px solid var(--border); }
+  .isnt__col--is { background: var(--ok-100); border-color: color-mix(in oklab, var(--ok-600) 22%, transparent); }
+  .isnt__col--isnt { background: var(--warn-100); border-color: color-mix(in oklab, var(--warn-600) 24%, transparent); }
+  .isnt__col h3 {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: var(--font-sans); font-size: var(--step-0);
+    font-weight: 700; letter-spacing: 0; margin-bottom: 0.75rem;
+  }
+  .isnt__col--is h3 { color: var(--ok-600); }
+  .isnt__col--isnt h3 { color: var(--warn-600); }
+  .isnt__col ul { padding-left: 1.15rem; display: grid; gap: 0.45rem; }
+  .isnt__col li { font-size: var(--step--1); line-height: var(--leading-normal); color: var(--ink-700); }
+</style>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+  const panels = tabs.map((t) => document.getElementById(`panel-${t.dataset.tab}`)!);
+
+  function select(i: number, focus = true) {
+    tabs.forEach((t, n) => {
+      const on = n === i;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+      panels[n].hidden = !on;
+    });
+    if (focus) tabs[i].focus();
+  }
+
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(i, false));
+    t.addEventListener('keydown', (e) => {
+      const keys: Record<string, number> = {
+        ArrowRight: i + 1,
+        ArrowLeft: i - 1,
+        Home: 0,
+        End: tabs.length - 1,
+      };
+      const next = keys[e.key];
+      if (next === undefined) return;
+      e.preventDefault();
+      select((next + tabs.length) % tabs.length);
+    });
+  });
+</script>

@@ -1,0 +1,291 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { knowledge, topicLabels, verifiedCount, unknownCount, type Topic } from '../../data/knowledge';
+import { site } from '../../data/site';
+import { breadcrumbSchema, organizationSchema, faqSchema } from '../../lib/schema';
+
+const topics = Object.keys(topicLabels) as Topic[];
+const generalCount = knowledge.length - verifiedCount - unknownCount;
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([{ name: 'Questions & answers', href: '/families/faq' }]),
+  faqSchema(knowledge),
+].filter(Boolean) as Record<string, unknown>[];
+---
+
+<Base
+  title="Questions & answers | Tiny Stars Daycare"
+  description="Every answer we have about Tiny Stars Daycare in Grande Prairie — searchable, grouped by topic, and each one labelled with where it comes from."
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Questions & answers"
+    title="Every answer, labelled by where it came from"
+    lede="Search it, filter it, or ask the concierge. What you will not find is a confident-sounding answer to something Tiny Stars has never published."
+    crumbs={[{ name: 'Questions & answers', href: '/families/faq' }]}
+  >
+    <ul class="tally">
+      <li><strong>{verifiedCount}</strong> published by Tiny Stars</li>
+      <li><strong>{generalCount}</strong> general guidance</li>
+      <li><strong>{unknownCount}</strong> only the team can answer</li>
+    </ul>
+  </PageHero>
+
+  <section class="section section--tight" aria-labelledby="faq-title">
+    <div class="container container--narrow">
+      <h2 id="faq-title" class="visually-hidden">Questions and answers</h2>
+
+      <!-- search -->
+      <div class="fsearch">
+        <label class="visually-hidden" for="faq-q">Search the questions</label>
+        <Icon name="search" size={19} class="fsearch__icon" />
+        <input
+          type="search"
+          id="faq-q"
+          class="fsearch__input"
+          placeholder="Search — try “camera”, “late”, “cost”…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button type="button" class="fsearch__clear" data-clear hidden aria-label="Clear search">
+          <Icon name="x" size={17} />
+        </button>
+      </div>
+
+      <!-- topic filter -->
+      <div class="ffilter mt-m" role="group" aria-label="Filter by topic">
+        <button type="button" class="gchip" data-topic="all" aria-pressed="true">All</button>
+        {topics.map((t) => (
+          <button type="button" class="gchip" data-topic={t} aria-pressed="false">
+            {topicLabels[t]}
+          </button>
+        ))}
+      </div>
+
+      <p class="visually-hidden" role="status" aria-live="polite" data-faq-announce></p>
+
+      <!-- results -->
+      <div class="qa mt-l" data-faq-list>
+        {knowledge.map((e) => (
+          <details
+            class="q"
+            id={e.id}
+            data-topic={e.topic}
+            data-text={`${e.question} ${e.keywords.join(' ')} ${e.answer}`.toLowerCase()}
+          >
+            <summary>
+              <span>{e.question}</span>
+              <span class={`badge badge--${e.trust}`}>
+                {e.trust === 'verified' ? 'Published' : e.trust === 'general' ? 'General' : 'Ask the team'}
+              </span>
+              <Icon name="chevron-down" size={18} class="q__caret" />
+            </summary>
+            <div class="q__body">
+              <p>{e.answer}</p>
+              {e.source && (
+                <p class="source-note mt-s">
+                  <Icon name="check-circle" size={14} />
+                  <span>Source: {e.source}</span>
+                </p>
+              )}
+              {e.trust === 'general' && (
+                <p class="source-note mt-s">
+                  <Icon name="info" size={14} />
+                  <span>General early-childhood guidance, not a Tiny Stars policy.</span>
+                </p>
+              )}
+              <div class="cluster mt-s">
+                {e.links?.map((l) => (
+                  <a href={l.href} class="btn btn--ghost btn--sm">{l.label}</a>
+                ))}
+                <span class="badge">{topicLabels[e.topic]}</span>
+              </div>
+            </div>
+          </details>
+        ))}
+      </div>
+
+      <!-- empty -->
+      <div class="empty" data-faq-empty hidden>
+        <span class="empty__icon"><Icon name="question" size={44} /></span>
+        <h3>No answer here yet</h3>
+        <p>
+          That does not mean there is no answer — only that we do not have a published one.
+          Ask the concierge, or go straight to a person.
+        </p>
+        <div class="cluster" style="justify-content:center">
+          <button type="button" class="btn btn--primary" data-ask-concierge>
+            <Icon name="sparkles" size={17} /> Ask Star Guide
+          </button>
+          <a href={site.phone.href} class="btn btn--ghost" data-track="phone_click">
+            Call {site.phone.label}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Still holding a question?"
+    lede="The ones that matter most are usually the ones no website answers. Bring them to a tour, or call and ask now."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: 'Ask everything in one go' }}
+    secondary={[
+      { label: 'Call the director', href: site.phone.href, desc: site.phone.label },
+      { label: 'Trust Centre', href: '/why/trust-centre', desc: 'Policies and sources' },
+      { label: 'Family Hub', href: '/families/hub', desc: 'Guides for every stage' },
+    ]}
+  />
+</Base>
+
+<style>
+  .tally { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; list-style: none; padding: 0; }
+  .tally li { font-size: var(--step--1); color: var(--text-muted); }
+  .tally strong {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: 650;
+    color: var(--ink-900);
+    margin-right: 0.35rem;
+  }
+
+  .fsearch {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--border-strong);
+    background: var(--bg-raised);
+    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .fsearch:focus-within { border-color: var(--coral-500); box-shadow: 0 0 0 3px var(--coral-100); }
+  :global(.fsearch__icon) { color: var(--text-muted); flex: none; }
+  .fsearch__input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: none;
+    padding: 0.6rem 0;
+    min-height: 40px;
+    font-size: var(--step-0);
+  }
+  .fsearch__input:focus { outline: none; }
+  .fsearch__input::-webkit-search-cancel-button { display: none; }
+  .fsearch__clear {
+    display: grid; place-items: center;
+    width: 34px; height: 34px; flex: none;
+    border: 0; border-radius: var(--radius-pill);
+    background: var(--cream-200); color: var(--ink-700);
+    cursor: pointer;
+  }
+  .fsearch__clear:hover { background: var(--cream-300); }
+
+  .ffilter { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .gchip {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.5rem 0.95rem;
+    min-height: 42px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--border-strong);
+    background: var(--bg-raised);
+    font-size: var(--step--1);
+    font-weight: 650;
+    color: var(--ink-700);
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .gchip:hover { border-color: var(--ink-700); color: var(--ink-900); }
+  .gchip[aria-pressed='true'] { background: var(--ink-900); border-color: var(--ink-900); color: var(--cream-100); }
+
+  .q[hidden] { display: none; }
+  .q :global(mark) { background: var(--gold-200); border-radius: 3px; padding: 0 2px; }
+</style>
+
+<script>
+  import { track } from '../../lib/analytics';
+
+  const input = document.querySelector<HTMLInputElement>('#faq-q')!;
+  const clear = document.querySelector<HTMLButtonElement>('[data-clear]')!;
+  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-topic]'));
+  const items = Array.from(document.querySelectorAll<HTMLDetailsElement>('.q'));
+  const empty = document.querySelector<HTMLElement>('[data-faq-empty]')!;
+  const list = document.querySelector<HTMLElement>('[data-faq-list]')!;
+  const announce = document.querySelector<HTMLElement>('[data-faq-announce]')!;
+
+  let topic = 'all';
+  let query = '';
+  let timer: number | undefined;
+
+  function apply() {
+    const q = query.trim().toLowerCase();
+    let shown = 0;
+
+    items.forEach((el) => {
+      const topicOk = topic === 'all' || el.dataset.topic === topic;
+      const textOk = !q || (el.dataset.text ?? '').includes(q);
+      const on = topicOk && textOk;
+      el.hidden = !on;
+      // Auto-open when a search narrows things down — saves a click.
+      el.open = on && !!q && shown < 3;
+      if (on) shown++;
+    });
+
+    empty.hidden = shown > 0;
+    list.hidden = shown === 0;
+    clear.hidden = !q;
+    announce.textContent = shown
+      ? `${shown} question${shown === 1 ? '' : 's'} shown.`
+      : 'No matching questions.';
+
+    if (q && !shown) track('search_no_results', { q_length: q.length });
+  }
+
+  input.addEventListener('input', () => {
+    query = input.value;
+    apply();
+    window.clearTimeout(timer);
+    if (query.trim().length > 2) {
+      timer = window.setTimeout(() => track('search_query', { q_length: query.length }), 600);
+    }
+  });
+
+  clear.addEventListener('click', () => {
+    input.value = '';
+    query = '';
+    apply();
+    input.focus();
+  });
+
+  chips.forEach((c) =>
+    c.addEventListener('click', () => {
+      topic = c.dataset.topic!;
+      chips.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+      apply();
+    })
+  );
+
+  document.querySelector('[data-ask-concierge]')?.addEventListener('click', () => {
+    document.dispatchEvent(
+      new CustomEvent('ts:concierge-open', { detail: { ask: input.value.trim() } })
+    );
+  });
+
+  // Deep links open the specific question.
+  const openFromHash = () => {
+    const id = location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el instanceof HTMLDetailsElement) {
+      el.open = true;
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  };
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+</script>

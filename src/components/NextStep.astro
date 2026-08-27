@@ -1,0 +1,137 @@
+---
+import Icon from './Icon.astro';
+
+/**
+ * "What happens next" — the anti-dead-end block.
+ *
+ * Every substantial page ends with one of these. It is the single most effective
+ * conversion device on the site precisely because it is not a hard sell: it names
+ * the next honest step for someone at this point in the journey.
+ */
+
+interface Link { label: string; href: string; desc?: string }
+
+interface Props {
+  title?: string;
+  lede?: string;
+  primary: Link;
+  secondary?: Link[];
+  tone?: 'default' | 'sunken';
+}
+
+const {
+  title = 'What happens next',
+  lede,
+  primary,
+  secondary = [],
+  tone = 'sunken',
+} = Astro.props;
+---
+
+<section class={`nstep nstep--${tone}`} aria-labelledby="nstep-title">
+  <div class="container">
+    <div class="nstep__inner">
+      <div class="nstep__copy">
+        <p class="eyebrow eyebrow--plain">
+          <Icon name="route" size={15} /> Next step
+        </p>
+        <h2 id="nstep-title">{title}</h2>
+        {lede && <p class="nstep__lede">{lede}</p>}
+      </div>
+
+      <div class="nstep__actions">
+        <a href={primary.href} class="nstep__primary" data-track="tour_cta_click" data-track-label="nextstep">
+          <span>
+            <strong>{primary.label}</strong>
+            {primary.desc && <small>{primary.desc}</small>}
+          </span>
+          <Icon name="arrow" size={19} />
+        </a>
+
+        {secondary.length > 0 && (
+          <ul class="nstep__list">
+            {secondary.map((s) => (
+              <li>
+                <a href={s.href}>
+                  <span>
+                    {s.label}
+                    {s.desc && <small>{s.desc}</small>}
+                  </span>
+                  <Icon name="arrow" size={15} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .nstep { padding-block: var(--section); }
+  .nstep--sunken { background: var(--bg-sunken); }
+
+  .nstep__inner { display: grid; gap: var(--space-l); align-items: center; }
+
+  .nstep__copy h2 { font-size: var(--step-3); margin-top: 0.5rem; }
+  .nstep__lede {
+    margin-top: var(--space-s);
+    color: var(--text-muted);
+    font-size: var(--step-0);
+    line-height: var(--leading-normal);
+    max-width: 46ch;
+  }
+
+  .nstep__actions { display: grid; gap: 0.6rem; }
+
+  .nstep__primary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-m);
+    padding: 1.1rem 1.35rem;
+    min-height: 72px;
+    border-radius: var(--radius-l);
+    background: var(--coral-500);
+    color: #fff;
+    text-decoration: none;
+    box-shadow: var(--shadow-m);
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+  }
+  .nstep__primary:hover {
+    background: var(--coral-600);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-l);
+  }
+  .nstep__primary strong { display: block; font-size: var(--step-1); font-weight: 650; line-height: 1.2; }
+  .nstep__primary small { display: block; font-size: var(--step--1); opacity: 0.88; margin-top: 0.2rem; }
+  .nstep__primary :global(svg) { flex: none; transition: transform var(--dur-fast) var(--ease-out); }
+  .nstep__primary:hover :global(svg) { transform: translateX(4px); }
+
+  .nstep__list { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+  .nstep__list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding: 0.85rem 1.2rem;
+    min-height: 56px;
+    border-radius: var(--radius-m);
+    border: 1.5px solid var(--border-strong);
+    background: var(--bg-raised);
+    color: var(--ink-800);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--step--1);
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .nstep__list a:hover { border-color: var(--ink-700); transform: translateY(-2px); color: var(--ink-900); }
+  .nstep__list small { display: block; font-weight: 450; font-size: var(--step--2); color: var(--text-muted); margin-top: 0.1rem; }
+  .nstep__list :global(svg) { flex: none; opacity: 0.5; }
+
+  @media (min-width: 860px) {
+    .nstep__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 26rem); gap: var(--space-2xl); }
+  }
+</style>

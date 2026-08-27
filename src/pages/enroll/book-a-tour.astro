@@ -1,0 +1,383 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+import { programs } from '../../data/programs';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([
+    { name: 'Enrol', href: '/enroll' },
+    { name: 'Book a tour', href: '/enroll/book-a-tour' },
+  ]),
+];
+
+const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'];
+---
+
+<Base
+  title="Book a tour | Tiny Stars Daycare"
+  description="Book a 30-minute tour of Tiny Stars Daycare in Grande Prairie. See the rooms, meet the team, and ask the questions the website cannot answer."
+  image="/assets/images/sections/cta.webp"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Book a tour"
+    title="Thirty minutes, in person"
+    lede="A website can show you photographs. A tour shows you how the room sounds at eleven in the morning. Tell us when suits and we will take it from there."
+    crumbs={[
+      { name: 'Enrol', href: '/enroll' },
+      { name: 'Book a tour', href: '/enroll/book-a-tour' },
+    ]}
+  />
+
+  <section class="section" aria-labelledby="tour-title">
+    <div class="container">
+      <div class="tour">
+        <!-- ------------------------------------------------- the flow -->
+        <div class="tour__main">
+          <h2 id="tour-title" class="visually-hidden">Tour request</h2>
+
+          <div class="notice notice--demo" data-reveal>
+            <Icon name="sparkles" size={20} />
+            <span>
+              <strong>This is a preview of the booking experience.</strong>
+              Nothing here reaches Tiny Stars. On the live site this flow connects to the
+              centre's real 30-minute booking calendar — the same one linked at the bottom
+              of this page, which does work today.
+            </span>
+          </div>
+
+          <div class="flow panel mt-l" data-flow>
+            <div class="flow__progress">
+              <div class="progress">
+                <span class="progress__label" data-step-label>Step 1 of 6</span>
+                <div class="progress__track">
+                  <div class="progress__fill" data-progress style="width:16.6%"></div>
+                </div>
+              </div>
+            </div>
+
+            <p class="visually-hidden" role="status" aria-live="polite" data-announce></p>
+
+            <!-- 1. visit type -->
+            <fieldset class="step is-active" data-step="1">
+              <legend>
+                <span class="step__n">1</span>
+                <span>
+                  <strong>What kind of visit?</strong>
+                  <small>All options are 30 minutes.</small>
+                </span>
+              </legend>
+              <div class="field">
+                <div class="choices choices--grid" data-required-group="visitType" data-error-empty="Pick a visit type to continue.">
+                  <label class="choice">
+                    <input type="radio" name="visitType" value="standard" data-label="Standard tour" />
+                    <span class="choice__box">Standard tour<small>See the rooms while the day is running</small></span>
+                  </label>
+                  <label class="choice">
+                    <input type="radio" name="visitType" value="quiet" data-label="Quieter time" />
+                    <span class="choice__box">A quieter time<small>Better if your child finds noise hard</small></span>
+                  </label>
+                  <label class="choice">
+                    <input type="radio" name="visitType" value="withchild" data-label="Bringing my child" />
+                    <span class="choice__box">I'll bring my child<small>See how they react to the space</small></span>
+                  </label>
+                  <label class="choice">
+                    <input type="radio" name="visitType" value="questions" data-label="Mostly questions" />
+                    <span class="choice__box">Mostly questions<small>You want a conversation more than a walk-through</small></span>
+                  </label>
+                </div>
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 2. date -->
+            <fieldset class="step" data-step="2" hidden>
+              <legend>
+                <span class="step__n">2</span>
+                <span>
+                  <strong>Which day works?</strong>
+                  <small>Pick a preference — the team will confirm what's actually free.</small>
+                </span>
+              </legend>
+              <div class="field">
+                <label class="field__label" for="tour-date">Preferred date</label>
+                <input class="input" type="date" id="tour-date" name="date" data-required data-error-empty="Choose a date you'd like to visit." />
+                <p class="field__error"></p>
+              </div>
+              <div class="notice notice--info mt-m">
+                <Icon name="info" size={18} />
+                <span>
+                  <strong>We're not showing you live slots.</strong>
+                  Tiny Stars' real availability isn't published, and inventing a calendar of
+                  green ticks would be a lie. This records a preference.
+                </span>
+              </div>
+            </fieldset>
+
+            <!-- 3. time -->
+            <fieldset class="step" data-step="3" hidden>
+              <legend>
+                <span class="step__n">3</span>
+                <span>
+                  <strong>What time of day?</strong>
+                  <small>Mid-morning shows the centre at its busiest — often the most useful.</small>
+                </span>
+              </legend>
+              <div class="field">
+                <div class="choices choices--grid choices--tight" data-required-group="time" data-error-empty="Pick a time preference.">
+                  {times.map((t) => (
+                    <label class="choice">
+                      <input type="radio" name="time" value={t} data-label={t} />
+                      <span class="choice__box">{t}</span>
+                    </label>
+                  ))}
+                </div>
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 4. you -->
+            <fieldset class="step" data-step="4" hidden>
+              <legend>
+                <span class="step__n">4</span>
+                <span>
+                  <strong>How do we reach you?</strong>
+                  <small>Only what's needed to confirm a visit. Nothing more.</small>
+                </span>
+              </legend>
+
+              <div class="field">
+                <label class="field__label" for="parent-name">Your name</label>
+                <input class="input" type="text" id="parent-name" name="parentName" autocomplete="name" data-required data-error-empty="We'd like to know who to expect." />
+                <p class="field__error"></p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="parent-email">Email</label>
+                <input class="input" type="email" id="parent-email" name="email" autocomplete="email" inputmode="email" data-required />
+                <p class="field__error"></p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="parent-phone">Phone</label>
+                <span class="field__hint">Most families find a quick call faster than email.</span>
+                <input class="input" type="tel" id="parent-phone" name="phone" autocomplete="tel" inputmode="tel" data-required />
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 5. child -->
+            <fieldset class="step" data-step="5" hidden>
+              <legend>
+                <span class="step__n">5</span>
+                <span>
+                  <strong>About your child</strong>
+                  <small>Just enough to show you the right room. No surnames, no birthdates.</small>
+                </span>
+              </legend>
+
+              <div class="field">
+                <label class="field__label" for="child-first">Child's first name <span class="text-subtle">(optional)</span></label>
+                <input class="input" type="text" id="child-first" name="childName" autocomplete="off" />
+                <p class="field__error"></p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="child-program">Which program are you looking at?</label>
+                <select class="select" id="child-program" name="program" data-required data-error-empty="Pick the closest age group.">
+                  <option value="">Choose an age group…</option>
+                  {programs.map((p) => (
+                    <option value={p.name} data-label={`${p.name} · ${p.ageLabel}`}>
+                      {p.name} · {p.ageLabel}
+                    </option>
+                  ))}
+                  <option value="Not sure">Not sure yet</option>
+                </select>
+                <p class="field__error"></p>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="tour-notes">Anything you'd like us to know? <span class="text-subtle">(optional)</span></label>
+                <span class="field__hint">Allergies, a question you want answered, whether your child is nervous about new places.</span>
+                <textarea class="textarea" id="tour-notes" name="notes" maxlength="600"></textarea>
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 6. review -->
+            <fieldset class="step" data-step="6" hidden>
+              <legend>
+                <span class="step__n">6</span>
+                <span>
+                  <strong>Check it over</strong>
+                  <small>Change anything before you send.</small>
+                </span>
+              </legend>
+              <dl class="review" data-review></dl>
+            </fieldset>
+
+            <div class="result" data-result hidden></div>
+
+            <div class="flow__nav" data-nav>
+              <button type="button" class="btn btn--quiet" data-back hidden>
+                <Icon name="chevron" size={16} class="flip" /> Back
+              </button>
+              <button type="button" class="btn btn--primary" data-next data-final-label="Send request">
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ------------------------------------------------- sidebar -->
+        <aside class="tour__side" aria-label="Before you visit">
+          <div class="panel sidecard" data-reveal>
+            <h3>Before you come</h3>
+            <ul class="prep">
+              <li><Icon name="check-circle" size={16} /> Read the Parent Handbook so you can ask about the parts that matter to you</li>
+              <li><Icon name="check-circle" size={16} /> Write down your three biggest worries — you will forget them otherwise</li>
+              <li><Icon name="check-circle" size={16} /> Ask about ratios, fees and availability, none of which are published</li>
+            </ul>
+            <a href="/enroll/tour-guide" class="btn btn--ghost btn--block btn--sm mt-m">
+              Full tour checklist
+            </a>
+          </div>
+
+          <div class="panel sidecard mt-m" data-reveal>
+            <h3>Prefer to just book?</h3>
+            <p class="sidecard__note">
+              Tiny Stars uses a real 30-minute booking calendar. This link goes straight to
+              it — it works today, and it is the only booking on this site that does.
+            </p>
+            <a
+              href={site.calendly}
+              target="_blank"
+              rel="noopener"
+              class="btn btn--ink btn--block btn--sm mt-s"
+              data-track="tour_cta_click"
+              data-track-label="calendly-real"
+            >
+              <Icon name="calendar" size={16} />
+              Open the real calendar
+            </a>
+            <p class="sidecard__note mt-s">
+              Or call <a href={site.phone.href} data-track="phone_click">{site.phone.label}</a>.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .tour { display: grid; gap: var(--space-xl); align-items: start; }
+  @media (min-width: 980px) {
+    .tour { grid-template-columns: minmax(0, 1fr) minmax(0, 21rem); gap: var(--space-2xl); }
+    .tour__side { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  }
+
+  /* sidebar */
+  .prep { list-style: none; padding: 0; display: grid; gap: 0.7rem; }
+  .prep li {
+    display: flex; gap: 0.6rem; align-items: flex-start;
+    font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal);
+  }
+  .prep :global(svg) { color: var(--teal-600); flex: none; margin-top: 0.15rem; }
+</style>
+
+<script>
+  import { StepFlow, esc } from '../../lib/stepflow';
+  import { track } from '../../lib/analytics';
+
+  const root = document.querySelector<HTMLElement>('[data-flow]')!;
+  const reviewEl = root.querySelector<HTMLElement>('[data-review]')!;
+
+  const FIELDS: { key: string; label: string; step: number }[] = [
+    { key: 'visitType', label: 'Visit type', step: 1 },
+    { key: 'date', label: 'Preferred date', step: 2 },
+    { key: 'time', label: 'Preferred time', step: 3 },
+    { key: 'parentName', label: 'Your name', step: 4 },
+    { key: 'email', label: 'Email', step: 4 },
+    { key: 'phone', label: 'Phone', step: 4 },
+    { key: 'childName', label: "Child's name", step: 5 },
+    { key: 'program', label: 'Program', step: 5 },
+    { key: 'notes', label: 'Notes', step: 5 },
+  ];
+
+  track('tour_flow_start');
+
+  const flow = new StepFlow({
+    root,
+    draftKey: 'ts:tour-draft',
+
+    onStep(step, total) {
+      track('tour_flow_step', { step, total });
+      if (step === total) renderReview();
+    },
+
+    onComplete(data) {
+      track('tour_flow_complete', { program: data.program ?? '' });
+      flow.clearDraft();
+
+      const when = [flow.labelFor('date'), flow.labelFor('time')].filter(Boolean).join(' · ');
+
+      flow.finish(
+        `<div class="done__icon">
+           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+         </div>
+         <span class="badge badge--demo">Preview — nothing was sent</span>
+         <h3 style="font-size:var(--step-3);margin-top:.75rem">This is where your request would go</h3>
+         <p class="lede" style="margin-top:.6rem">
+           In the live version, Tiny Stars would receive a request for
+           <strong>${esc(when || 'your chosen time')}</strong> and confirm by phone or email.
+           Because this is a preview, nothing left your browser.
+         </p>
+
+         <div class="notice notice--warn" style="margin-top:var(--space-l)">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5 2.8 20h18.4Z"/><path d="M12 10v4"/><path d="M12 17.2v.1"/></svg>
+           <span>
+             <strong>To actually book a tour today</strong>, use Tiny Stars' real
+             30-minute calendar or call the director. Both are one tap away below.
+           </span>
+         </div>
+
+         <div class="cluster" style="margin-top:var(--space-l)">
+           <a class="btn btn--primary" href="https://calendly.com/tinystars-info/30min" target="_blank" rel="noopener" data-track="tour_cta_click" data-track-label="calendly-after-demo">Open the real calendar</a>
+           <a class="btn btn--ghost" href="tel:+17802301599" data-track="phone_click">Call (780) 230-1599</a>
+           <a class="btn btn--quiet" href="/enroll/tour-guide">Prepare for your visit</a>
+         </div>`,
+        'Preview complete. Nothing was sent to Tiny Stars.'
+      );
+    },
+  });
+
+  function renderReview() {
+    const rows = FIELDS.map(({ key, label, step }) => {
+      const value = flow.labelFor(key);
+      if (!value) return '';
+      return `<div>
+          <dt>${label}</dt>
+          <dd>${esc(value)} <button type="button" class="review__edit" data-goto="${step}">Change</button></dd>
+        </div>`;
+    })
+      .filter(Boolean)
+      .join('');
+
+    reviewEl.innerHTML =
+      rows ||
+      '<div><dt>Nothing yet</dt><dd>Go back and fill in the earlier steps.</dd></div>';
+
+    reviewEl.querySelectorAll<HTMLButtonElement>('[data-goto]').forEach((btn) => {
+      btn.addEventListener('click', () => flow.goTo(Number(btn.dataset.goto)));
+    });
+  }
+
+  // Sensible date floor: today.
+  const dateInput = root.querySelector<HTMLInputElement>('#tour-date');
+  if (dateInput) dateInput.min = new Date().toISOString().slice(0, 10);
+</script>

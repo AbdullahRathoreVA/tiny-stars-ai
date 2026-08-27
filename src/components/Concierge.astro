@@ -1,0 +1,601 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+
+<button type="button" class="cg-launch" data-concierge-open aria-haspopup="dialog" aria-controls="concierge">
+  <span class="cg-launch__mark" aria-hidden="true"><Icon name="star" size={17} /></span>
+  <span class="cg-launch__text">Ask Star&nbsp;Guide</span>
+</button>
+
+<div class="cg" id="concierge" hidden>
+  <div class="cg__scrim" data-concierge-close></div>
+
+  <div class="cg__panel" role="dialog" aria-modal="true" aria-labelledby="cg-title">
+    <header class="cg__head">
+      <span class="cg__avatar" aria-hidden="true"><Icon name="star" size={18} /></span>
+      <div class="cg__id">
+        <h2 id="cg-title">Star Guide</h2>
+        <p data-cg-status>Tiny Stars concierge · answers from published information</p>
+      </div>
+      <button type="button" class="cg__close" data-concierge-close aria-label="Close Star Guide">
+        <Icon name="x" size={19} />
+      </button>
+    </header>
+
+    <div class="cg__log" data-cg-log role="log" aria-live="polite" aria-relevant="additions text">
+      <!-- populated by script -->
+    </div>
+
+    <div class="cg__chips" data-cg-chips></div>
+
+    <form class="cg__form" data-cg-form>
+      <label for="cg-input" class="visually-hidden">Ask Star Guide a question</label>
+      <input
+        type="text"
+        id="cg-input"
+        class="cg__input"
+        data-cg-input
+        autocomplete="off"
+        placeholder="Ask anything about Tiny Stars…"
+        maxlength="600"
+      />
+      <button type="submit" class="cg__send" aria-label="Send">
+        <Icon name="arrow" size={18} />
+      </button>
+    </form>
+
+    <footer class="cg__foot">
+      <span>Star Guide only uses what Tiny Stars has published.</span>
+      <a href={site.phone.href} data-track="concierge_handoff">Talk to a person</a>
+    </footer>
+  </div>
+</div>
+
+<style>
+  /* ------------------------------------------------------------- launcher */
+  .cg-launch {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: var(--z-concierge);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.65rem 1.15rem 0.65rem 0.65rem;
+    min-height: 52px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--ink-900);
+    color: var(--cream-100);
+    font-size: var(--step--1);
+    font-weight: 650;
+    cursor: pointer;
+    box-shadow: var(--shadow-l);
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+  }
+  .cg-launch:hover { transform: translateY(-3px); box-shadow: var(--shadow-xl); }
+  .cg-launch__mark {
+    display: grid; place-items: center;
+    width: 34px; height: 34px;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--gold-400) 20%, transparent);
+    color: var(--gold-400);
+    flex: none;
+  }
+  .cg-launch__mark :global(svg) { fill: currentColor; stroke-width: 1.2; }
+
+  @media (max-width: 900px) {
+    /* The mobile bar owns the bottom edge — the launcher steps aside. */
+    .cg-launch { display: none; }
+  }
+
+  /* ---------------------------------------------------------------- panel */
+  .cg { position: fixed; inset: 0; z-index: var(--z-concierge); }
+  .cg__scrim {
+    position: absolute; inset: 0;
+    background: color-mix(in oklab, var(--ink-900) 40%, transparent);
+    backdrop-filter: blur(3px);
+    animation: cgFade var(--dur) var(--ease-out);
+  }
+  @keyframes cgFade { from { opacity: 0; } to { opacity: 1; } }
+
+  .cg__panel {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    width: min(25rem, calc(100% - 2rem));
+    height: min(38rem, calc(100dvh - 5rem));
+    display: flex;
+    flex-direction: column;
+    background: var(--cream-50);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    animation: cgPop var(--dur-slow) var(--ease-out);
+  }
+  @keyframes cgPop {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cg__scrim, .cg__panel { animation: none; }
+  }
+
+  @media (max-width: 640px) {
+    .cg__panel {
+      inset: auto 0 0 0;
+      width: 100%;
+      height: min(85dvh, 100dvh - 3rem);
+      border-radius: var(--radius-l) var(--radius-l) 0 0;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+  }
+
+  .cg__head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1rem;
+    background: var(--ink-900);
+    color: var(--cream-100);
+    flex: none;
+  }
+  .cg__avatar {
+    display: grid; place-items: center;
+    width: 38px; height: 38px;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--gold-400) 20%, transparent);
+    color: var(--gold-400);
+    flex: none;
+  }
+  .cg__avatar :global(svg) { fill: currentColor; stroke-width: 1.2; }
+  .cg__id { flex: 1; min-width: 0; }
+  .cg__id h2 {
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-weight: 650;
+    line-height: 1.2;
+  }
+  .cg__id p {
+    font-size: 0.7rem;
+    color: var(--ink-400);
+    line-height: 1.35;
+    margin-top: 0.1rem;
+  }
+  .cg__close {
+    display: grid; place-items: center;
+    width: 38px; height: 38px;
+    flex: none;
+    border: 0; border-radius: var(--radius-pill);
+    background: color-mix(in oklab, #fff 10%, transparent);
+    color: var(--cream-200);
+    cursor: pointer;
+  }
+  .cg__close:hover { background: color-mix(in oklab, #fff 18%, transparent); }
+
+  .cg__log {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    scroll-behavior: smooth;
+  }
+
+  .cg__chips {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0 1rem 0.65rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: none;
+  }
+  .cg__chips::-webkit-scrollbar { display: none; }
+  .cg__chips:empty { display: none; }
+
+  .cg__form {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--cream-100);
+    flex: none;
+  }
+  .cg__input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem 0.9rem;
+    min-height: 44px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    background: var(--cream-50);
+    font-size: var(--step--1);
+  }
+  .cg__input:focus {
+    outline: none;
+    border-color: var(--coral-500);
+    box-shadow: 0 0 0 3px var(--coral-100);
+  }
+  .cg__send {
+    display: grid; place-items: center;
+    width: 44px; height: 44px;
+    flex: none;
+    border: 0; border-radius: var(--radius-pill);
+    background: var(--coral-500);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .cg__send:hover { background: var(--coral-600); }
+  .cg__send:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .cg__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem 0.7rem;
+    background: var(--cream-100);
+    font-size: 0.68rem;
+    color: var(--text-subtle);
+    flex: none;
+  }
+  .cg__foot > span { min-width: 0; }
+  .cg__foot a { flex: none; white-space: nowrap; font-weight: 650; color: var(--coral-700); text-decoration: none; }
+  .cg__foot a:hover { text-decoration: underline; }
+</style>
+
+<!--
+  Runtime-injected markup does not receive Astro's scoping attribute, so any rule
+  that styles HTML created by the script below must be global. Keeping those rules
+  in their own block makes that requirement explicit rather than accidental.
+-->
+<style is:global>
+  .cg-msg { max-width: 100%; }
+  .cg-msg--user {
+    align-self: flex-end;
+    max-width: 85%;
+    padding: 0.65rem 0.95rem;
+    border-radius: var(--radius-m) var(--radius-m) var(--radius-xs) var(--radius-m);
+    background: var(--coral-500);
+    color: #fff;
+    font-size: var(--step--1);
+    line-height: 1.5;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .cg-msg--bot {
+    align-self: flex-start;
+    width: 100%;
+  }
+  .cg-bubble {
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-m) var(--radius-m) var(--radius-m) var(--radius-xs);
+    background: var(--cream-200);
+    border: 1px solid var(--border);
+    font-size: var(--step--1);
+    line-height: var(--leading-normal);
+  }
+  .cg-bubble p + p { margin-top: 0.7em; }
+  .cg-bubble strong { font-weight: 700; }
+
+  .cg-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+  }
+  .cg-agent {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .cg-agent::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--coral-500);
+  }
+
+  .cg-sources {
+    margin-top: 0.6rem;
+    padding-top: 0.55rem;
+    border-top: 1px dashed var(--border-strong);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+  .cg-sources strong { font-weight: 700; color: var(--ink-700); }
+  .cg-sources a { color: var(--coral-700); }
+
+  .cg-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+  .cg-action {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.45rem 0.85rem;
+    min-height: 38px;
+    border-radius: var(--radius-pill);
+    font-size: 0.76rem;
+    font-weight: 650;
+    text-decoration: none;
+    border: 1.5px solid var(--border-strong);
+    background: var(--cream-50);
+    color: var(--ink-800);
+  }
+  .cg-action:hover { background: var(--cream-100); border-color: var(--ink-700); color: var(--ink-900); }
+  .cg-action--primary {
+    background: var(--coral-500);
+    border-color: var(--coral-500);
+    color: #fff;
+  }
+  .cg-action--primary:hover { background: var(--coral-600); border-color: var(--coral-600); color: #fff; }
+
+  .cg-typing { display: inline-flex; gap: 4px; padding: 0.5rem 0; }
+  .cg-typing span {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--sand-500);
+    animation: cgBounce 1.1s var(--ease-in-out) infinite;
+  }
+  .cg-typing span:nth-child(2) { animation-delay: 0.14s; }
+  .cg-typing span:nth-child(3) { animation-delay: 0.28s; }
+  @keyframes cgBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+    30% { transform: translateY(-5px); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cg-typing span { animation: none; opacity: 0.6; }
+  }
+  .cg-chip {
+    flex: none;
+    padding: 0.45rem 0.85rem;
+    min-height: 38px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--border-strong);
+    background: var(--cream-50);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--ink-700);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .cg-chip:hover { background: var(--cream-200); border-color: var(--ink-600); color: var(--ink-900); }
+</style>
+
+<script>
+  import { getProvider } from '../lib/ai/provider';
+  import { quickActions, samplePrompts } from '../lib/ai/local';
+  import { agentById } from '../lib/ai/agents';
+  import { escapeHtml } from '../lib/ai/guardrails';
+  import { track } from '../lib/analytics';
+  import type { Turn, SessionContext } from '../lib/ai/provider';
+
+  const root = document.getElementById('concierge')!;
+  const log = root.querySelector<HTMLElement>('[data-cg-log]')!;
+  const chips = root.querySelector<HTMLElement>('[data-cg-chips]')!;
+  const form = root.querySelector<HTMLFormElement>('[data-cg-form]')!;
+  const input = root.querySelector<HTMLInputElement>('[data-cg-input]')!;
+  const send = form.querySelector<HTMLButtonElement>('.cg__send')!;
+  const status = root.querySelector<HTMLElement>('[data-cg-status]')!;
+
+  const provider = getProvider();
+  const history: Turn[] = [];
+  let lastFocus: HTMLElement | null = null;
+  let busy = false;
+  let greeted = false;
+
+  /** Session-only context. Never written to storage, never sent anywhere. */
+  const context: SessionContext = {
+    path: location.pathname,
+    program: document.body.dataset.program,
+    intent: sessionStorage.getItem('ts:intent') ?? undefined,
+  };
+
+  input.placeholder = samplePrompts[Math.floor(Math.random() * samplePrompts.length)];
+
+  /** Minimal, safe markdown: **bold** and paragraph breaks. Nothing else. */
+  function format(text: string): string {
+    return escapeHtml(text)
+      .split(/\n{2,}/)
+      .map((p) => `<p>${p.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>`)
+      .join('');
+  }
+
+  function scrollDown() {
+    requestAnimationFrame(() => {
+      log.scrollTop = log.scrollHeight;
+    });
+  }
+
+  function addUser(text: string) {
+    const el = document.createElement('div');
+    el.className = 'cg-msg cg-msg--user';
+    el.textContent = text;
+    log.append(el);
+    scrollDown();
+  }
+
+  function addTyping(): HTMLElement {
+    const el = document.createElement('div');
+    el.className = 'cg-msg cg-msg--bot';
+    el.innerHTML =
+      '<div class="cg-bubble"><span class="cg-typing" role="status" aria-label="Star Guide is thinking"><span></span><span></span><span></span></span></div>';
+    log.append(el);
+    scrollDown();
+    return el;
+  }
+
+  const TRUST_LABEL: Record<string, string> = {
+    verified: 'From Tiny Stars',
+    general: 'General guidance',
+    unknown: 'Not published',
+  };
+
+  function renderBot(el: HTMLElement, res: Awaited<ReturnType<typeof provider.respond>>) {
+    const agent = agentById(res.agent);
+
+    const sources = res.sources.length
+      ? `<div class="cg-sources"><strong>Source:</strong> ${res.sources
+          .map((s) =>
+            s.href
+              ? `<a href="${s.href}">${escapeHtml(s.label)}</a>`
+              : escapeHtml(s.label)
+          )
+          .join(' · ')}</div>`
+      : res.trust === 'general'
+        ? '<div class="cg-sources"><strong>Note:</strong> general early-childhood guidance, not a Tiny Stars policy.</div>'
+        : '';
+
+    const actions = res.actions.length
+      ? `<div class="cg-actions">${res.actions
+          .map(
+            (a) =>
+              `<a class="cg-action${a.kind === 'primary' ? ' cg-action--primary' : ''}" href="${a.href}">${escapeHtml(a.label)}</a>`
+          )
+          .join('')}</div>`
+      : '';
+
+    el.innerHTML = `
+      <div class="cg-meta">
+        <span class="cg-agent">${escapeHtml(agent.name)}</span>
+        <span class="badge badge--${res.trust}">${TRUST_LABEL[res.trust]}</span>
+      </div>
+      <div class="cg-bubble">
+        ${format(res.text)}
+        ${sources}
+        ${actions}
+      </div>`;
+
+    chips.innerHTML = res.followUps
+      .map((q) => `<button type="button" class="cg-chip" data-ask="${escapeHtml(q)}">${escapeHtml(q)}</button>`)
+      .join('');
+
+    status.textContent = `${agent.name} · ${agent.role}`;
+    scrollDown();
+  }
+
+  async function ask(message: string) {
+    if (busy || !message.trim()) return;
+    busy = true;
+    send.disabled = true;
+
+    addUser(message);
+    history.push({ role: 'user', text: message });
+    chips.innerHTML = '';
+    track('concierge_question', { length: message.length });
+
+    const typing = addTyping();
+
+    // A deliberate beat. Instant answers read as canned; this reads as considered.
+    const [res] = await Promise.all([
+      provider.respond({ message, history: history.slice(-6), context }),
+      new Promise((r) => setTimeout(r, 420)),
+    ]);
+
+    renderBot(typing, res);
+    history.push({ role: 'assistant', text: res.text });
+
+    if (res.handoff) track('concierge_handoff', { agent: res.agent });
+
+    // Remember an age the visitor volunteered, for this session only.
+    if (!context.ageMonths) {
+      const m = message.match(/(\d{1,2})\s*(month|year)/i);
+      if (m) context.ageMonths = m[2].toLowerCase().startsWith('y') ? +m[1] * 12 : +m[1];
+    }
+
+    busy = false;
+    send.disabled = false;
+    input.focus();
+  }
+
+  function greet() {
+    if (greeted) return;
+    greeted = true;
+
+    const el = document.createElement('div');
+    el.className = 'cg-msg cg-msg--bot';
+    el.innerHTML = `
+      <div class="cg-bubble">
+        <p>Hello — I’m Star Guide.</p>
+        <p>I can help you find the right program, understand how enrolment works, or get you booked in for a visit. I only use what Tiny Stars has actually published, and I’ll say so plainly when something hasn’t been.</p>
+      </div>`;
+    log.append(el);
+
+    chips.innerHTML = quickActions
+      .map(
+        (a) =>
+          `<button type="button" class="cg-chip" data-ask="${a.message.replace(/"/g, '&quot;')}">${a.label}</button>`
+      )
+      .join('');
+    scrollDown();
+  }
+
+  chips.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-ask]');
+    if (btn?.dataset.ask) ask(btn.dataset.ask);
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const value = input.value;
+    input.value = '';
+    ask(value);
+  });
+
+  function open() {
+    if (!root.hidden) return;
+    lastFocus = document.activeElement as HTMLElement;
+    root.hidden = false;
+    document.body.style.overflow = 'hidden';
+    greet();
+    track('concierge_open', { path: location.pathname });
+    setTimeout(() => input.focus(), 60);
+  }
+
+  function close() {
+    if (root.hidden) return;
+    root.hidden = true;
+    document.body.style.overflow = '';
+    lastFocus?.focus();
+  }
+
+  document.querySelectorAll('[data-concierge-open]').forEach((el) =>
+    el.addEventListener('click', open)
+  );
+  root.querySelectorAll('[data-concierge-close]').forEach((el) =>
+    el.addEventListener('click', close)
+  );
+  document.addEventListener('ts:concierge-open', (e) => {
+    open();
+    const q = (e as CustomEvent<{ ask?: string }>).detail?.ask;
+    if (q) setTimeout(() => ask(q), 300);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !root.hidden) close();
+  });
+
+  root.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const list = Array.from(
+      root.querySelectorAll<HTMLElement>('button, a[href], input')
+    ).filter((el) => el.offsetParent !== null && !el.hasAttribute('disabled'));
+    if (!list.length) return;
+    const first = list[0];
+    const last = list[list.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+</script>

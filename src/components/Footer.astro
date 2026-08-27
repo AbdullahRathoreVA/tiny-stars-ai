@@ -1,0 +1,259 @@
+---
+import Icon from './Icon.astro';
+import { footerNav } from '../lib/nav';
+import { site, trustMarkers } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="ftr">
+  <div class="starfield" aria-hidden="true">
+    <span style="--s:3px;left:8%;top:22%;--d:5s;--delay:0s;--o:.5"></span>
+    <span style="--s:2px;left:22%;top:64%;--d:6s;--delay:.9s;--o:.4"></span>
+    <span style="--s:4px;left:39%;top:16%;--d:4.4s;--delay:1.6s;--o:.6"></span>
+    <span style="--s:2px;left:57%;top:72%;--d:5.6s;--delay:.4s;--o:.35"></span>
+    <span style="--s:3px;left:71%;top:28%;--d:4.8s;--delay:2.1s;--o:.5"></span>
+    <span style="--s:2px;left:88%;top:58%;--d:6.2s;--delay:1.2s;--o:.45"></span>
+  </div>
+
+  <div class="container container--wide">
+    <div class="ftr__top">
+      <div class="ftr__brand">
+        <a href="/" class="ftr__logo">
+          <span class="ftr__mark" aria-hidden="true"><Icon name="star" size={20} /></span>
+          <span>
+            <strong>Tiny Stars</strong>
+            <small>Daycare · Grande Prairie, Alberta</small>
+          </span>
+        </a>
+        <p class="ftr__pitch">
+          A safe place to learn, play, grow and belong — for children from 12 months to 12 years.
+        </p>
+
+        <ul class="ftr__trust">
+          {trustMarkers.map((t) => (
+            <li>
+              <Icon name={t.icon as any} size={15} />
+              {t.label}
+            </li>
+          ))}
+        </ul>
+
+        <div class="ftr__social">
+          <a href={site.social.facebook} rel="me noopener" target="_blank" aria-label="Tiny Stars on Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.6V12h2.7l-.4 2.9h-2.3v7A10 10 0 0 0 22 12Z"/></svg>
+          </a>
+          <a href={site.social.instagram} rel="me noopener" target="_blank" aria-label="Tiny Stars on Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c0 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2 0-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c0-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4 1.3-.1 1.7-.1 4.9-.1Zm0 3.8a6 6 0 1 0 0 12 6 6 0 0 0 0-12Zm0 9.9a3.9 3.9 0 1 1 0-7.8 3.9 3.9 0 0 1 0 7.8Zm7.6-10.1a1.4 1.4 0 1 1-2.8 0 1.4 1.4 0 0 1 2.8 0Z"/></svg>
+          </a>
+          <a href={site.social.tiktok} rel="me noopener" target="_blank" aria-label="Tiny Stars on TikTok">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.5 2h-3v14a2.5 2.5 0 1 1-2.5-2.5c.3 0 .5 0 .8.1v-3a5.5 5.5 0 1 0 4.7 5.4V8.9a7 7 0 0 0 4 1.3v-3a4 4 0 0 1-4-4.1V2Z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="ftr__cols">
+        {footerNav.map((col) => (
+          <nav class="ftr__col" aria-labelledby={`ftr-${col.title.replace(/\W+/g, '')}`}>
+            <h2 id={`ftr-${col.title.replace(/\W+/g, '')}`}>{col.title}</h2>
+            <ul>
+              {col.links.map((l) => (
+                <li><a href={l.href}>{l.label}</a></li>
+              ))}
+            </ul>
+          </nav>
+        ))}
+      </div>
+    </div>
+
+    <div class="ftr__contact">
+      <a href={site.phone.href} class="ftr__contact-item" data-track="phone_click">
+        <Icon name="phone" size={18} />
+        <span><small>Call the director</small><strong>{site.phone.label}</strong></span>
+      </a>
+      <a href={`mailto:${site.email.general}`} class="ftr__contact-item" data-track="email_click">
+        <Icon name="mail" size={18} />
+        <span><small>Email us</small><strong>{site.email.general}</strong></span>
+      </a>
+      <a
+        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapsQuery)}`}
+        class="ftr__contact-item"
+        target="_blank"
+        rel="noopener"
+        data-track="directions_click"
+      >
+        <Icon name="pin" size={18} />
+        <span><small>Visit us</small><strong>{site.address.street}, {site.address.city}</strong></span>
+      </a>
+    </div>
+
+    <div class="ftr__bottom">
+      <p>© {year} {site.name}. Family owned in {site.address.city}, {site.address.region}.</p>
+      <ul class="ftr__legal">
+        <li><a href="/accessibility">Accessibility</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/about-this-demo">About this preview</a></li>
+        <li><a href="/command-center">Command Centre</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    position: relative;
+    background: var(--ink-900);
+    color: var(--cream-300);
+    padding-block: var(--space-2xl) var(--space-l);
+    margin-top: var(--space-2xl);
+    overflow: hidden;
+  }
+  .ftr::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-400), transparent);
+    opacity: 0.4;
+  }
+
+  .ftr__top {
+    position: relative;
+    display: grid;
+    gap: var(--space-xl);
+    grid-template-columns: 1fr;
+  }
+
+  .ftr__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+    color: var(--cream-100);
+  }
+  .ftr__mark {
+    display: grid; place-items: center;
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: color-mix(in oklab, var(--gold-400) 18%, transparent);
+    color: var(--gold-400);
+    flex: none;
+  }
+  .ftr__mark :global(svg) { fill: currentColor; stroke-width: 1.2; }
+  .ftr__logo strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 650;
+  }
+  .ftr__logo small { font-size: 0.72rem; color: var(--ink-400); letter-spacing: 0.04em; }
+
+  .ftr__pitch {
+    margin-top: var(--space-s);
+    max-width: 30ch;
+    font-size: var(--step--1);
+    color: var(--cream-400);
+    line-height: var(--leading-normal);
+  }
+
+  .ftr__trust {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    margin-top: var(--space-m);
+    list-style: none; padding: 0;
+  }
+  .ftr__trust li {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid color-mix(in oklab, #fff 14%, transparent);
+    font-size: var(--step--2);
+    font-weight: 600;
+    color: var(--cream-300);
+  }
+  .ftr__trust :global(svg) { color: var(--gold-400); }
+
+  .ftr__social { display: flex; gap: 0.5rem; margin-top: var(--space-m); }
+  .ftr__social a {
+    display: grid; place-items: center;
+    width: 44px; height: 44px;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, #fff 8%, transparent);
+    color: var(--cream-200);
+    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  .ftr__social a:hover { background: var(--gold-400); color: var(--ink-900); }
+
+  .ftr__cols {
+    display: grid;
+    gap: var(--space-l);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  }
+  .ftr__col h2 {
+    font-family: var(--font-sans);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--gold-400);
+    margin-bottom: 0.85rem;
+  }
+  .ftr__col ul { list-style: none; padding: 0; display: grid; gap: 0.1rem; }
+  .ftr__col a {
+    display: block;
+    padding: 0.35rem 0;
+    font-size: var(--step--1);
+    color: var(--cream-400);
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+  .ftr__col a:hover { color: var(--cream-50); }
+
+  .ftr__contact {
+    position: relative;
+    display: grid;
+    gap: var(--space-s);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-l);
+    border-top: 1px solid color-mix(in oklab, #fff 12%, transparent);
+  }
+  .ftr__contact-item {
+    display: flex; align-items: center; gap: 0.8rem;
+    padding: 0.85rem 1rem;
+    min-height: 56px;
+    border-radius: var(--radius-m);
+    background: color-mix(in oklab, #fff 5%, transparent);
+    color: var(--cream-200);
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .ftr__contact-item:hover {
+    background: color-mix(in oklab, #fff 10%, transparent);
+    transform: translateY(-2px);
+    color: var(--cream-50);
+  }
+  .ftr__contact-item :global(svg) { color: var(--gold-400); flex: none; }
+  .ftr__contact-item small { display: block; font-size: var(--step--2); color: var(--ink-400); }
+  .ftr__contact-item strong { font-size: var(--step--1); font-weight: 650; }
+
+  .ftr__bottom {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s) var(--space-m);
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-l);
+    padding-top: var(--space-m);
+    border-top: 1px solid color-mix(in oklab, #fff 10%, transparent);
+    font-size: var(--step--2);
+    color: var(--ink-400);
+  }
+  .ftr__legal { display: flex; flex-wrap: wrap; gap: var(--space-s); list-style: none; padding: 0; }
+  .ftr__legal a { color: var(--cream-400); text-decoration: none; }
+  .ftr__legal a:hover { color: var(--cream-50); text-decoration: underline; }
+
+  @media (min-width: 900px) {
+    .ftr__top { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); gap: var(--space-3xl); }
+  }
+</style>

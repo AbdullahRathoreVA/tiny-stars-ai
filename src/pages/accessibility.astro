@@ -1,0 +1,113 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+
+const done = [
+  'Semantic HTML throughout, with one H1 per page and a logical heading order',
+  'A skip link to main content as the first focusable element',
+  'Visible focus rings on every interactive element, never removed',
+  'Full keyboard operation: menus, dialogs, tabs, gallery, carousels and every form',
+  'Focus trapped inside dialogs and returned to the trigger on close',
+  'Arrow-key navigation in search results, tab sets and the photo viewer',
+  'Live regions announcing step changes, filter results and validation errors',
+  'Descriptive alt text written after looking at each photograph',
+  'Tap targets of at least 44x44 CSS pixels',
+  'Colour never used as the only way to convey meaning — badges carry text too',
+  'prefers-reduced-motion honoured; all animation collapses to near-instant',
+  'Forms with real labels, hints tied by aria-describedby, and errors that move focus',
+  'Video with visible controls, no autoplay, and no background audio',
+];
+
+const honest = [
+  {
+    title: 'Captions on video',
+    detail:
+      'The five video clips are mirrored from tinystars.ca and have no caption tracks. They carry no spoken narration, but that is not a substitute for captions. Adding WebVTT tracks is a known gap.',
+  },
+  {
+    title: 'PDF accessibility',
+    detail:
+      'The four policy documents are Tiny Stars’ own PDFs. We have not audited their internal tagging, so a screen reader may find them harder going than this site.',
+  },
+  {
+    title: 'Formal audit',
+    detail:
+      'This build has been keyboard-tested and checked against WCAG 2.2 AA by hand. It has not been through an independent audit or tested with every assistive technology.',
+  },
+];
+---
+
+<Base
+  title="Accessibility | Tiny Stars Daycare"
+  description="How this site approaches accessibility, what has been implemented against WCAG 2.2 AA, and an honest list of the gaps that remain."
+>
+  <PageHero
+    eyebrow="Accessibility"
+    title="What we've done, and what we haven't"
+    lede="An accessibility statement is only useful if it includes the gaps. Here are both halves."
+    crumbs={[{ name: 'Accessibility', href: '/accessibility' }]}
+  />
+
+  <section class="section section--tight">
+    <div class="container container--narrow prose">
+      <h2>Target</h2>
+      <p>
+        This site aims at <strong>WCAG 2.2 Level AA</strong>. Text contrast is at or above
+        4.5:1 for body copy and 3:1 for large text and interface components.
+      </p>
+
+      <h2>Implemented</h2>
+      <ul class="marks marks--ok">
+        {done.map((d) => <li><Icon name="check-circle" size={17} /><span>{d}</span></li>)}
+      </ul>
+
+      <h2>Known gaps</h2>
+      <p>These are real and we would rather name them than let you discover them.</p>
+      <div class="gaps">
+        {honest.map((g) => (
+          <article class="gap">
+            <h3>{g.title}</h3>
+            <p>{g.detail}</p>
+          </article>
+        ))}
+      </div>
+
+      <h2>Found something?</h2>
+      <p>
+        If any part of this site is hard to use, please tell us — it is the fastest way to
+        get it fixed. Call <a href={site.phone.href}>{site.phone.label}</a> or email
+        <a href={`mailto:${site.email.general}`}>{site.email.general}</a>.
+      </p>
+      <p>
+        If you need information from this site in another format, ask. We will find a way
+        to get it to you.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .marks { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+  .marks li {
+    display: flex; gap: 0.7rem; align-items: flex-start;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-s);
+    font-size: var(--step--1);
+    line-height: var(--leading-normal);
+    background: var(--ok-100);
+    color: var(--ink-800);
+  }
+  .marks li :global(svg) { flex: none; margin-top: 0.15rem; color: var(--ok-600); }
+
+  .gaps { display: grid; gap: 0.75rem; }
+  .gap {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--warn-100);
+    border: 1px solid color-mix(in oklab, var(--warn-600) 24%, transparent);
+  }
+  .gap h3 { font-size: var(--step-1); color: var(--warn-600); }
+  .gap p { margin-top: 0.4rem; font-size: var(--step--1); color: var(--ink-800); line-height: var(--leading-normal); }
+</style>

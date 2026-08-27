@@ -1,0 +1,296 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+/**
+ * A genuinely useful utility, not a lead magnet.
+ *
+ * This checklist works at any childcare centre, not just Tiny Stars — which is the
+ * point. A site confident enough to help you evaluate it properly is making a
+ * stronger argument than one that only tells you how good it is.
+ */
+const groups = [
+  {
+    title: 'What to watch, not ask',
+    note: 'The things nobody can rehearse for you.',
+    icon: 'eye',
+    items: [
+      'Do educators get down to the children’s eye level, or talk down at them?',
+      'When a child is upset, does someone go to them — and how long does it take?',
+      'Are the children absorbed in something, or drifting?',
+      'Does the room sound busy-happy or busy-frantic?',
+      'Do the staff look like they enjoy each other’s company?',
+      'Is the art on the wall made by children, or made by adults for children?',
+    ],
+  },
+  {
+    title: 'The practical questions',
+    note: 'Ask these out loud. Write the answers down.',
+    icon: 'question',
+    items: [
+      'What is the educator-to-child ratio in my child’s room, right now?',
+      'What are the fees, and what exactly is included?',
+      'Do you have availability for my child’s age, and when?',
+      'How long have the educators in this room been here?',
+      'What happens on a day when someone calls in sick?',
+      'What is the full cost of being late for pick-up?',
+    ],
+  },
+  {
+    title: 'Settling in and communication',
+    note: 'How the relationship works after day one.',
+    icon: 'chat',
+    items: [
+      'How do you handle the first week for a child who finds separation hard?',
+      'How will I hear about my child’s day?',
+      'Who do I contact if I am worried about something small?',
+      'How do you tell parents when something has gone wrong?',
+      'Can I visit unannounced once my child is enrolled?',
+    ],
+  },
+  {
+    title: 'Safety and policy',
+    note: 'Ask for anything you have not been able to read.',
+    icon: 'shield',
+    items: [
+      'Can I see the licence?',
+      'How does the front door work during the day?',
+      'What is the policy when a child becomes ill during the day?',
+      'How are allergies handled at mealtimes?',
+      'What is the emergency evacuation procedure?',
+      'Where are cameras, and who can view the footage?',
+    ],
+  },
+];
+
+const total = groups.reduce((n, g) => n + g.items.length, 0);
+---
+
+<Base
+  title="Prepare for your tour | Tiny Stars"
+  description="A practical checklist for touring any daycare: what to watch for, what to ask out loud, and how to compare centres fairly. Tick items off on your phone."
+  schema={[
+    organizationSchema,
+    breadcrumbSchema([
+      { name: 'Enrol', href: '/enroll' },
+      { name: 'Prepare for your tour', href: '/enroll/tour-guide' },
+    ]),
+  ]}
+>
+  <PageHero
+    tone="teal"
+    eyebrow="Before your tour"
+    title="The questions most people think of on the drive home"
+    lede="Tick these off on your phone while you walk around. It works at any centre — including the ones you visit before or after this one."
+    crumbs={[
+      { name: 'Enrol', href: '/enroll' },
+      { name: 'Prepare for your tour', href: '/enroll/tour-guide' },
+    ]}
+  >
+    <div class="cluster">
+      <a href="/enroll/book-a-tour" class="btn btn--primary" data-track="tour_cta_click" data-track-label="tourguide-hero">
+        <Icon name="calendar" size={18} /> Book a Tiny Stars tour
+      </a>
+      <button type="button" class="btn btn--ghost" data-print>
+        <Icon name="file" size={17} /> Print this checklist
+      </button>
+    </div>
+  </PageHero>
+
+  <section class="section" aria-labelledby="cl-title">
+    <div class="container container--narrow">
+      <h2 id="cl-title" class="visually-hidden">Tour checklist</h2>
+
+      <div class="clbar" data-reveal>
+        <div class="progress">
+          <span class="progress__label" data-count>0 of {total}</span>
+          <div class="progress__track">
+            <div class="progress__fill" data-fill style="width:0%"></div>
+          </div>
+        </div>
+        <button type="button" class="btn btn--quiet btn--sm" data-reset>Clear</button>
+      </div>
+      <p class="visually-hidden" role="status" aria-live="polite" data-cl-announce></p>
+
+      <div class="checklist mt-l">
+        {groups.map((g, gi) => (
+          <section class="clgroup" data-reveal style={`--reveal-delay:${gi * 60}ms`} aria-labelledby={`clg-${gi}`}>
+            <header class="clgroup__head">
+              <span class="clgroup__icon"><Icon name={g.icon as any} size={19} /></span>
+              <div>
+                <h3 id={`clg-${gi}`}>{g.title}</h3>
+                <p>{g.note}</p>
+              </div>
+            </header>
+
+            <ul class="clitems">
+              {g.items.map((item, ii) => (
+                <li>
+                  <label class="clitem">
+                    <input type="checkbox" data-cl id={`cl-${gi}-${ii}`} />
+                    <span class="clitem__tick" aria-hidden="true">
+                      <Icon name="check" size={14} />
+                    </span>
+                    <span class="clitem__text">{item}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+
+      <div class="notice notice--info mt-xl" data-reveal>
+        <Icon name="info" size={20} />
+        <span>
+          <strong>Your ticks stay on this device.</strong>
+          They are saved in your browser so the list survives a refresh mid-tour, and they
+          are never sent anywhere. “Clear” wipes them completely.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Bring this with you"
+    lede="Book a 30-minute visit, then open this page on your phone when you arrive."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' }}
+    secondary={[
+      { label: 'Read the Parent Handbook', href: '/assets/pdf/parent-handbook.pdf', desc: 'So you can ask better questions' },
+      { label: 'Trust Centre', href: '/why/trust-centre', desc: 'What is already answered in writing' },
+      { label: 'Call the director', href: site.phone.href, desc: site.phone.label },
+    ]}
+  />
+</Base>
+
+<style>
+  .clbar {
+    display: flex; align-items: center; gap: var(--space-m);
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    position: sticky;
+    top: calc(var(--header-h) + 0.5rem);
+    z-index: var(--z-sticky);
+    box-shadow: var(--shadow-s);
+  }
+  .clbar .progress { flex: 1; }
+
+  .checklist { display: grid; gap: var(--space-l); }
+  .clgroup {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .clgroup__head { display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: var(--space-m); }
+  .clgroup__icon {
+    display: grid; place-items: center;
+    width: 42px; height: 42px; flex: none;
+    border-radius: var(--radius-s);
+    background: var(--teal-50); color: var(--teal-700);
+  }
+  .clgroup h3 { font-size: var(--step-1); }
+  .clgroup__head p { font-size: var(--step--2); color: var(--text-muted); margin-top: 0.15rem; }
+
+  .clitems { list-style: none; padding: 0; display: grid; gap: 0.3rem; }
+
+  .clitem {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    padding: 0.7rem 0.8rem;
+    min-height: 48px;
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .clitem:hover { background: var(--cream-200); }
+  .clitem input {
+    position: absolute;
+    opacity: 0;
+    width: 1px; height: 1px;
+  }
+  .clitem__tick {
+    display: grid; place-items: center;
+    width: 24px; height: 24px; flex: none;
+    margin-top: 0.1rem;
+    border: 2px solid var(--border-strong);
+    border-radius: 7px;
+    color: transparent;
+    background: var(--cream-50);
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .clitem input:focus-visible + .clitem__tick { outline: 3px solid var(--coral-500); outline-offset: 2px; }
+  .clitem input:checked + .clitem__tick {
+    background: var(--teal-600);
+    border-color: var(--teal-600);
+    color: #fff;
+  }
+  .clitem__text { font-size: var(--step--1); line-height: var(--leading-normal); }
+  .clitem input:checked ~ .clitem__text { color: var(--text-subtle); text-decoration: line-through; }
+
+  @media print {
+    .clbar, .clitem__tick { break-inside: avoid; }
+    .clgroup { break-inside: avoid; border: 1px solid #999; }
+  }
+</style>
+
+<script>
+  const KEY = 'ts:tour-checklist';
+  const boxes = Array.from(document.querySelectorAll<HTMLInputElement>('[data-cl]'));
+  const count = document.querySelector<HTMLElement>('[data-count]')!;
+  const fill = document.querySelector<HTMLElement>('[data-fill]')!;
+  const announce = document.querySelector<HTMLElement>('[data-cl-announce]')!;
+
+  // localStorage is right here: a per-device convenience that must survive a
+  // refresh mid-tour, containing nothing personal.
+  function load() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) ?? '[]') as string[];
+      boxes.forEach((b) => (b.checked = saved.includes(b.id)));
+    } catch {
+      /* cleared storage, private mode — the list simply starts empty */
+    }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(boxes.filter((b) => b.checked).map((b) => b.id)));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function refresh(announceIt = false) {
+    const done = boxes.filter((b) => b.checked).length;
+    count.textContent = `${done} of ${boxes.length}`;
+    fill.style.width = `${(done / boxes.length) * 100}%`;
+    if (announceIt) announce.textContent = `${done} of ${boxes.length} checked.`;
+  }
+
+  boxes.forEach((b) =>
+    b.addEventListener('change', () => {
+      save();
+      refresh(true);
+    })
+  );
+
+  document.querySelector('[data-reset]')?.addEventListener('click', () => {
+    boxes.forEach((b) => (b.checked = false));
+    try {
+      localStorage.removeItem(KEY);
+    } catch {
+      /* ignore */
+    }
+    refresh(true);
+  });
+
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+
+  load();
+  refresh();
+</script>

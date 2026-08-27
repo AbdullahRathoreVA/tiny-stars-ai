@@ -1,0 +1,104 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+
+<div class="mbar" role="group" aria-label="Quick actions">
+  <a href={site.phone.href} class="mbar__item" data-track="phone_click">
+    <Icon name="phone" size={20} />
+    <span>Call</span>
+  </a>
+  <button type="button" class="mbar__item" data-concierge-open>
+    <Icon name="sparkles" size={20} />
+    <span>Ask</span>
+  </button>
+  <a href="/enroll/book-a-tour" class="mbar__item mbar__item--primary" data-track="tour_cta_click" data-track-label="mobilebar">
+    <Icon name="calendar" size={20} />
+    <span>Book a tour</span>
+  </a>
+</div>
+
+<style>
+  .mbar {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: var(--z-mobilebar);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr;
+    gap: 0.4rem;
+    padding: 0.5rem 0.6rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    background: color-mix(in oklab, var(--cream-50) 92%, transparent);
+    backdrop-filter: saturate(1.5) blur(16px);
+    -webkit-backdrop-filter: saturate(1.5) blur(16px);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -6px 24px color-mix(in oklab, var(--ink-900) 8%, transparent);
+    transform: translateY(110%);
+    transition: transform var(--dur-slow) var(--ease-out);
+  }
+  .mbar[data-visible='true'] { transform: none; }
+
+  .mbar__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    min-height: 54px;
+    padding: 0.4rem 0.5rem;
+    border: 0;
+    border-radius: var(--radius-m);
+    background: transparent;
+    color: var(--ink-700);
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .mbar__item:active { background: var(--cream-200); }
+  .mbar__item--primary {
+    flex-direction: row;
+    gap: 0.45rem;
+    background: var(--coral-500);
+    color: #fff;
+    font-size: var(--step--1);
+    box-shadow: var(--shadow-s);
+  }
+  .mbar__item--primary:active { background: var(--coral-600); }
+
+  /* The bar is a mobile affordance only — desktop has a persistent header CTA. */
+  @media (min-width: 901px) { .mbar { display: none; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mbar { transition: none; }
+  }
+</style>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('.mbar');
+  if (bar) {
+    // Reveal once the visitor has committed to reading — showing it instantly
+    // covers the hero and reads as a nag.
+    const REVEAL_AT = 380;
+    let visible = false;
+
+    const update = () => {
+      const should = window.scrollY > REVEAL_AT;
+      if (should === visible) return;
+      visible = should;
+      bar.dataset.visible = String(should);
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+
+    // Never let the bar sit on top of a focused input on a small screen.
+    document.addEventListener('focusin', (e) => {
+      const el = e.target as HTMLElement;
+      if (el.matches?.('input, textarea, select')) bar.dataset.visible = 'false';
+    });
+    document.addEventListener('focusout', () => setTimeout(update, 60));
+  }
+</script>

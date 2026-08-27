@@ -1,0 +1,357 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { programs, priorityLabels, type Program } from '../../data/programs';
+import { documents } from '../../data/site';
+import { breadcrumbSchema, organizationSchema, programSchema } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return programs.map((p, i) => ({
+    params: { slug: p.slug },
+    props: {
+      program: p,
+      prev: programs[i - 1],
+      next: programs[i + 1],
+    },
+  }));
+}
+
+interface Props {
+  program: Program;
+  prev?: Program;
+  next?: Program;
+}
+
+const { program: p, prev, next } = Astro.props;
+
+const schema = [
+  organizationSchema,
+  programSchema(p.slug),
+  breadcrumbSchema([
+    { name: 'Programs', href: '/programs' },
+    { name: p.name, href: `/programs/${p.slug}` },
+  ]),
+].filter(Boolean) as Record<string, unknown>[];
+
+const relatedDocs = documents.filter((d) =>
+  ['classroom-routine', 'parent-handbook'].includes(d.slug)
+);
+
+/** Clamp to a word boundary so descriptions stay inside a healthy SERP length. */
+function clamp(text: string, max = 158): string {
+  if (text.length <= max) return text;
+  return text.slice(0, text.lastIndexOf(' ', max)).replace(/[,;:.]$/, '') + '.';
+}
+
+const metaDescription = clamp(
+  `${p.name} at Tiny Stars Daycare, Grande Prairie: ${p.familiar.toLowerCase()} aged ${p.ageLabel}. ${p.blurb} Book a 30-minute tour to see the room.`
+);
+---
+
+<Base
+  title={`${p.name} · ${p.ageLabel} | Tiny Stars Daycare`}
+  description={metaDescription}
+  image={p.image}
+  schema={schema}
+  bodyClass={`program-page`}
+>
+  <PageHero
+    eyebrow={`${p.familiar} · ${p.ageLabel}`}
+    title={p.name}
+    lede={p.blurb}
+    crumbs={[
+      { name: 'Programs', href: '/programs' },
+      { name: p.name, href: `/programs/${p.slug}` },
+    ]}
+    image={p.image}
+    imageAlt={`Children in the ${p.name} program at Tiny Stars Daycare`}
+  >
+    <div class="cluster">
+      <a href="/enroll/book-a-tour" class="btn btn--primary" data-track="tour_cta_click" data-track-label={p.slug}>
+        <Icon name="calendar" size={18} />
+        Book a tour
+      </a>
+      <button type="button" class="btn btn--ghost" data-ask-program>
+        <Icon name="sparkles" size={17} />
+        Ask about this program
+      </button>
+    </div>
+  </PageHero>
+
+  <!-- --------------------------------------------------- what it is -->
+  <section class="section section--tight" aria-labelledby="about-title">
+    <div class="container">
+      <div class="split">
+        <div class="split__main" data-reveal>
+          <p class="eyebrow">In Tiny Stars' own words</p>
+          <h2 id="about-title">What {p.name} is</h2>
+          <blockquote class="quote">
+            <p>{p.official}</p>
+            <footer>
+              <Icon name="check-circle" size={15} />
+              {p.officialSource}
+            </footer>
+          </blockquote>
+
+          <h3 class="mt-xl">What this age is like</h3>
+          <p class="text-muted" style="font-size:var(--step--1)">
+            General early-childhood context — not a description of Tiny Stars' practice.
+          </p>
+          <ul class="notes mt-m">
+            {p.stageNotes.map((n) => (
+              <li>
+                <Icon name="bulb" size={17} />
+                <span>{n}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <aside class="split__side" data-reveal aria-label="Program summary">
+          <div class="panel sidecard">
+            <h3>At a glance</h3>
+            <dl class="facts">
+              <div>
+                <dt>Ages</dt>
+                <dd>{p.ageLabel}</dd>
+              </div>
+              <div>
+                <dt>Also called</dt>
+                <dd>{p.familiar}</dd>
+              </div>
+              <div>
+                <dt>Focus</dt>
+                <dd class="facts__tags">
+                  {p.priorities.map((pr) => (
+                    <span class="badge">{priorityLabels[pr].label}</span>
+                  ))}
+                </dd>
+              </div>
+              <div>
+                <dt>Closing time</dt>
+                <dd>6:00 PM <span class="badge badge--verified">Published</span></dd>
+              </div>
+            </dl>
+
+            <hr class="divider" />
+
+            <h4>Not published</h4>
+            <p class="sidecard__note">
+              Fees, current availability, group size and educator ratios for this room.
+              The team can tell you all four.
+            </p>
+            <a href="/enroll/book-a-tour" class="btn btn--ink btn--block btn--sm mt-s">
+              Ask on a tour
+            </a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------- questions -->
+  <section class="section section--sunken" aria-labelledby="q-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Questions about {p.name}</p>
+        <h2 id="q-title">What families ask about this group</h2>
+      </div>
+
+      <div class="qs mt-l" data-reveal>
+        {p.questions.map((q) => (
+          <details class="q">
+            <summary>
+              <span>{q.q}</span>
+              <span class={`badge badge--${q.verified ? 'verified' : 'unknown'}`}>
+                {q.verified ? 'From Tiny Stars' : 'Ask the team'}
+              </span>
+              <Icon name="chevron-down" size={18} class="q__caret" />
+            </summary>
+            <div class="q__body">
+              <p>{q.a}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+
+      <div class="cluster mt-l" style="justify-content:center" data-reveal>
+        <a href="/families/faq" class="btn btn--ghost">All questions & answers</a>
+        <button type="button" class="btn btn--quiet" data-concierge-open>
+          <Icon name="chat" size={16} /> Ask something else
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------ helpful -->
+  <section class="section" aria-labelledby="help-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Helpful right now</p>
+        <h2 id="help-title">If you're looking at {p.name}, start here</h2>
+      </div>
+
+      <div class="grid grid--3 mt-l">
+        {relatedDocs.map((d) => (
+          <a href={d.file} class="card card--interactive rlink" data-reveal data-track="document_download" data-track-label={d.slug}>
+            <span class="rlink__icon"><Icon name="file" size={20} /></span>
+            <strong>{d.title}</strong>
+            <span>{d.description}</span>
+            <span class="rlink__cta">Open PDF <Icon name="download" size={14} /></span>
+          </a>
+        ))}
+        <a href="/enroll/tour-guide" class="card card--interactive rlink" data-reveal>
+          <span class="rlink__icon"><Icon name="check-circle" size={20} /></span>
+          <strong>Tour checklist</strong>
+          <span>What to look for and what to ask when you visit — including the questions most people forget.</span>
+          <span class="rlink__cta">Open the guide <Icon name="arrow" size={14} /></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------- prev / next -->
+  <nav class="pnav container" aria-label="Other programs">
+    {prev ? (
+      <a href={`/programs/${prev.slug}`} class="pnav__link pnav__link--prev">
+        <Icon name="chevron" size={16} />
+        <span><small>Younger</small><strong>{prev.name}</strong></span>
+      </a>
+    ) : <span></span>}
+    {next && (
+      <a href={`/programs/${next.slug}`} class="pnav__link pnav__link--next">
+        <span><small>Older</small><strong>{next.name}</strong></span>
+        <Icon name="chevron" size={16} />
+      </a>
+    )}
+  </nav>
+
+  <NextStep
+    title={`Come and see the ${p.familiar.toLowerCase()} room`}
+    lede="Thirty minutes in person tells you more than any page can. Bring the questions this page couldn't answer."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' }}
+    secondary={[
+      { label: 'How enrolment works', href: '/enroll/guide', desc: 'Steps and paperwork' },
+      { label: 'Join the waitlist', href: '/enroll/waitlist', desc: 'If this group is full' },
+      { label: 'All programs', href: '/programs', desc: 'Compare side by side' },
+    ]}
+  />
+</Base>
+
+<style>
+  .split { display: grid; gap: var(--space-xl); align-items: start; }
+  @media (min-width: 900px) {
+    .split { grid-template-columns: minmax(0, 1fr) minmax(0, 21rem); gap: var(--space-2xl); }
+    .split__side { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  }
+
+  .quote {
+    margin: var(--space-m) 0 0;
+    padding: var(--space-m) var(--space-m) var(--space-m) var(--space-l);
+    border-left: 3px solid var(--coral-500);
+    background: var(--bg-raised);
+    border-radius: 0 var(--radius-m) var(--radius-m) 0;
+  }
+  .quote p {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    line-height: var(--leading-snug);
+    color: var(--ink-800);
+  }
+  .quote footer {
+    display: flex; align-items: center; gap: 0.4rem;
+    margin-top: var(--space-s);
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+  .quote footer :global(svg) { color: var(--ok-600); }
+
+  .notes { list-style: none; padding: 0; display: grid; gap: 0.85rem; }
+  .notes li {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    padding: 0.9rem 1.1rem;
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    font-size: var(--step--1);
+    line-height: var(--leading-normal);
+  }
+  .notes :global(svg) { color: var(--marigold-500); flex: none; margin-top: 0.15rem; }
+
+  .sidecard { padding: var(--space-m); }
+  .sidecard h3 { font-size: var(--step-1); }
+  .sidecard h4 { font-family: var(--font-sans); font-size: var(--step--1); font-weight: 700; }
+  .sidecard__note { font-size: var(--step--2); color: var(--text-muted); line-height: var(--leading-normal); margin-top: 0.35rem; }
+
+  .facts { margin-top: var(--space-s); display: grid; gap: 0.75rem; }
+  .facts > div { display: grid; gap: 0.2rem; }
+  .facts dt {
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .facts dd { margin: 0; font-size: var(--step--1); font-weight: 600; }
+  .facts__tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+
+  /* related links */
+  .rlink { display: flex; flex-direction: column; gap: 0.45rem; text-decoration: none; color: inherit; }
+  .rlink__icon {
+    display: grid; place-items: center;
+    width: 42px; height: 42px;
+    border-radius: var(--radius-s);
+    background: var(--cream-200);
+    color: var(--coral-700);
+    margin-bottom: 0.25rem;
+  }
+  .rlink strong { font-size: var(--step-0); }
+  .rlink > span:not(.rlink__icon):not(.rlink__cta) {
+    font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); flex: 1;
+  }
+  .rlink__cta {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: var(--step--1); font-weight: 650; color: var(--coral-700); margin-top: 0.25rem;
+  }
+
+  /* prev / next */
+  .pnav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding-block: var(--space-l);
+  }
+  .pnav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.1rem;
+    min-height: 56px;
+    border-radius: var(--radius-m);
+    border: 1px solid var(--border);
+    background: var(--bg-raised);
+    text-decoration: none;
+    color: var(--ink-800);
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .pnav__link:hover { border-color: var(--ink-700); transform: translateY(-2px); color: var(--ink-900); }
+  .pnav__link small { display: block; font-size: var(--step--2); color: var(--text-muted); }
+  .pnav__link strong { font-size: var(--step--1); font-weight: 650; }
+  .pnav__link--prev :global(svg) { transform: rotate(180deg); opacity: 0.5; }
+  .pnav__link--next { margin-left: auto; text-align: right; }
+  .pnav__link--next :global(svg) { opacity: 0.5; }
+</style>
+
+<script define:vars={{ slug: p.slug, name: p.name }}>
+  document.body.dataset.program = slug;
+
+  document.querySelector('[data-ask-program]')?.addEventListener('click', () => {
+    document.dispatchEvent(
+      new CustomEvent('ts:concierge-open', {
+        detail: { ask: `Tell me about the ${name} program` },
+      })
+    );
+  });
+</script>

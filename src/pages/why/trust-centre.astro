@@ -1,0 +1,359 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { site, trustMarkers, policyFacts, documents, unverified } from '../../data/site';
+import { byTopic } from '../../data/knowledge';
+import { breadcrumbSchema, organizationSchema, faqSchema } from '../../lib/schema';
+
+const safetyEntries = [...byTopic('safety'), ...byTopic('policies')];
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([
+    { name: 'Why Tiny Stars', href: '/why' },
+    { name: 'Trust Centre', href: '/why/trust-centre' },
+  ]),
+  faqSchema(safetyEntries),
+].filter(Boolean) as Record<string, unknown>[];
+
+const pillars = [
+  {
+    icon: 'lock',
+    title: 'Entry & supervision',
+    body: 'Tiny Stars states that from the moment you say goodbye until you return, your child is in caring and capable hands, and that the team ensures every child feels secure and supported throughout the day.',
+    source: 'tinystars.ca — Health and Safety',
+    verified: true,
+  },
+  {
+    icon: 'eye',
+    title: 'Video surveillance',
+    body: 'Cameras are in use, governed by a published Video Surveillance Policy covering child safety, security and privacy within the facility.',
+    source: 'Tiny Stars Video Surveillance Policy',
+    verified: true,
+    doc: '/assets/pdf/video-surveillance-policy.pdf',
+  },
+  {
+    icon: 'shield',
+    title: 'Cleanliness & health',
+    body: 'Tiny Stars states a commitment to maintaining the highest standards of cleanliness and safety, and to spaces that are clean, healthy and focused on a child’s well-being.',
+    source: 'tinystars.ca — About Us',
+    verified: true,
+  },
+  {
+    icon: 'clock',
+    title: 'Pick-up & late collection',
+    body: 'The centre closes at 6:00 PM. Late fees are $1.00 per minute from 6:01–6:15 PM and $2.00 per minute from 6:16–6:30 PM, per child, payable to the educator who stayed. If a child is not collected and no authorized contact can be reached, the RCMP is contacted.',
+    source: 'Tiny Stars registration package',
+    verified: true,
+  },
+  {
+    icon: 'leaf',
+    title: 'Pets & allergies',
+    body: 'A published Pet Policy sets out guidelines on the presence of pets, covering children’s safety, hygiene and allergy awareness.',
+    source: 'Tiny Stars Pet Policy',
+    verified: true,
+    doc: '/assets/pdf/pet-policy.pdf',
+  },
+  {
+    icon: 'people',
+    title: 'Behaviour',
+    body: 'Families review and sign an Aggressive Behavior Policy as part of the registration package. The Parent Handbook is the fuller reference.',
+    source: 'Tiny Stars registration package',
+    verified: true,
+    doc: '/assets/pdf/parent-handbook.pdf',
+  },
+];
+---
+
+<Base
+  title="Trust Centre | Tiny Stars Daycare"
+  description="Everything Tiny Stars Daycare has published about safety, licensing and policies — with sources — and an honest list of what has not been published."
+  image="/assets/images/sections/health-and-safety.webp"
+  schema={schema}
+>
+  <PageHero
+    tone="teal"
+    eyebrow="Trust Centre"
+    title="What's written down, and what isn't"
+    lede="Most childcare websites sound equally confident about everything. This page separates what Tiny Stars has actually published from what only a person can tell you — because you deserve to know which is which."
+    crumbs={[
+      { name: 'Why Tiny Stars', href: '/why' },
+      { name: 'Trust Centre', href: '/why/trust-centre' },
+    ]}
+  >
+    <div class="legend">
+      <span class="badge badge--verified"><Icon name="check" size={12} /> Published by Tiny Stars</span>
+      <span class="badge badge--general"><Icon name="info" size={12} /> General guidance</span>
+      <span class="badge badge--unknown"><Icon name="question" size={12} /> Ask the team</span>
+    </div>
+  </PageHero>
+
+  <!-- --------------------------------------------------------- claims -->
+  <section class="section section--tight" aria-labelledby="claims-title">
+    <div class="container">
+      <h2 id="claims-title" class="visually-hidden">Published trust markers</h2>
+      <div class="claims" data-reveal>
+        {trustMarkers.map((t) => (
+          <div class="claim">
+            <span class="claim__icon"><Icon name={t.icon as any} size={20} /></span>
+            <strong>{t.label}</strong>
+            <small>Stated on tinystars.ca</small>
+          </div>
+        ))}
+        <div class="claim claim--note">
+          <span class="claim__icon claim__icon--warn"><Icon name="alert" size={20} /></span>
+          <strong>Licence number not published</strong>
+          <small>Ask the director — Alberta records are also public</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------------- pillars -->
+  <section class="section" aria-labelledby="pillars-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow eyebrow--teal">Safety, in writing</p>
+        <h2 id="pillars-title">Six areas Tiny Stars has documented</h2>
+        <p class="lede">
+          Each card carries its source. Where a full policy document exists, it's linked —
+          read it before you enrol, not after.
+        </p>
+      </div>
+
+      <div class="grid grid--2 mt-l">
+        {pillars.map((p, i) => (
+          <article class="pillar" data-reveal style={`--reveal-delay:${i * 55}ms`}>
+            <div class="pillar__head">
+              <span class="pillar__icon"><Icon name={p.icon as any} size={20} /></span>
+              <h3>{p.title}</h3>
+              <span class="badge badge--verified">Published</span>
+            </div>
+            <p>{p.body}</p>
+            <div class="pillar__foot">
+              <span class="source-note">
+                <Icon name="check-circle" size={14} />
+                <span>{p.source}</span>
+              </span>
+              {p.doc && (
+                <a href={p.doc} class="pillar__doc" data-track="document_download">
+                  Read the policy <Icon name="download" size={14} />
+                </a>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------- not-known -->
+  <section class="section section--sunken" aria-labelledby="unknown-title">
+    <div class="container">
+      <div class="unknown" data-reveal>
+        <div>
+          <p class="eyebrow">The honest half</p>
+          <h2 id="unknown-title">Nine things we will not make up</h2>
+          <p class="lede mt-s">
+            These aren't published anywhere on the Tiny Stars site. Another website might
+            fill the gap with a plausible-sounding number. We'd rather hand you a phone
+            number that actually gets you the truth.
+          </p>
+
+          <div class="cluster mt-l">
+            <a href={site.phone.href} class="btn btn--primary" data-track="phone_click">
+              <Icon name="phone" size={18} />
+              {site.phone.label}
+            </a>
+            <a href="/enroll/book-a-tour" class="btn btn--ghost" data-track="tour_cta_click" data-track-label="trust-unknown">
+              Ask on a tour
+            </a>
+          </div>
+        </div>
+
+        <ul class="unknown__list">
+          {unverified.map((u) => (
+            <li>
+              <Icon name="question" size={16} />
+              <span>{u.charAt(0).toUpperCase() + u.slice(1)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------ documents -->
+  <section class="section" aria-labelledby="docs-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Read before you sign</p>
+        <h2 id="docs-title">The four published documents</h2>
+      </div>
+
+      <div class="grid grid--2 mt-l">
+        {documents.map((d, i) => (
+          <a href={d.file} class="doc card card--interactive" data-reveal style={`--reveal-delay:${i * 50}ms`} data-track="document_download" data-track-label={d.slug}>
+            <span class="doc__icon"><Icon name="file" size={22} /></span>
+            <span class="doc__body">
+              <span class="doc__head">
+                <strong>{d.title}</strong>
+                <span class="badge">{d.category}</span>
+              </span>
+              <span class="doc__desc">{d.description}</span>
+              <span class="doc__cta">Open PDF <Icon name="download" size={14} /></span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------------ q&a -->
+  <section class="section section--sunken" aria-labelledby="qa-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Safety questions</p>
+        <h2 id="qa-title">What families ask about safety</h2>
+      </div>
+
+      <div class="qa mt-l" data-reveal>
+        {safetyEntries.map((e) => (
+          <details class="q" id={e.id}>
+            <summary>
+              <span>{e.question}</span>
+              <span class={`badge badge--${e.trust}`}>
+                {e.trust === 'verified' ? 'Published' : e.trust === 'general' ? 'General' : 'Ask the team'}
+              </span>
+              <Icon name="chevron-down" size={18} class="q__caret" />
+            </summary>
+            <div class="q__body">
+              <p>{e.answer}</p>
+              {e.source && (
+                <p class="source-note mt-s">
+                  <Icon name="check-circle" size={14} />
+                  <span>Source: {e.source}</span>
+                </p>
+              )}
+              {e.links && (
+                <div class="cluster mt-s">
+                  {e.links.map((l) => (
+                    <a href={l.href} class="btn btn--ghost btn--sm">{l.label}</a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="The best safety check is the one you do yourself"
+    lede="Read the handbook, then come and see whether the room matches it. That combination tells you more than any page of reassurance."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' }}
+    secondary={[
+      { label: 'Questions parents forget to ask', href: '/why/questions', desc: 'The revealing ones' },
+      { label: 'Parent Handbook', href: '/assets/pdf/parent-handbook.pdf', desc: 'Full policies (PDF)' },
+      { label: 'Call the director', href: site.phone.href, desc: site.phone.label },
+    ]}
+  />
+</Base>
+
+<style>
+  .legend { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+  /* claims */
+  .claims { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }
+  .claim {
+    display: flex; flex-direction: column; gap: 0.2rem;
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--teal-50);
+    border: 1px solid color-mix(in oklab, var(--teal-600) 20%, transparent);
+  }
+  .claim strong { font-size: var(--step-0); color: var(--teal-700); }
+  .claim small { font-size: var(--step--2); color: var(--text-muted); }
+  .claim__icon {
+    display: grid; place-items: center;
+    width: 42px; height: 42px;
+    border-radius: var(--radius-s);
+    background: color-mix(in oklab, var(--teal-600) 14%, transparent);
+    color: var(--teal-700);
+    margin-bottom: 0.4rem;
+  }
+  .claim--note { background: var(--warn-100); border-color: color-mix(in oklab, var(--warn-600) 24%, transparent); }
+  .claim--note strong { color: var(--warn-600); }
+  .claim__icon--warn { background: color-mix(in oklab, var(--warn-600) 14%, transparent); color: var(--warn-600); }
+
+  /* pillars */
+  .pillar {
+    display: flex; flex-direction: column; gap: 0.7rem;
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .pillar__head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+  .pillar__head h3 { flex: 1; font-size: var(--step-1); min-width: 8rem; }
+  .pillar__icon {
+    display: grid; place-items: center;
+    width: 40px; height: 40px;
+    border-radius: var(--radius-s);
+    background: var(--teal-50);
+    color: var(--teal-700);
+    flex: none;
+  }
+  .pillar p { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); flex: 1; }
+  .pillar__foot {
+    display: flex; flex-wrap: wrap; gap: 0.5rem var(--space-m);
+    align-items: center; justify-content: space-between;
+    padding-top: 0.7rem;
+    border-top: 1px dashed var(--border-strong);
+  }
+  .pillar__foot .source-note :global(svg) { color: var(--ok-600); }
+  .pillar__doc {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding-block: 0.3rem;
+    min-height: 28px;
+    font-size: var(--step--2); font-weight: 700; text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* unknown */
+  .unknown { display: grid; gap: var(--space-xl); align-items: start; }
+  .unknown__list { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+  .unknown__list li {
+    display: flex; align-items: center; gap: 0.65rem;
+    padding: 0.8rem 1.1rem;
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px dashed var(--border-strong);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--ink-700);
+  }
+  .unknown__list :global(svg) { color: var(--warn-600); flex: none; }
+  @media (min-width: 900px) {
+    .unknown { grid-template-columns: minmax(0, 1fr) minmax(0, 24rem); gap: var(--space-2xl); }
+  }
+
+</style>
+
+<script>
+  // Deep links from search / the concierge land on a specific question: open it.
+  const openFromHash = () => {
+    const id = location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el instanceof HTMLDetailsElement) {
+      el.open = true;
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  };
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+</script>

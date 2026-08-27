@@ -1,0 +1,345 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import { programs } from '../../data/programs';
+import { site, registrationSections } from '../../data/site';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([
+    { name: 'Enrol', href: '/enroll' },
+    { name: 'Registration', href: '/enroll/registration' },
+  ]),
+];
+---
+
+<Base
+  title="Start your registration | Tiny Stars Daycare"
+  description="Begin registration at Tiny Stars Daycare in guided steps — tell us about your child, choose a program and start date, and see exactly what the full package will ask for."
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Registration"
+    title="Start your Tiny Stars journey"
+    lede="The full registration package has eleven sections. This gets the first few out of the way in small pieces, and shows you precisely what is coming next."
+    crumbs={[
+      { name: 'Enrol', href: '/enroll' },
+      { name: 'Registration', href: '/enroll/registration' },
+    ]}
+  />
+
+  <section class="section" aria-labelledby="reg-title">
+    <div class="container">
+      <div class="reg">
+        <div class="reg__main">
+          <h2 id="reg-title" class="visually-hidden">Registration</h2>
+
+          <div class="notice notice--demo" data-reveal>
+            <Icon name="sparkles" size={20} />
+            <span>
+              <strong>Preview only — nothing is submitted.</strong>
+              The live version would carry these answers into Tiny Stars' real registration
+              package. Here, everything stays in your browser and clears when you close the tab.
+            </span>
+          </div>
+
+          <div class="flow panel mt-l" data-flow>
+            <div class="flow__progress">
+              <div class="progress">
+                <span class="progress__label" data-step-label>Step 1 of 6</span>
+                <div class="progress__track">
+                  <div class="progress__fill" data-progress style="width:16.6%"></div>
+                </div>
+              </div>
+            </div>
+
+            <p class="visually-hidden" role="status" aria-live="polite" data-announce></p>
+
+            <!-- 1 -->
+            <fieldset class="step is-active" data-step="1">
+              <legend>
+                <span class="step__n">1</span>
+                <span>
+                  <strong>Tell us about your family</strong>
+                  <small>Who we would be speaking to.</small>
+                </span>
+              </legend>
+              <div class="field">
+                <label class="field__label" for="r-name">Your full name</label>
+                <input class="input" type="text" id="r-name" name="parentName" autocomplete="name" data-required data-error-empty="We need a name to attach this to." />
+                <p class="field__error"></p>
+              </div>
+              <div class="field">
+                <label class="field__label" for="r-rel">Your relationship to the child</label>
+                <select class="select" id="r-rel" name="relationship" data-required data-error-empty="Choose one.">
+                  <option value="">Choose…</option>
+                  <option>Parent</option>
+                  <option>Guardian</option>
+                  <option>Grandparent</option>
+                  <option>Other family member</option>
+                </select>
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 2 -->
+            <fieldset class="step" data-step="2" hidden>
+              <legend>
+                <span class="step__n">2</span>
+                <span>
+                  <strong>About your child</strong>
+                  <small>A first name and an age band is all we need at this stage.</small>
+                </span>
+              </legend>
+              <div class="field">
+                <label class="field__label" for="r-child">Child's first name</label>
+                <input class="input" type="text" id="r-child" name="childName" autocomplete="off" data-required data-error-empty="A first name, so we know who we're talking about." />
+                <p class="field__error"></p>
+              </div>
+              <div class="field">
+                <label class="field__label" for="r-age">Age</label>
+                <span class="field__hint">Exact birthdates come later, in the official package.</span>
+                <select class="select" id="r-age" name="ageBand" data-required data-error-empty="Choose the closest band.">
+                  <option value="">Choose an age band…</option>
+                  <option>Under 12 months</option>
+                  <option>12–18 months</option>
+                  <option>18 months – 3 years</option>
+                  <option>3–5 years</option>
+                  <option>5–6 years</option>
+                  <option>6–12 years</option>
+                </select>
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 3 -->
+            <fieldset class="step" data-step="3" hidden>
+              <legend>
+                <span class="step__n">3</span>
+                <span>
+                  <strong>Which program?</strong>
+                  <small>Not sure is a perfectly good answer.</small>
+                </span>
+              </legend>
+              <div class="field">
+                <div class="choices choices--grid" data-required-group="program" data-error-empty="Pick a program, or 'not sure yet'.">
+                  {programs.map((p) => (
+                    <label class="choice">
+                      <input type="radio" name="program" value={p.name} data-label={`${p.name} · ${p.ageLabel}`} />
+                      <span class="choice__box">{p.name}<small>{p.ageLabel}</small></span>
+                    </label>
+                  ))}
+                  <label class="choice">
+                    <input type="radio" name="program" value="Not sure" data-label="Not sure yet" />
+                    <span class="choice__box">Not sure yet<small>The team will help you decide</small></span>
+                  </label>
+                </div>
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 4 -->
+            <fieldset class="step" data-step="4" hidden>
+              <legend>
+                <span class="step__n">4</span>
+                <span>
+                  <strong>When would you like to start?</strong>
+                  <small>Availability isn't published, so treat this as a preference.</small>
+                </span>
+              </legend>
+              <div class="field">
+                <label class="field__label" for="r-start">Preferred start date</label>
+                <input class="input" type="date" id="r-start" name="startDate" data-required data-error-empty="Give us a date to aim at." />
+                <p class="field__error"></p>
+              </div>
+              <div class="field">
+                <label class="field__label" for="r-sched">Schedule you're after</label>
+                <select class="select" id="r-sched" name="schedule" data-required data-error-empty="Choose a schedule.">
+                  <option value="">Choose…</option>
+                  <option>Full time, five days</option>
+                  <option>Part time, three days</option>
+                  <option>Part time, two days</option>
+                  <option>Before and after school only</option>
+                  <option>Not sure yet</option>
+                </select>
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 5 -->
+            <fieldset class="step" data-step="5" hidden>
+              <legend>
+                <span class="step__n">5</span>
+                <span>
+                  <strong>How do we reach you?</strong>
+                  <small>Nothing beyond what's needed to reply.</small>
+                </span>
+              </legend>
+              <div class="field">
+                <label class="field__label" for="r-email">Email</label>
+                <input class="input" type="email" id="r-email" name="email" autocomplete="email" inputmode="email" data-required />
+                <p class="field__error"></p>
+              </div>
+              <div class="field">
+                <label class="field__label" for="r-phone">Phone</label>
+                <input class="input" type="tel" id="r-phone" name="phone" autocomplete="tel" inputmode="tel" data-required />
+                <p class="field__error"></p>
+              </div>
+              <div class="field">
+                <label class="field__label" for="r-q">Anything you'd like to ask? <span class="text-subtle">(optional)</span></label>
+                <textarea class="textarea" id="r-q" name="questions" maxlength="600"></textarea>
+                <p class="field__error"></p>
+              </div>
+            </fieldset>
+
+            <!-- 6 -->
+            <fieldset class="step" data-step="6" hidden>
+              <legend>
+                <span class="step__n">6</span>
+                <span>
+                  <strong>Check it over</strong>
+                  <small>Change anything before you finish.</small>
+                </span>
+              </legend>
+              <dl class="review" data-review></dl>
+            </fieldset>
+
+            <div class="result" data-result hidden></div>
+
+            <div class="flow__nav" data-nav>
+              <button type="button" class="btn btn--quiet" data-back hidden>
+                <Icon name="chevron" size={16} class="flip" /> Back
+              </button>
+              <button type="button" class="btn btn--primary" data-next data-final-label="Finish">Continue</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="reg__side" aria-label="What comes next">
+          <div class="panel sidecard" data-reveal>
+            <h3>What the full package asks</h3>
+            <p class="sidecard__note">Eleven sections, in this order.</p>
+            <ol class="mini mt-s">
+              {registrationSections.map((s) => <li>{s}</li>)}
+            </ol>
+            <a href="/enroll/guide" class="btn btn--ghost btn--block btn--sm mt-m">
+              What each one wants
+            </a>
+          </div>
+
+          <div class="panel sidecard mt-m" data-reveal>
+            <h3>Rather talk first?</h3>
+            <p class="sidecard__note">
+              Most families tour before they register. It is the faster route to a decision.
+            </p>
+            <a href="/enroll/book-a-tour" class="btn btn--ink btn--block btn--sm mt-s" data-track="tour_cta_click" data-track-label="registration-side">
+              Book a tour
+            </a>
+            <p class="sidecard__note mt-s">
+              Or call <a href={site.phone.href} data-track="phone_click">{site.phone.label}</a>.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .reg { display: grid; gap: var(--space-xl); align-items: start; }
+  @media (min-width: 980px) {
+    .reg { grid-template-columns: minmax(0, 1fr) minmax(0, 21rem); gap: var(--space-2xl); }
+    .reg__side { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  }
+
+  .mini { padding-left: 1.15rem; display: grid; gap: 0.3rem; }
+  .mini li { font-size: var(--step--2); color: var(--text-muted); line-height: 1.45; }
+</style>
+
+<script>
+  import { StepFlow, esc } from '../../lib/stepflow';
+  import { track } from '../../lib/analytics';
+
+  const root = document.querySelector<HTMLElement>('[data-flow]')!;
+  const reviewEl = root.querySelector<HTMLElement>('[data-review]')!;
+
+  const FIELDS = [
+    { key: 'parentName', label: 'Your name', step: 1 },
+    { key: 'relationship', label: 'Relationship', step: 1 },
+    { key: 'childName', label: "Child's name", step: 2 },
+    { key: 'ageBand', label: 'Age', step: 2 },
+    { key: 'program', label: 'Program', step: 3 },
+    { key: 'startDate', label: 'Preferred start', step: 4 },
+    { key: 'schedule', label: 'Schedule', step: 4 },
+    { key: 'email', label: 'Email', step: 5 },
+    { key: 'phone', label: 'Phone', step: 5 },
+    { key: 'questions', label: 'Questions', step: 5 },
+  ];
+
+  track('enrollment_start');
+
+  const flow = new StepFlow({
+    root,
+    draftKey: 'ts:registration-draft',
+    onStep(step, total) {
+      track('enrollment_step', { step, total });
+      if (step === total) renderReview();
+    },
+    onComplete(data) {
+      track('enrollment_complete', { program: data.program ?? '' });
+      flow.clearDraft();
+
+      const child = flow.labelFor('childName') || 'your child';
+      const program = flow.labelFor('program');
+
+      flow.finish(
+        `<div class="done__icon">
+           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+         </div>
+         <span class="badge badge--demo">Preview — nothing was submitted</span>
+         <h3 style="font-size:var(--step-3);margin-top:.75rem">This is where it would go</h3>
+         <p class="lede" style="margin-top:.6rem">
+           In the live version, Tiny Stars would receive an enrolment enquiry for
+           <strong>${esc(child)}</strong>${program ? ` in <strong>${esc(program)}</strong>` : ''} and
+           send you the full registration package. Because this is a preview, nothing left
+           your browser.
+         </p>
+
+         <div class="notice notice--info" style="margin-top:var(--space-l)">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><path d="M12 7.9v.1"/></svg>
+           <span>
+             <strong>To actually start enrolling today</strong>, book a tour or call the
+             director. Registration normally follows a visit rather than replacing one.
+           </span>
+         </div>
+
+         <div class="cluster" style="margin-top:var(--space-l)">
+           <a class="btn btn--primary" href="/enroll/book-a-tour" data-track="tour_cta_click" data-track-label="after-registration">Book a tour</a>
+           <a class="btn btn--ghost" href="tel:+17802301599" data-track="phone_click">Call (780) 230-1599</a>
+           <a class="btn btn--quiet" href="/enroll/guide">See the full package</a>
+         </div>`,
+        'Preview complete. Nothing was submitted to Tiny Stars.'
+      );
+    },
+  });
+
+  function renderReview() {
+    reviewEl.innerHTML =
+      FIELDS.map(({ key, label, step }) => {
+        const value = flow.labelFor(key);
+        if (!value) return '';
+        return `<div><dt>${label}</dt><dd>${esc(value)} <button type="button" class="review__edit" data-goto="${step}">Change</button></dd></div>`;
+      })
+        .filter(Boolean)
+        .join('') || '<div><dt>Nothing yet</dt><dd>Go back and fill in the earlier steps.</dd></div>';
+
+    reviewEl.querySelectorAll<HTMLButtonElement>('[data-goto]').forEach((btn) =>
+      btn.addEventListener('click', () => flow.goTo(Number(btn.dataset.goto)))
+    );
+  }
+
+  const start = root.querySelector<HTMLInputElement>('#r-start');
+  if (start) start.min = new Date().toISOString().slice(0, 10);
+</script>

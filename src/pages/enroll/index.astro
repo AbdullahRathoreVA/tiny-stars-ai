@@ -1,0 +1,199 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import NextStep from '../../components/NextStep.astro';
+import { site } from '../../data/site';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+const journey = [
+  {
+    n: 1,
+    icon: 'compass',
+    title: 'Work out which program fits',
+    body: 'Age decides the group. Three questions will tell you which one, and what to read next.',
+    href: '/enroll/find-your-program',
+    cta: 'Find your program',
+  },
+  {
+    n: 2,
+    icon: 'calendar',
+    title: 'Come and see it',
+    body: 'A 30-minute tour. This is where you ask about fees, availability and ratios — none of which are published anywhere.',
+    href: '/enroll/book-a-tour',
+    cta: 'Book a tour',
+  },
+  {
+    n: 3,
+    icon: 'book',
+    title: 'Read before you sign',
+    body: 'The Parent Handbook, Classroom Routine, Pet Policy and Video Surveillance Policy are all published. Read them while you are still deciding, not after.',
+    href: '/families/documents',
+    cta: 'Open the documents',
+  },
+  {
+    n: 4,
+    icon: 'file',
+    title: 'Complete the registration package',
+    body: 'Eleven sections, from emergency contacts to the fees agreement. We list every one so nothing is a surprise.',
+    href: '/enroll/guide',
+    cta: 'See what it asks',
+  },
+  {
+    n: 5,
+    icon: 'clock',
+    title: 'Or join the waitlist',
+    body: 'If your program or start date is full, the waitlist registers your interest. It is not a guarantee of placement.',
+    href: '/enroll/waitlist',
+    cta: 'Join the waitlist',
+  },
+];
+---
+
+<Base
+  title="Enrol at Tiny Stars | How it works"
+  description="The five steps to enrolling at Tiny Stars Daycare in Grande Prairie: find your program, book a tour, read the policies, complete registration, or join the waitlist."
+  image="/assets/images/sections/cta.webp"
+  schema={[organizationSchema, breadcrumbSchema([{ name: 'Enrol', href: '/enroll' }])]}
+>
+  <PageHero
+    eyebrow="Enrol"
+    title="Five steps, in the order they actually happen"
+    lede="No maze, no mystery. Here is the whole path from “we might need childcare” to “our child starts on Monday” — including the bits most centres leave vague."
+    crumbs={[{ name: 'Enrol', href: '/enroll' }]}
+  >
+    <div class="cluster">
+      <a href="/enroll/book-a-tour" class="btn btn--primary" data-track="tour_cta_click" data-track-label="enroll-hero">
+        <Icon name="calendar" size={18} /> Book a tour
+      </a>
+      <a href="/enroll/find-your-program" class="btn btn--ghost">Find your program</a>
+    </div>
+  </PageHero>
+
+  <section class="section" aria-labelledby="journey-title">
+    <div class="container">
+      <h2 id="journey-title" class="visually-hidden">The enrolment journey</h2>
+
+      <ol class="journey">
+        {journey.map((j, i) => (
+          <li class="jstep" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+            <span class="jstep__n">{j.n}</span>
+            <div class="jstep__body">
+              <span class="jstep__icon"><Icon name={j.icon as any} size={20} /></span>
+              <h3>{j.title}</h3>
+              <p>{j.body}</p>
+              <a href={j.href} class="jstep__cta">
+                {j.cta} <Icon name="arrow" size={15} />
+              </a>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--sunken" aria-labelledby="honest-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Straight answers</p>
+        <h2 id="honest-title">Three things you probably want to know first</h2>
+      </div>
+
+      <div class="straight mt-l" data-reveal>
+        <div class="straight__item">
+          <h3>How much does it cost?</h3>
+          <p>
+            Tiny Stars does not publish fees, so we are not going to estimate them. Rates
+            depend on age and schedule. The team can give you an exact number in a couple
+            of minutes on the phone.
+          </p>
+          <a href={site.phone.href} class="btn btn--ghost btn--sm mt-s" data-track="phone_click">
+            <Icon name="phone" size={15} /> Ask about fees
+          </a>
+        </div>
+
+        <div class="straight__item">
+          <h3>Do you have space?</h3>
+          <p>
+            Availability is not published and changes by age group. Anyone showing you a
+            live “3 spots left” counter on a daycare website is making it up. Call, or join
+            the waitlist and the team will be in touch.
+          </p>
+          <a href="/enroll/waitlist" class="btn btn--ghost btn--sm mt-s">Join the waitlist</a>
+        </div>
+
+        <div class="straight__item">
+          <h3>How long does it take?</h3>
+          <p>
+            That depends on availability and how quickly the registration package comes
+            back. What we can tell you: the tour itself is 30 minutes, and the package has
+            eleven sections.
+          </p>
+          <a href="/enroll/guide" class="btn btn--ghost btn--sm mt-s">See the sections</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Start with the part that can't be done online"
+    lede="Everything else on this list can wait. Standing in the room cannot."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' }}
+    secondary={[
+      { label: 'Prepare for your tour', href: '/enroll/tour-guide', desc: 'What to look for and ask' },
+      { label: 'Enrolment guide', href: '/enroll/guide', desc: 'Every section of the paperwork' },
+      { label: 'Call the director', href: site.phone.href, desc: site.phone.label },
+    ]}
+  />
+</Base>
+
+<style>
+  .journey { list-style: none; padding: 0; display: grid; gap: var(--space-m); counter-reset: j; }
+
+  .jstep { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--space-s); align-items: start; }
+  .jstep__n {
+    display: grid; place-items: center;
+    width: 44px; height: 44px;
+    border-radius: var(--radius-pill);
+    background: var(--ink-900);
+    color: var(--gold-400);
+    font-family: var(--font-display);
+    font-size: var(--step-0);
+    font-weight: 700;
+  }
+  .jstep__body {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+  }
+  .jstep__body:hover { transform: translateY(-3px); box-shadow: var(--shadow-m); }
+  .jstep__icon {
+    display: grid; place-items: center;
+    width: 42px; height: 42px;
+    border-radius: var(--radius-s);
+    background: var(--coral-50);
+    color: var(--coral-600);
+    margin-bottom: 0.7rem;
+  }
+  .jstep h3 { font-size: var(--step-1); }
+  .jstep p { margin-top: 0.4rem; font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); max-width: 60ch; }
+  .jstep__cta {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    margin-top: 0.75rem;
+    font-size: var(--step--1); font-weight: 650; text-decoration: none;
+  }
+  .jstep__cta :global(svg) { transition: transform var(--dur-fast) var(--ease-out); }
+  .jstep__cta:hover :global(svg) { transform: translateX(3px); }
+
+  .straight { display: grid; gap: var(--space-m); }
+  .straight__item {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .straight__item h3 { font-size: var(--step-1); }
+  .straight__item p { margin-top: 0.5rem; font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); }
+</style>

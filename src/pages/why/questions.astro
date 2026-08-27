@@ -1,0 +1,164 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { site } from '../../data/site';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+const questions = [
+  {
+    q: 'How long have the educators in my child’s room been here?',
+    why: 'Turnover is the single most useful number nobody publishes. A room where the same two adults have been there for years is a different experience from one that changes every few months.',
+    at: 'Not published by Tiny Stars — ask on your tour.',
+  },
+  {
+    q: 'What happens on a day when someone calls in sick?',
+    why: 'Every centre has good days. What matters is the plan for the bad ones — who covers, and whether children see a familiar face.',
+    at: 'Not published — ask on your tour.',
+  },
+  {
+    q: 'How will you tell me if something goes wrong?',
+    why: 'A bumped head, a bite, a bad afternoon. You want to hear it from them first, plainly, on the day.',
+    at: 'Not published — but Tiny Stars’ Parent Handbook is where procedures live.',
+  },
+  {
+    q: 'Can I visit unannounced once my child is enrolled?',
+    why: 'The answer tells you a great deal, whichever way it goes. A "yes, of course" is reassuring; a thoughtful "here is why we ask you to check first" can be too.',
+    at: 'Not published — ask directly.',
+  },
+  {
+    q: 'What does the full cost of being late actually come to?',
+    why: 'Late fees compound quickly and cause more friction between families and centres than almost anything else.',
+    at: 'Published: Tiny Stars closes at 6:00 PM. $1/minute from 6:01–6:15 PM, $2/minute from 6:16–6:30 PM, per child, paid to the educator who stayed.',
+    verified: true,
+  },
+  {
+    q: 'Where exactly are the cameras, and who can watch the footage?',
+    why: 'Surveillance can be reassuring or uncomfortable depending on the specifics. You are entitled to the specifics.',
+    at: 'Published: Tiny Stars has a Video Surveillance Policy covering safety, security and privacy.',
+    verified: true,
+  },
+  {
+    q: 'What is the educator-to-child ratio in my child’s room?',
+    why: 'It shapes almost everything else: how quickly a crying child is picked up, how much language they hear, how safe outdoor time is.',
+    at: 'Not published — this is the single most important question to ask out loud.',
+  },
+  {
+    q: 'How do you settle a child who is finding the first week hard?',
+    why: 'Listen for a specific answer describing a specific child, not a policy. The difference is audible.',
+    at: 'Not published — ask on your tour.',
+  },
+  {
+    q: 'What do you do that you think other centres don’t?',
+    why: 'An honest answer to this is more revealing than any brochure. So is a vague one.',
+    at: 'Ask a person.',
+  },
+];
+---
+
+<Base
+  title="Questions parents forget to ask | Tiny Stars Daycare"
+  description="Nine questions that reveal the most about a childcare centre, why each one matters, and — for Tiny Stars specifically — which ones already have a published answer."
+  schema={[
+    organizationSchema,
+    breadcrumbSchema([
+      { name: 'Why Tiny Stars', href: '/why' },
+      { name: 'Questions parents forget to ask', href: '/why/questions' },
+    ]),
+  ]}
+>
+  <PageHero
+    eyebrow="Choosing a centre"
+    title="The nine questions that tell you the most"
+    lede="Every one of these works at any daycare, not just this one. Where Tiny Stars has already published an answer, we have said so — and where it hasn't, we've said that too."
+    crumbs={[
+      { name: 'Why Tiny Stars', href: '/why' },
+      { name: 'Questions parents forget to ask', href: '/why/questions' },
+    ]}
+  />
+
+  <section class="section section--tight" aria-labelledby="q-title">
+    <div class="container container--narrow">
+      <h2 id="q-title" class="visually-hidden">Questions worth asking</h2>
+
+      <ol class="qlist">
+        {questions.map((item, i) => (
+          <li class="qcard" data-reveal style={`--reveal-delay:${i * 45}ms`}>
+            <span class="qcard__n">{String(i + 1).padStart(2, '0')}</span>
+            <div class="qcard__body">
+              <h3>{item.q}</h3>
+              <p class="qcard__why">{item.why}</p>
+              <p class={`qcard__at${item.verified ? ' qcard__at--verified' : ''}`}>
+                <Icon name={item.verified ? 'check-circle' : 'question'} size={15} />
+                <span>{item.at}</span>
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div class="notice notice--info mt-xl" data-reveal>
+        <Icon name="bulb" size={20} />
+        <span>
+          <strong>Ask the same nine at every centre you visit.</strong>
+          Comparing answers side by side is far more useful than comparing websites —
+          and it is the fastest way to spot which places are being straight with you.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Take these with you"
+    lede="The full tour checklist has these plus the things worth watching for rather than asking about."
+    primary={{ label: 'Open the tour checklist', href: '/enroll/tour-guide', desc: 'Tick items off on your phone' }}
+    secondary={[
+      { label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' },
+      { label: 'Trust Centre', href: '/why/trust-centre', desc: 'What is already answered' },
+      { label: 'Call the director', href: site.phone.href, desc: site.phone.label },
+    ]}
+  />
+</Base>
+
+<style>
+  .qlist { list-style: none; padding: 0; display: grid; gap: 0.75rem; }
+  .qcard {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--space-s);
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+  }
+  .qcard:hover { transform: translateY(-3px); box-shadow: var(--shadow-m); }
+  .qcard__n {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 700;
+    color: var(--sand-500);
+    padding-top: 0.2rem;
+  }
+  .qcard h3 { font-size: var(--step-1); }
+  .qcard__why {
+    margin-top: 0.5rem;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    line-height: var(--leading-normal);
+  }
+  .qcard__at {
+    display: flex; gap: 0.5rem; align-items: flex-start;
+    margin-top: 0.85rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: var(--radius-s);
+    background: var(--warn-100);
+    color: var(--warn-600);
+    font-size: var(--step--2);
+    font-weight: 600;
+    line-height: var(--leading-normal);
+  }
+  .qcard__at :global(svg) { flex: none; margin-top: 0.1rem; }
+  .qcard__at--verified { background: var(--ok-100); color: var(--ok-600); }
+</style>

@@ -1,0 +1,259 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import NextStep from '../components/NextStep.astro';
+import Icon from '../components/Icon.astro';
+import { byTopic } from '../data/knowledge';
+import { breadcrumbSchema, organizationSchema, faqSchema } from '../lib/schema';
+
+/**
+ * Deliberate design decision: NO clock times.
+ *
+ * Tiny Stars publishes a Classroom Routine document but does not publish the
+ * schedule on its website, and the only time we can source is the 6:00 PM close.
+ * Inventing "7:00 Arrival · 8:00 Breakfast" would be a fabrication dressed up as
+ * a feature. So this page shows the *sequence* of the day, which is honest, and
+ * points hard at the real document for the times.
+ */
+const moments = [
+  {
+    icon: 'sun',
+    title: 'Arrival & settling in',
+    body: 'The handover. A predictable goodbye routine matters more than a quick one — most children settle within minutes once the ritual is familiar.',
+    tone: 'general',
+  },
+  {
+    icon: 'people',
+    title: 'Finding their people',
+    body: 'Tiny Stars describes nurturing early friendships as part of the day, not a by-product of it.',
+    tone: 'verified',
+    source: 'tinystars.ca — Who We Are',
+  },
+  {
+    icon: 'bulb',
+    title: 'Learning & discovery',
+    body: 'Age-appropriate activities supporting cognitive, social and emotional growth — the centre’s stated approach to early learning.',
+    tone: 'verified',
+    source: 'tinystars.ca — Learning & Development',
+  },
+  {
+    icon: 'apple',
+    title: 'Meals & snacks',
+    body: 'Food services are part of the registration package, and meals appear in the published Classroom Routine. Menus are not published online.',
+    tone: 'verified',
+    source: 'Tiny Stars Classroom Routine',
+  },
+  {
+    icon: 'leaf',
+    title: 'Outdoor & active play',
+    body: 'Hands-on exploration and room to move. For toddlers especially, the body is how the learning happens.',
+    tone: 'general',
+  },
+  {
+    icon: 'moon',
+    title: 'Rest',
+    body: 'Quiet time sits in the published routine alongside meals, play and activities.',
+    tone: 'verified',
+    source: 'Tiny Stars Classroom Routine',
+  },
+  {
+    icon: 'palette',
+    title: 'Creative time',
+    body: 'Making things, music and imagination — the parts of the day children actually report back on.',
+    tone: 'general',
+  },
+  {
+    icon: 'heart',
+    title: 'Pick-up',
+    body: 'Tiny Stars closes at 6:00 PM. Late collection carries a per-minute fee payable to the educator who stays, and unreachable contacts escalate to the RCMP.',
+    tone: 'verified',
+    source: 'Tiny Stars registration package',
+  },
+];
+
+const dailyEntries = byTopic('daily-life');
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([{ name: 'A day at Tiny Stars', href: '/day' }]),
+  faqSchema(dailyEntries),
+].filter(Boolean) as Record<string, unknown>[];
+---
+
+<Base
+  title="A day at Tiny Stars | What happens between drop-off and pick-up"
+  description="The shape of a day at Tiny Stars Daycare in Grande Prairie: arrival, learning, meals, outdoor play, rest and pick-up, sourced from the published Classroom Routine."
+  image="/assets/images/sections/classrooms-and-learning.webp"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Your child’s day"
+    title="What happens between goodbye and hello again"
+    lede="The rhythm of a Tiny Stars day, in the order it happens — and a straight answer about why you won't find a made-up timetable on this page."
+    crumbs={[{ name: 'A day at Tiny Stars', href: '/day' }]}
+    image="/assets/images/sections/classrooms-and-learning.webp"
+    imageAlt="Children learning together in a Tiny Stars classroom"
+  >
+    <div class="cluster">
+      <a href="/assets/pdf/classroom-routine.pdf" class="btn btn--primary" data-track="document_download" data-track-label="classroom-routine">
+        <Icon name="file" size={18} />
+        Read the Classroom Routine
+      </a>
+      <a href="/experience/virtual-tour" class="btn btn--ghost">
+        <Icon name="play" size={17} />
+        See the spaces
+      </a>
+    </div>
+  </PageHero>
+
+  <!-- --------------------------------------------------- honest note -->
+  <section class="section section--tight">
+    <div class="container container--narrow">
+      <div class="notice notice--info" data-reveal>
+        <Icon name="info" size={20} />
+        <span>
+          <strong>Why there are no clock times here.</strong>
+          Tiny Stars publishes a Classroom Routine document with the real daily schedule,
+          but does not publish those times on its website. We could have invented a
+          plausible timetable — most sites do. Instead, here is the sequence, and a link
+          to the document that has the actual times.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------- the moments -->
+  <section class="section section--tight" aria-labelledby="moments-title">
+    <div class="container">
+      <h2 id="moments-title" class="visually-hidden">The moments of the day, in order</h2>
+
+      <ol class="tl">
+        {moments.map((m, i) => (
+          <li class="tl__item" data-reveal style={`--reveal-delay:${i * 50}ms`}>
+            <span class="tl__marker">
+              <span class="tl__icon"><Icon name={m.icon as any} size={18} /></span>
+            </span>
+            <div class="tl__card">
+              <div class="tl__head">
+                <h3>{m.title}</h3>
+                <span class={`badge badge--${m.tone}`}>
+                  {m.tone === 'verified' ? 'From Tiny Stars' : 'General guidance'}
+                </span>
+              </div>
+              <p>{m.body}</p>
+              {m.source && (
+                <p class="source-note">
+                  <Icon name="check-circle" size={14} />
+                  <span>{m.source}</span>
+                </p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------ questions -->
+  <section class="section section--sunken" aria-labelledby="dq-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Everyday questions</p>
+        <h2 id="dq-title">The practical stuff</h2>
+      </div>
+
+      <div class="qa mt-l" data-reveal>
+        {dailyEntries.map((e) => (
+          <details class="q" id={e.id}>
+            <summary>
+              <span>{e.question}</span>
+              <span class={`badge badge--${e.trust}`}>
+                {e.trust === 'verified' ? 'Published' : e.trust === 'general' ? 'General' : 'Ask the team'}
+              </span>
+              <Icon name="chevron-down" size={18} class="q__caret" />
+            </summary>
+            <div class="q__body">
+              <p>{e.answer}</p>
+              {e.source && (
+                <p class="source-note mt-s">
+                  <Icon name="check-circle" size={14} />
+                  <span>Source: {e.source}</span>
+                </p>
+              )}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Watch a day happen"
+    lede="A 30-minute tour lands mid-day on purpose — you see the room running, not the room tidied."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' }}
+    secondary={[
+      { label: 'The learning journey', href: '/learning', desc: 'What they are building' },
+      { label: 'Photo gallery', href: '/experience/gallery', desc: 'Real photos from inside' },
+      { label: 'Classroom Routine (PDF)', href: '/assets/pdf/classroom-routine.pdf', desc: 'The actual schedule' },
+    ]}
+  />
+</Base>
+
+<style>
+  .tl { list-style: none; padding: 0; display: grid; gap: 0; position: relative; }
+
+  .tl__item { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: var(--space-s); }
+
+  .tl__marker { position: relative; display: flex; justify-content: center; }
+  .tl__marker::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: var(--cream-300);
+  }
+  .tl__item:first-child .tl__marker::before { top: 22px; }
+  .tl__item:last-child .tl__marker::before { bottom: calc(100% - 22px); }
+
+  .tl__icon {
+    position: relative;
+    display: grid; place-items: center;
+    width: 44px; height: 44px;
+    margin-top: 0;
+    border-radius: var(--radius-pill);
+    background: var(--bg-raised);
+    border: 2px solid var(--cream-300);
+    color: var(--coral-600);
+    flex: none;
+  }
+
+  .tl__card {
+    padding: var(--space-s) var(--space-m) var(--space-l);
+    min-width: 0;
+  }
+  .tl__head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+  .tl__head h3 { font-size: var(--step-1); }
+  .tl__card p { margin-top: 0.45rem; font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); max-width: 62ch; }
+  .tl__card .source-note { margin-top: 0.6rem; }
+  .tl__card .source-note :global(svg) { color: var(--ok-600); }
+
+  @media (min-width: 720px) {
+    .tl__item { grid-template-columns: 60px minmax(0, 1fr); }
+    .tl__card { padding-block: 0.5rem var(--space-l); }
+  }
+
+</style>
+
+<script>
+  const openFromHash = () => {
+    const id = location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el instanceof HTMLDetailsElement) {
+      el.open = true;
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  };
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+</script>

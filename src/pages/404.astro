@@ -1,0 +1,106 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+
+const suggestions = [
+  { label: 'Programs by age', href: '/programs', desc: 'Twelve months to twelve years' },
+  { label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' },
+  { label: 'Questions & answers', href: '/families/faq', desc: 'Searchable, with sources' },
+  { label: 'Contact', href: '/contact', desc: 'Phone, email and directions' },
+];
+---
+
+<Base
+  title="Page not found | Tiny Stars Daycare"
+  description="That page does not exist on the Tiny Stars website. Here is where most people were heading, plus a search box and a phone number."
+  noindex={true}
+>
+  <section class="nf">
+    <div class="starfield" aria-hidden="true">
+      <span style="--s:3px;left:18%;top:22%;--d:4.6s;--o:.6"></span>
+      <span style="--s:2px;left:44%;top:66%;--d:5.4s;--delay:1s;--o:.45"></span>
+      <span style="--s:4px;left:74%;top:28%;--d:5s;--delay:1.7s;--o:.55"></span>
+    </div>
+
+    <div class="container container--narrow text-center">
+      <p class="nf__code" aria-hidden="true">404</p>
+      <h1>That one has wandered off</h1>
+      <p class="lede mt-s mx-auto">
+        The page you were after does not exist — or it moved when this site was redesigned.
+        Nothing is broken on your end.
+      </p>
+
+      <div class="cluster mt-l" style="justify-content:center">
+        <button type="button" class="btn btn--primary" data-search-open>
+          <Icon name="search" size={18} /> Search the site
+        </button>
+        <a href="/" class="btn btn--ghost">Back to the start</a>
+      </div>
+
+      <ul class="nf__links mt-xl">
+        {suggestions.map((s) => (
+          <li>
+            <a href={s.href}>
+              <span><strong>{s.label}</strong><small>{s.desc}</small></span>
+              <Icon name="arrow" size={16} />
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <p class="text-muted mt-l" style="font-size:var(--step--1)">
+        Or just call us — <a href={site.phone.href} data-track="phone_click">{site.phone.label}</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    position: relative;
+    padding-block: clamp(3rem, 2rem + 6vw, 7rem);
+    overflow: hidden;
+    background:
+      radial-gradient(60rem 28rem at 50% -10%, var(--coral-50) 0%, transparent 60%),
+      var(--bg);
+  }
+  .nf__code {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 3rem + 8vw, 8rem);
+    font-weight: 650;
+    line-height: 1;
+    color: var(--cream-300);
+    letter-spacing: -0.03em;
+  }
+  .nf h1 { font-size: var(--step-4); margin-top: -0.5rem; }
+  .nf .lede { max-width: 46ch; }
+
+  .nf__links {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+    text-align: left;
+    max-width: 34rem;
+    margin-inline: auto;
+  }
+  .nf__links a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding: 0.9rem 1.2rem;
+    min-height: 60px;
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--ink-800);
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .nf__links a:hover { border-color: var(--ink-700); transform: translateY(-2px); color: var(--ink-900); }
+  .nf__links strong { display: block; font-size: var(--step--1); }
+  .nf__links small { display: block; font-size: var(--step--2); color: var(--text-muted); }
+  .nf__links :global(svg) { flex: none; opacity: 0.45; }
+</style>

@@ -1,0 +1,7 @@
+# Tiny Stars 2.0 — PREVIEW BUILD
+# This is a redesign prototype. It must never be indexed or compete with the
+# live site at https://tinystars.ca. Flip PUBLIC_INDEXABLE=true and replace this
+# file only when this codebase actually becomes tinystars.ca.
+
+User-agent: *
+Disallow: /

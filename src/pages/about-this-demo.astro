@@ -1,0 +1,201 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site, VERIFIED_ON, unverified } from '../data/site';
+import { knowledge, verifiedCount, unknownCount } from '../data/knowledge';
+import { liveAgents, futureAgents } from '../lib/ai/agents';
+
+const real = [
+  'Every photograph and video — all mirrored from tinystars.ca',
+  'The five programs, their names and their age ranges',
+  'The address, phone number and both email addresses',
+  'The four published policy documents (they open the real PDFs)',
+  'The 6:00 PM closing time and the late pick-up fee schedule',
+  'The eleven sections of the registration package',
+  'The 30-minute tour length, and the real booking calendar link',
+  '“Licensed & Insured”, “Experienced Staff” and “Family Owned”',
+];
+
+const demo = [
+  'The tour, registration, waitlist, contact and careers forms — they validate, then stop',
+  'The Parent Portal at /parent — every child, message and event in it is invented',
+  'The Agent Command Centre metrics beyond your own session',
+  'Any event dates shown in the portal calendar',
+  'The Family Hub guides, which are our general early-childhood content',
+];
+---
+
+<Base
+  title="About this preview | Tiny Stars 2.0"
+  description="What this Tiny Stars redesign preview is, what on it is real, what is demonstration only, and how the AI concierge is prevented from inventing facts."
+  noindex={true}
+>
+  <PageHero
+    tone="ink"
+    eyebrow="About this preview"
+    title="What you're looking at"
+    lede="This is a redesign prototype of tinystars.ca. It is not the live Tiny Stars website, and it is not indexed by search engines."
+  >
+    <div class="cluster">
+      <a href="https://tinystars.ca" class="btn btn--on-dark" target="_blank" rel="noopener">
+        Visit the live site <Icon name="arrow" size={16} />
+      </a>
+      <a href="/" class="btn btn--primary">Back to the preview</a>
+    </div>
+  </PageHero>
+
+  <section class="section section--tight">
+    <div class="container container--narrow prose">
+      <div class="notice notice--warn">
+        <Icon name="alert" size={20} />
+        <span>
+          <strong>Nothing you submit here reaches Tiny Stars.</strong>
+          If you want to book a tour, join the waitlist, apply for a job or ask a question
+          for real, call <a href={site.phone.href}>{site.phone.label}</a> or email
+          <a href={`mailto:${site.email.general}`}>{site.email.general}</a>.
+        </span>
+      </div>
+
+      <h2>The one rule this build follows</h2>
+      <p>
+        A childcare website is an unusually bad place to be approximately right. A parent
+        reading it is deciding whether to hand over their child — so a plausible-sounding
+        invented fee, ratio or vacancy is worse than no answer at all.
+      </p>
+      <p>
+        So every factual claim on this site is either traceable to something Tiny Stars has
+        published, or explicitly labelled as general guidance, or openly marked as unknown
+        with a route to a person. There is no fourth category.
+      </p>
+
+      <div class="tallies">
+        <div class="tally">
+          <strong>{verifiedCount}</strong>
+          <span>answers traceable to a Tiny Stars page or document</span>
+        </div>
+        <div class="tally">
+          <strong>{knowledge.length - verifiedCount - unknownCount}</strong>
+          <span>labelled as general early-childhood guidance</span>
+        </div>
+        <div class="tally">
+          <strong>{unknownCount}</strong>
+          <span>deliberately answered with “ask the team”</span>
+        </div>
+      </div>
+
+      <h2>What's real</h2>
+      <p>
+        All of this came from tinystars.ca and its published documents, read on {VERIFIED_ON}.
+      </p>
+      <ul class="marks marks--ok">
+        {real.map((r) => <li><Icon name="check-circle" size={17} /><span>{r}</span></li>)}
+      </ul>
+
+      <h2>What's demonstration</h2>
+      <ul class="marks marks--warn">
+        {demo.map((d) => <li><Icon name="alert" size={17} /><span>{d}</span></li>)}
+      </ul>
+
+      <h2>What nobody has published</h2>
+      <p>
+        These appear nowhere on the Tiny Stars site, so they appear nowhere here either —
+        not in the copy, not in the schema markup, and not in anything the concierge will say.
+      </p>
+      <ul class="chips">
+        {unverified.map((u) => <li>{u}</li>)}
+      </ul>
+
+      <h2>How the concierge is kept honest</h2>
+      <p>
+        Star Guide runs entirely in your browser. It has no model behind it and no network
+        connection — it retrieves from a knowledge base where every entry carries a trust
+        level and a source. It literally cannot invent a fee, because it can only return
+        text that was written into that knowledge base.
+      </p>
+      <p>
+        On top of that, every turn passes through guardrails: prompt-injection phrases are
+        stripped rather than obeyed, emails and phone numbers are redacted before routing,
+        medical and legal questions are refused with a handoff, and any answer containing a
+        currency amount, a ratio or an availability claim without a source is blocked before
+        you see it.
+      </p>
+      <p>
+        {liveAgents.length} specialist agents run today; {futureAgents.length} more are
+        designed but honestly marked as not built, each with a note saying what it would
+        need. You can watch the whole pipeline run on a question of your own in the
+        <a href="/command-center">Agent Command Centre</a>.
+      </p>
+
+      <h2>Privacy</h2>
+      <p>
+        No analytics service, no cookies, no third-party scripts, no embedded map. Events
+        stay in memory for the length of your visit so the Command Centre has something
+        honest to show, and are discarded when you close the tab. Global Privacy Control
+        and Do Not Track are both respected. The tour checklist is the only thing saved to
+        your device, and “Clear” removes it.
+      </p>
+
+      <h2>Why it's noindex</h2>
+      <p>
+        Every page here carries <code>noindex</code> and robots.txt disallows everything.
+        Two versions of the same business competing in search would hurt the real one.
+        A single environment variable flips that if this ever becomes production.
+      </p>
+
+      <div class="notice notice--info mt-l">
+        <Icon name="info" size={20} />
+        <span>
+          <strong>Feedback welcome.</strong>
+          The fastest way to make this better is to tell us which page made you hesitate,
+          and why.
+        </span>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .tallies { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); margin-block: var(--space-l); }
+  .tally {
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .tally strong { display: block; font-family: var(--font-display); font-size: var(--step-4); font-weight: 650; line-height: 1; }
+  .tally span { display: block; font-size: var(--step--2); color: var(--text-muted); margin-top: 0.4rem; line-height: 1.5; }
+
+  .marks { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+  .marks li {
+    display: flex; gap: 0.7rem; align-items: flex-start;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-s);
+    font-size: var(--step--1);
+    line-height: var(--leading-normal);
+  }
+  .marks li :global(svg) { flex: none; margin-top: 0.15rem; }
+  .marks--ok li { background: var(--ok-100); color: var(--ink-800); }
+  .marks--ok li :global(svg) { color: var(--ok-600); }
+  .marks--warn li { background: var(--warn-100); color: var(--ink-800); }
+  .marks--warn li :global(svg) { color: var(--warn-600); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; padding: 0; }
+  .chips li {
+    padding: 0.35rem 0.8rem;
+    border-radius: var(--radius-pill);
+    background: var(--cream-200);
+    border: 1px dashed var(--border-strong);
+    font-size: var(--step--2);
+    font-weight: 600;
+    color: var(--ink-700);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--cream-200);
+  }
+</style>

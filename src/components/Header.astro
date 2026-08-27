@@ -1,0 +1,598 @@
+---
+import Icon from './Icon.astro';
+import { nav, utilityNav } from '../lib/nav';
+import { site } from '../data/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => path === href || (href !== '/' && path.startsWith(href + '/'));
+---
+
+<header class="hdr" id="site-header">
+  <div class="hdr__bar container container--wide">
+    <a href="/" class="brand" aria-label={`${site.name} — home`}>
+      <span class="brand__mark" aria-hidden="true">
+        <Icon name="star" size={20} />
+      </span>
+      <span class="brand__text">
+        <strong>Tiny Stars</strong>
+        <small>Grande Prairie</small>
+      </span>
+    </a>
+
+    <a href="/about-this-demo" class="preview-tag" title="This is a redesign preview, not the live Tiny Stars site">
+      <Icon name="sparkles" size={12} />
+      <span>Preview</span>
+    </a>
+
+    <nav class="primary" aria-label="Main">
+      <ul class="primary__list">
+        {nav.map((group) => (
+          <li class="primary__item">
+            <button
+              type="button"
+              class="primary__trigger"
+              aria-expanded="false"
+              aria-controls={`menu-${group.href.replace(/\W+/g, '-')}`}
+              data-nav-trigger
+              data-active={isActive(group.href) ? 'true' : undefined}
+            >
+              {group.label}
+              <Icon name="chevron-down" size={15} class="primary__caret" />
+            </button>
+
+            <div class="mega" id={`menu-${group.href.replace(/\W+/g, '-')}`} data-nav-panel hidden>
+              <div class="mega__inner container container--wide">
+                <div class="mega__links">
+                  <p class="mega__summary">{group.summary}</p>
+                  <ul>
+                    {group.links.map((l) => (
+                      <li>
+                        <a href={l.href} class="mega__link" aria-current={path === l.href ? 'page' : undefined}>
+                          <span class="mega__link-label">
+                            {l.label}
+                            {l.demo && <span class="badge badge--demo">Demo</span>}
+                          </span>
+                          {l.desc && <span class="mega__link-desc">{l.desc}</span>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {group.feature && (
+                  <a href={group.feature.href} class="mega__feature">
+                    <img src={group.feature.image} alt="" loading="lazy" decoding="async" width="320" height="200" />
+                    <span class="mega__feature-body">
+                      <strong>{group.feature.label}</strong>
+                      <span>{group.feature.desc}</span>
+                      <span class="mega__feature-cta">
+                        Open <Icon name="arrow" size={15} />
+                      </span>
+                    </span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="hdr__actions">
+      <button type="button" class="icon-btn" data-search-open aria-label="Search Tiny Stars">
+        <Icon name="search" size={19} />
+      </button>
+      <a href={site.phone.href} class="icon-btn hide-sm" aria-label={`Call Tiny Stars on ${site.phone.label}`} data-track="phone_click">
+        <Icon name="phone" size={19} />
+      </a>
+      <a href="/enroll/book-a-tour" class="btn btn--primary btn--sm hdr__cta" data-track="tour_cta_header">
+        Book a tour
+      </a>
+      <button
+        type="button"
+        class="icon-btn icon-btn--menu"
+        data-drawer-open
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-drawer"
+      >
+        <Icon name="menu" size={22} />
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile drawer -->
+<div class="drawer" id="mobile-drawer" hidden>
+  <div class="drawer__scrim" data-drawer-close></div>
+  <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="drawer__head">
+      <a href="/" class="brand brand--sm">
+        <span class="brand__mark" aria-hidden="true"><Icon name="star" size={18} /></span>
+        <strong>Tiny Stars</strong>
+      </a>
+      <button type="button" class="icon-btn" data-drawer-close aria-label="Close menu">
+        <Icon name="x" size={22} />
+      </button>
+    </div>
+
+    <div class="drawer__body">
+      <a href="/enroll/book-a-tour" class="btn btn--primary btn--block" data-track="tour_cta_drawer">Book a tour</a>
+      <button type="button" class="btn btn--ghost btn--block mt-s" data-search-open>
+        <Icon name="search" size={17} /> Search the site
+      </button>
+
+      <nav aria-label="Mobile">
+        {nav.map((group) => (
+          <details class="drawer__group" open={isActive(group.href)}>
+            <summary>
+              {group.label}
+              <Icon name="chevron-down" size={17} />
+            </summary>
+            <ul>
+              {group.links.map((l) => (
+                <li>
+                  <a href={l.href} aria-current={path === l.href ? 'page' : undefined}>
+                    {l.label}
+                    {l.demo && <span class="badge badge--demo">Demo</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ))}
+        <ul class="drawer__utility">
+          {utilityNav.map((l) => (
+            <li><a href={l.href}>{l.label}</a></li>
+          ))}
+          <li><a href="/command-center">Agent Command Centre <span class="badge badge--demo">Demo</span></a></li>
+        </ul>
+      </nav>
+
+      <div class="drawer__contact">
+        <a href={site.phone.href} data-track="phone_click"><Icon name="phone" size={17} /> {site.phone.label}</a>
+        <a href={`mailto:${site.email.general}`}><Icon name="mail" size={17} /> {site.email.general}</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background: color-mix(in oklab, var(--cream-100) 88%, transparent);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+  }
+  .hdr[data-stuck='true'] {
+    border-bottom-color: var(--border);
+    box-shadow: var(--shadow-s);
+  }
+
+  .hdr__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: var(--header-h);
+  }
+  @media (min-width: 1060px) { .hdr__bar { gap: var(--space-m); } }
+
+  /* The brand's sub-label is the least useful pixel on a narrow row; the
+     "Preview" wording is one of the most important, so it goes last. */
+  @media (max-width: 400px) {
+    .brand__text small { display: none; }
+  }
+  @media (max-width: 339px) {
+    .preview-tag span { display: none; }
+    .preview-tag { padding-inline: 0.45rem; }
+  }
+
+  /* ---- brand ---- */
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 44px;
+    text-decoration: none;
+    color: var(--ink-900);
+    flex: none;
+  }
+  .brand__mark {
+    display: grid;
+    place-items: center;
+    width: 38px; height: 38px;
+    border-radius: 12px;
+    background: linear-gradient(150deg, var(--ink-800), var(--ink-900) 60%);
+    color: var(--gold-400);
+    box-shadow: var(--shadow-s);
+    flex: none;
+  }
+  .brand__mark :global(svg) { fill: currentColor; stroke-width: 1.2; }
+  .brand__text { display: flex; flex-direction: column; line-height: 1.05; }
+  .brand__text strong {
+    font-family: var(--font-display);
+    font-size: 1.16rem;
+    font-weight: 650;
+    letter-spacing: var(--tracking-snug);
+  }
+  .brand__text small {
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .brand--sm .brand__text { display: none; }
+
+  .preview-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    flex: none;
+    padding: 0.35rem 0.65rem;
+    min-height: 28px;
+    border-radius: var(--radius-pill);
+    border: 1px solid color-mix(in oklab, var(--violet-700) 28%, transparent);
+    background: var(--violet-100);
+    color: var(--violet-700);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .preview-tag:hover { background: color-mix(in oklab, var(--violet-500) 20%, transparent); color: var(--violet-700); }
+
+  /* ---- primary nav ---- */
+  .primary { flex: 1; display: none; }
+  .primary__list { display: flex; gap: 0.15rem; justify-content: center; }
+  .primary__item { position: static; }
+
+  .primary__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.6rem 0.8rem;
+    min-height: 42px;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-s);
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--ink-700);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+  }
+  .primary__trigger:hover { color: var(--ink-900); background: var(--cream-200); }
+  .primary__trigger[data-active] { color: var(--coral-700); }
+  .primary__trigger[aria-expanded='true'] { color: var(--ink-900); background: var(--cream-200); }
+  :global(.primary__caret) { transition: transform var(--dur) var(--ease-out); opacity: 0.6; }
+  .primary__trigger[aria-expanded='true'] :global(.primary__caret) { transform: rotate(180deg); }
+
+  /* ---- mega panel ---- */
+  .mega {
+    position: absolute;
+    left: 0; right: 0;
+    top: 100%;
+    background: var(--cream-50);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-l);
+    animation: megaIn var(--dur) var(--ease-out);
+  }
+  @keyframes megaIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .mega { animation: none; } }
+
+  .mega__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+    gap: var(--space-xl);
+    padding-block: var(--space-l);
+  }
+  .mega__summary {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    margin-bottom: var(--space-s);
+  }
+  .mega__links ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
+  }
+  .mega__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.65rem 0.8rem;
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    color: var(--ink-800);
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .mega__link:hover { background: var(--cream-200); color: var(--ink-900); }
+  .mega__link[aria-current='page'] { background: var(--coral-50); color: var(--coral-700); }
+  .mega__link-label {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-weight: 600; font-size: var(--step--1);
+  }
+  .mega__link-desc { font-size: var(--step--2); color: var(--text-muted); }
+
+  .mega__feature {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background: var(--cream-200);
+    text-decoration: none;
+    color: var(--ink-900);
+    border: 1px solid var(--border);
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
+  }
+  .mega__feature:hover { transform: translateY(-3px); box-shadow: var(--shadow-m); color: var(--ink-900); }
+  .mega__feature img { width: 100%; height: 128px; object-fit: cover; }
+  .mega__feature-body { display: flex; flex-direction: column; gap: 0.3rem; padding: var(--space-s); }
+  .mega__feature-body strong { font-size: var(--step--1); }
+  .mega__feature-body > span { font-size: var(--step--2); color: var(--text-muted); line-height: 1.5; }
+  .mega__feature-cta {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-weight: 650; font-size: var(--step--2); color: var(--coral-700) !important;
+  }
+
+  /* ---- actions ---- */
+  .hdr__actions { display: flex; align-items: center; gap: 0.4rem; margin-left: auto; flex: none; }
+
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    width: 44px; height: 44px;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    border: 0;
+    color: var(--ink-700);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  .icon-btn:hover { background: var(--cream-200); color: var(--ink-900); }
+  .icon-btn--menu { display: grid; }
+
+  .hdr__cta { display: none; }
+
+  /* ---- drawer ---- */
+  .drawer { position: fixed; inset: 0; z-index: var(--z-overlay); }
+  .drawer__scrim {
+    position: absolute; inset: 0;
+    background: color-mix(in oklab, var(--ink-900) 45%, transparent);
+    backdrop-filter: blur(3px);
+    animation: fadeIn var(--dur) var(--ease-out);
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .drawer__panel {
+    position: absolute;
+    inset-block: 0;
+    right: 0;
+    width: min(24rem, 100%);
+    background: var(--cream-100);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+    animation: slideIn var(--dur-slow) var(--ease-out);
+  }
+  @keyframes slideIn { from { transform: translateX(100%); } to { transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .drawer__scrim, .drawer__panel { animation: none; }
+  }
+
+  .drawer__head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-s) var(--space-m);
+    border-bottom: 1px solid var(--border);
+  }
+  .drawer__head .brand__text { display: flex; }
+  .drawer__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-m);
+    overscroll-behavior: contain;
+  }
+  .drawer__body nav { margin-top: var(--space-m); }
+
+  .drawer__group { border-bottom: 1px solid var(--border); }
+  .drawer__group summary {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.9rem 0.25rem;
+    min-height: 48px;
+    font-weight: 650;
+    cursor: pointer;
+    list-style: none;
+  }
+  .drawer__group summary::-webkit-details-marker { display: none; }
+  .drawer__group summary :global(svg) { transition: transform var(--dur) var(--ease-out); opacity: 0.55; }
+  .drawer__group[open] summary :global(svg) { transform: rotate(180deg); }
+  .drawer__group ul { padding: 0 0 0.75rem 0.25rem; list-style: none; }
+  .drawer__group a,
+  .drawer__utility a {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.6rem 0.25rem;
+    min-height: 44px;
+    font-size: var(--step--1);
+    color: var(--ink-700);
+    text-decoration: none;
+  }
+  .drawer__group a:hover, .drawer__utility a:hover { color: var(--coral-700); }
+  .drawer__group a[aria-current='page'] { color: var(--coral-700); font-weight: 650; }
+
+  .drawer__utility { margin-top: var(--space-s); list-style: none; padding: 0; }
+  .drawer__contact {
+    margin-top: var(--space-l);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--border);
+    display: grid;
+    gap: 0.4rem;
+  }
+  .drawer__contact a {
+    display: flex; align-items: center; gap: 0.55rem;
+    min-height: 44px;
+    font-size: var(--step--1); font-weight: 600;
+    color: var(--ink-800); text-decoration: none;
+  }
+
+  /* ---- breakpoints ---- */
+  @media (min-width: 400px) {
+    .hdr__cta { display: inline-flex; }
+  }
+  @media (min-width: 1060px) {
+    .primary { display: block; }
+    .icon-btn--menu { display: none; }
+    .brand--sm .brand__text { display: flex; }
+  }
+</style>
+
+<script>
+  // --- sticky shadow -------------------------------------------------------
+  const header = document.getElementById('site-header');
+  if (header) {
+    const setStuck = () => header.setAttribute('data-stuck', String(window.scrollY > 8));
+    setStuck();
+    window.addEventListener('scroll', setStuck, { passive: true });
+  }
+
+  // --- desktop mega menu ---------------------------------------------------
+  const triggers = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-nav-trigger]')
+  );
+
+  let openTrigger: HTMLButtonElement | null = null;
+  let closeTimer: number | undefined;
+
+  const panelFor = (t: HTMLButtonElement) =>
+    document.getElementById(t.getAttribute('aria-controls') || '');
+
+  function closeMenu() {
+    if (!openTrigger) return;
+    const panel = panelFor(openTrigger);
+    openTrigger.setAttribute('aria-expanded', 'false');
+    if (panel) panel.hidden = true;
+    openTrigger = null;
+  }
+
+  function openMenu(t: HTMLButtonElement) {
+    if (openTrigger === t) return;
+    closeMenu();
+    const panel = panelFor(t);
+    if (!panel) return;
+    t.setAttribute('aria-expanded', 'true');
+    panel.hidden = false;
+    openTrigger = t;
+  }
+
+  triggers.forEach((t) => {
+    const panel = panelFor(t);
+    const li = t.closest('li');
+
+    t.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openTrigger === t ? closeMenu() : openMenu(t);
+    });
+
+    // Hover intent on pointer devices only — never on touch.
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      const enter = () => {
+        window.clearTimeout(closeTimer);
+        openMenu(t);
+      };
+      const leave = () => {
+        closeTimer = window.setTimeout(closeMenu, 180);
+      };
+      li?.addEventListener('mouseenter', enter);
+      li?.addEventListener('mouseleave', leave);
+      panel?.addEventListener('mouseenter', () => window.clearTimeout(closeTimer));
+      panel?.addEventListener('mouseleave', leave);
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && openTrigger) {
+      const t = openTrigger;
+      closeMenu();
+      t.focus();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!openTrigger) return;
+    const target = e.target as Node;
+    const panel = panelFor(openTrigger);
+    if (!panel?.contains(target) && !openTrigger.contains(target)) closeMenu();
+  });
+
+  // Close when focus leaves the whole nav (keyboard tabbing out).
+  document.querySelector('.primary')?.addEventListener('focusout', (e) => {
+    const next = (e as FocusEvent).relatedTarget as Node | null;
+    if (next && !(e.currentTarget as HTMLElement).contains(next)) closeMenu();
+  });
+
+  // --- mobile drawer -------------------------------------------------------
+  const drawer = document.getElementById('mobile-drawer');
+  const drawerOpener = document.querySelector<HTMLButtonElement>('[data-drawer-open]');
+  let lastFocus: HTMLElement | null = null;
+
+  function openDrawer() {
+    if (!drawer) return;
+    lastFocus = document.activeElement as HTMLElement;
+    drawer.hidden = false;
+    document.body.style.overflow = 'hidden';
+    drawerOpener?.setAttribute('aria-expanded', 'true');
+    drawer.querySelector<HTMLElement>('[data-drawer-close]')?.focus();
+  }
+
+  function closeDrawer() {
+    if (!drawer || drawer.hidden) return;
+    drawer.hidden = true;
+    document.body.style.overflow = '';
+    drawerOpener?.setAttribute('aria-expanded', 'false');
+    lastFocus?.focus();
+  }
+
+  drawerOpener?.addEventListener('click', openDrawer);
+  drawer?.querySelectorAll('[data-drawer-close]').forEach((el) =>
+    el.addEventListener('click', closeDrawer)
+  );
+  drawer?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeDrawer));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || !drawer || drawer.hidden) return;
+    closeDrawer();
+  });
+
+  // Focus trap inside the drawer.
+  drawer?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const focusables = drawer.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), summary, input, [tabindex]:not([tabindex="-1"])'
+    );
+    const list = Array.from(focusables).filter((el) => el.offsetParent !== null);
+    if (!list.length) return;
+    const first = list[0];
+    const last = list[list.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+</script>

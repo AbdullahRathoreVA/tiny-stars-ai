@@ -1,0 +1,484 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import { programs, priorityLabels, type Priority } from '../../data/programs';
+import { site } from '../../data/site';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+const ageBands = [
+  { id: 'u12', label: 'Under 12 months', months: 6 },
+  { id: '12-18', label: '12–18 months', months: 15 },
+  { id: '18-36', label: '18 months – 3 years', months: 26 },
+  { id: '3-5', label: '3–5 years', months: 48 },
+  { id: '5-6', label: '5–6 years', months: 66 },
+  { id: '6-12', label: '6–12 years', months: 100 },
+];
+
+const priorities: Priority[] = [
+  'safety', 'learning', 'social', 'creativity', 'routine', 'outdoor', 'communication',
+];
+
+const timings = [
+  { id: 'asap', label: 'As soon as possible' },
+  { id: '1-3', label: 'In the next 1–3 months' },
+  { id: '3-6', label: 'In 3–6 months' },
+  { id: 'exploring', label: 'Just exploring for now' },
+];
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([
+    { name: 'Enrol', href: '/enroll' },
+    { name: 'Find your program', href: '/enroll/find-your-program' },
+  ]),
+];
+---
+
+<Base
+  title="Find your program | Tiny Stars Daycare"
+  description="Answer three questions about your child's age, priorities and timing, and get a clear program recommendation plus the right next step at Tiny Stars Daycare."
+  image="/assets/images/programs/toddler.webp"
+  schema={schema}
+>
+  <PageHero
+    eyebrow="Find your program"
+    title="Three questions, one clear next step"
+    lede="No sign-up, no email, nothing stored. This runs entirely in your browser and forgets everything when you close the tab."
+    crumbs={[
+      { name: 'Enrol', href: '/enroll' },
+      { name: 'Find your program', href: '/enroll/find-your-program' },
+    ]}
+  />
+
+  <section class="section" aria-labelledby="finder-title">
+    <div class="container container--narrow">
+      <h2 id="finder-title" class="visually-hidden">Program finder</h2>
+
+      <div class="finder panel" data-finder>
+        <!-- progress -->
+        <div class="finder__progress">
+          <div class="progress">
+            <span class="progress__label" data-step-label>Step 1 of 3</span>
+            <div class="progress__track">
+              <div class="progress__fill" data-progress style="width:33%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- live region for screen readers -->
+        <p class="visually-hidden" role="status" aria-live="polite" data-announce></p>
+
+        <!-- ------------------------------------------------ step 1 -->
+        <fieldset class="step is-active" data-step="1">
+          <legend>
+            <span class="step__n">1</span>
+            <span>
+              <strong>How old is your child?</strong>
+              <small>If you have more than one, start with the youngest.</small>
+            </span>
+          </legend>
+
+          <div class="choices choices--grid">
+            {ageBands.map((b) => (
+              <label class="choice">
+                <input type="radio" name="age" value={b.months} data-label={b.label} />
+                <span class="choice__box">{b.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <!-- ------------------------------------------------ step 2 -->
+        <fieldset class="step" data-step="2" hidden>
+          <legend>
+            <span class="step__n">2</span>
+            <span>
+              <strong>What matters most to you?</strong>
+              <small>Pick up to three. This changes what we show you, not which program fits.</small>
+            </span>
+          </legend>
+
+          <div class="choices choices--grid">
+            {priorities.map((p) => (
+              <label class="choice">
+                <input type="checkbox" name="priority" value={p} data-label={priorityLabels[p].label} />
+                <span class="choice__box">
+                  {priorityLabels[p].label}
+                  <small>{priorityLabels[p].help}</small>
+                </span>
+              </label>
+            ))}
+          </div>
+          <p class="step__hint" data-priority-hint>Choose at least one to continue.</p>
+        </fieldset>
+
+        <!-- ------------------------------------------------ step 3 -->
+        <fieldset class="step" data-step="3" hidden>
+          <legend>
+            <span class="step__n">3</span>
+            <span>
+              <strong>When would you want to start?</strong>
+              <small>Tiny Stars doesn’t publish availability, so this only shapes what we recommend next.</small>
+            </span>
+          </legend>
+
+          <div class="choices choices--grid">
+            {timings.map((t) => (
+              <label class="choice">
+                <input type="radio" name="timing" value={t.id} data-label={t.label} />
+                <span class="choice__box">{t.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <!-- ------------------------------------------------ result -->
+        <div class="result" data-result hidden>
+          <!-- filled by script -->
+        </div>
+
+        <!-- nav -->
+        <div class="finder__nav" data-nav>
+          <button type="button" class="btn btn--quiet" data-back hidden>
+            <Icon name="chevron" size={16} class="flip" />
+            Back
+          </button>
+          <button type="button" class="btn btn--primary" data-next disabled>
+            Continue
+            <Icon name="arrow" size={17} />
+          </button>
+        </div>
+      </div>
+
+      <p class="finder__foot">
+        <Icon name="lock" size={14} />
+        Nothing you choose here is sent anywhere or saved. Refresh the page and it's gone.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .finder { padding: var(--space-l) var(--space-m) var(--space-m); }
+  @media (min-width: 640px) { .finder { padding: var(--space-l); } }
+
+  .finder__progress { margin-bottom: var(--space-l); }
+
+  .finder__foot {
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+    margin-top: var(--space-m);
+    font-size: var(--step--2);
+    color: var(--text-subtle);
+    text-align: center;
+  }
+
+  /* ------------------------------------------------------------ result */
+  .result { animation: stepIn var(--dur-slow) var(--ease-out); }
+  @media (prefers-reduced-motion: reduce) { .result { animation: none; } }
+</style>
+
+<!--
+  Runtime-injected markup does not receive Astro's scoping attribute, so any rule
+  that styles HTML created by the script below must be global. Keeping those rules
+  in their own block makes that requirement explicit rather than accidental.
+-->
+<style is:global>
+
+  .rhead { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: var(--space-s); }
+  .rhead h3 { font-size: var(--step-3); }
+
+  .rmatch {
+    display: grid;
+    gap: var(--space-m);
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--cream-200);
+    border: 1px solid var(--border);
+  }
+  .rmatch img { border-radius: var(--radius-m); aspect-ratio: 4/3; object-fit: cover; width: 100%; }
+  .rmatch__name { font-family: var(--font-display); font-size: var(--step-2); font-weight: 650; }
+  .rmatch__age { font-size: var(--step--1); font-weight: 650; color: var(--coral-700); }
+  .rmatch__quote { margin-top: 0.6rem; font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); }
+  @media (min-width: 620px) { .rmatch { grid-template-columns: 12rem minmax(0, 1fr); align-items: center; } }
+
+  .rsection { margin-top: var(--space-l); }
+  .rsection h4 {
+    font-family: var(--font-sans);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    margin-bottom: 0.6rem;
+  }
+  .rlist { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+  .rlist a {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-s);
+    padding: 0.85rem 1.15rem; min-height: 56px;
+    border-radius: var(--radius-m);
+    border: 1.5px solid var(--border-strong);
+    background: var(--bg-raised);
+    text-decoration: none; color: var(--ink-800);
+    font-weight: 600; font-size: var(--step--1);
+    transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+  }
+  .rlist a:hover { border-color: var(--ink-700); transform: translateY(-2px); color: var(--ink-900); }
+  .rlist small { display: block; font-weight: 450; font-size: var(--step--2); color: var(--text-muted); margin-top: 0.1rem; }
+  .rlist :global(svg) { flex: none; opacity: 0.5; }
+
+  .ractions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: var(--space-l); }
+</style>
+
+<script>
+  import { programForAgeMonths, priorityLabels } from '../../data/programs';
+  import { track } from '../../lib/analytics';
+
+  const root = document.querySelector<HTMLElement>('[data-finder]')!;
+  const steps = Array.from(root.querySelectorAll<HTMLFieldSetElement>('[data-step]'));
+  const nav = root.querySelector<HTMLElement>('[data-nav]')!;
+  const nextBtn = root.querySelector<HTMLButtonElement>('[data-next]')!;
+  const backBtn = root.querySelector<HTMLButtonElement>('[data-back]')!;
+  const fill = root.querySelector<HTMLElement>('[data-progress]')!;
+  const stepLabel = root.querySelector<HTMLElement>('[data-step-label]')!;
+  const announce = root.querySelector<HTMLElement>('[data-announce]')!;
+  const resultBox = root.querySelector<HTMLElement>('[data-result]')!;
+  const priorityHint = root.querySelector<HTMLElement>('[data-priority-hint]')!;
+
+  const MAX_PRIORITIES = 3;
+  let current = 1;
+
+  const answers = {
+    ageMonths: null as number | null,
+    ageLabel: '',
+    priorities: [] as string[],
+    timing: '',
+    timingLabel: '',
+  };
+
+  track('program_finder_start');
+
+  /* ---------------------------------------------------------- helpers */
+
+  function selectedPriorities(): HTMLInputElement[] {
+    return Array.from(root.querySelectorAll<HTMLInputElement>('input[name="priority"]:checked'));
+  }
+
+  function canAdvance(): boolean {
+    if (current === 1) return answers.ageMonths !== null;
+    if (current === 2) return answers.priorities.length > 0;
+    if (current === 3) return answers.timing !== '';
+    return false;
+  }
+
+  function refreshNav() {
+    nextBtn.disabled = !canAdvance();
+    backBtn.hidden = current === 1;
+    nextBtn.innerHTML =
+      current === 3
+        ? 'See my recommendation <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12h14"/><path d="m13 6.5 5.5 5.5L13 17.5"/></svg>'
+        : 'Continue <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12h14"/><path d="m13 6.5 5.5 5.5L13 17.5"/></svg>';
+  }
+
+  function show(step: number) {
+    current = step;
+    steps.forEach((s) => {
+      const on = Number(s.dataset.step) === step;
+      s.hidden = !on;
+      s.classList.toggle('is-active', on);
+    });
+    fill.style.width = `${(step / 3) * 100}%`;
+    stepLabel.textContent = `Step ${step} of 3`;
+    announce.textContent = `Step ${step} of 3.`;
+    refreshNav();
+
+    const first = steps[step - 1]?.querySelector<HTMLInputElement>('input');
+    first?.focus({ preventScroll: true });
+    root.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+
+  /* ------------------------------------------------------ interaction */
+
+  root.addEventListener('change', (e) => {
+    const el = e.target as HTMLInputElement;
+
+    if (el.name === 'age') {
+      answers.ageMonths = Number(el.value);
+      answers.ageLabel = el.dataset.label ?? '';
+    }
+
+    if (el.name === 'priority') {
+      const chosen = selectedPriorities();
+      if (chosen.length > MAX_PRIORITIES) {
+        el.checked = false;
+        priorityHint.dataset.over = 'true';
+        priorityHint.textContent = `Three is the limit — untick one first.`;
+        return;
+      }
+      delete priorityHint.dataset.over;
+      answers.priorities = selectedPriorities().map((i) => i.value);
+      priorityHint.textContent = answers.priorities.length
+        ? `${answers.priorities.length} of ${MAX_PRIORITIES} chosen.`
+        : 'Choose at least one to continue.';
+    }
+
+    if (el.name === 'timing') {
+      answers.timing = el.value;
+      answers.timingLabel = el.dataset.label ?? '';
+    }
+
+    refreshNav();
+  });
+
+  backBtn.addEventListener('click', () => show(Math.max(1, current - 1)));
+
+  nextBtn.addEventListener('click', () => {
+    if (!canAdvance()) return;
+    if (current < 3) {
+      track('program_finder_step', { step: current });
+      show(current + 1);
+    } else {
+      renderResult();
+    }
+  });
+
+  /* ---------------------------------------------------------- result */
+
+  const PRIORITY_LINKS: Record<string, { label: string; href: string; desc: string }> = {
+    safety: { label: 'Trust Centre', href: '/why/trust-centre', desc: 'Every published safety policy, with sources' },
+    learning: { label: 'The learning journey', href: '/learning', desc: 'What your child is actually building' },
+    social: { label: 'A day at Tiny Stars', href: '/day', desc: 'Where friendships get made' },
+    creativity: { label: 'Photo gallery', href: '/experience/gallery', desc: 'Creative work from inside the centre' },
+    routine: { label: 'Classroom Routine (PDF)', href: '/assets/pdf/classroom-routine.pdf', desc: 'The published daily schedule' },
+    outdoor: { label: 'Take a look around', href: '/experience/virtual-tour', desc: 'The spaces, on video' },
+    communication: { label: 'Parent Handbook (PDF)', href: '/assets/pdf/parent-handbook.pdf', desc: 'How the centre communicates with families' },
+  };
+
+  const TIMING_STEP: Record<string, { label: string; href: string; desc: string }> = {
+    asap: { label: 'Book a tour this week', href: '/enroll/book-a-tour', desc: 'Then ask about availability directly — it is not published' },
+    '1-3': { label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person, before you commit' },
+    '3-6': { label: 'Join the waitlist', href: '/enroll/waitlist', desc: 'Register interest early, then tour closer to the time' },
+    exploring: { label: 'Prepare for a tour', href: '/enroll/tour-guide', desc: 'A checklist you can use at any centre, not just this one' },
+  };
+
+  function esc(s: string) {
+    return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  }
+
+  function renderResult() {
+    const program = answers.ageMonths !== null ? programForAgeMonths(answers.ageMonths) : undefined;
+    const tooYoung = answers.ageMonths !== null && answers.ageMonths < 12;
+
+    track('program_finder_result', {
+      program: program?.slug ?? 'none',
+      timing: answers.timing,
+      priorities: answers.priorities.length,
+    });
+
+    steps.forEach((s) => {
+      s.hidden = true;
+      s.classList.remove('is-active');
+    });
+    nav.hidden = true;
+    fill.style.width = '100%';
+    stepLabel.textContent = 'Done';
+
+    const match = tooYoung
+      ? `<div class="notice notice--warn">
+           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.5 2.8 20h18.4Z"/><path d="M12 10v4"/><path d="M12 17.2v.1"/></svg>
+           <span>
+             <strong>The youngest published program starts at 12 months.</strong>
+             Tiny Stars lists Twinkle Stars from 12–18 months. Whether younger babies can be
+             accommodated isn't published anywhere — the team is the only reliable answer.
+           </span>
+         </div>`
+      : program
+        ? `<div class="rmatch">
+             <img src="${program.image}" alt="Children in the ${esc(program.name)} program at Tiny Stars" width="360" height="270" loading="lazy" decoding="async" />
+             <div>
+               <p class="rmatch__age">${esc(program.ageLabel)}</p>
+               <p class="rmatch__name">${esc(program.name)} <span style="font-size:var(--step--1);font-weight:450;color:var(--text-muted)">· ${esc(program.familiar)}</span></p>
+               <p class="rmatch__quote">${esc(program.official)}</p>
+               <p class="source-note" style="margin-top:.7rem">
+                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--ok-600)"><circle cx="12" cy="12" r="8.5"/><path d="m8.4 12.2 2.5 2.5 4.7-4.9"/></svg>
+                 <span>${esc(program.officialSource)}</span>
+               </p>
+             </div>
+           </div>`
+        : '';
+
+    const resources = answers.priorities
+      .map((p) => PRIORITY_LINKS[p])
+      .filter(Boolean)
+      .map(
+        (l) => `<li><a href="${l.href}"><span>${esc(l.label)}<small>${esc(l.desc)}</small></span>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12h14"/><path d="m13 6.5 5.5 5.5L13 17.5"/></svg></a></li>`
+      )
+      .join('');
+
+    const step = TIMING_STEP[answers.timing] ?? TIMING_STEP.exploring;
+
+    resultBox.innerHTML = `
+      <div class="rhead">
+        <span class="badge badge--verified">Based on published program ages</span>
+      </div>
+      <h3>${tooYoung ? 'Here is the honest answer' : `Your child fits ${esc(program?.name ?? '')}`}</h3>
+      <p class="text-muted" style="margin-top:.5rem;font-size:var(--step--1)">
+        ${esc(answers.ageLabel)} · ${answers.priorities.map((p) => esc((priorityLabels as any)[p].label)).join(' · ')} · ${esc(answers.timingLabel)}
+      </p>
+
+      <div style="margin-top:var(--space-m)">${match}</div>
+
+      ${
+        resources
+          ? `<div class="rsection"><h4>Because of what matters to you</h4><ul class="rlist">${resources}</ul></div>`
+          : ''
+      }
+
+      <div class="rsection">
+        <h4>Your next step</h4>
+        <ul class="rlist">
+          <li><a href="${step.href}"><span>${esc(step.label)}<small>${esc(step.desc)}</small></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12h14"/><path d="m13 6.5 5.5 5.5L13 17.5"/></svg></a></li>
+        </ul>
+      </div>
+
+      <div class="notice notice--info" style="margin-top:var(--space-l)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><path d="M12 7.9v.1"/></svg>
+        <span>
+          <strong>This is a routing suggestion, not a placement.</strong>
+          It matches your child's age against the published program ranges. Availability,
+          fees and final placement are decided by Tiny Stars — not by this page.
+        </span>
+      </div>
+
+      <div class="ractions">
+        ${program && !tooYoung ? `<a href="/programs/${program.slug}" class="btn btn--ghost">Read about ${esc(program.name)}</a>` : ''}
+        <a href="tel:+17802301599" class="btn btn--ghost" data-track="phone_click">Call ${esc('(780) 230-1599')}</a>
+        <button type="button" class="btn btn--quiet" data-restart>Start over</button>
+      </div>`;
+
+    resultBox.hidden = false;
+    announce.textContent = tooYoung
+      ? 'Result ready. The youngest published program starts at 12 months.'
+      : `Result ready. Your child fits ${program?.name}.`;
+    resultBox.scrollIntoView({ block: 'start', behavior: 'smooth' });
+
+    resultBox.querySelector('[data-restart]')?.addEventListener('click', () => {
+      root.querySelectorAll<HTMLInputElement>('input').forEach((i) => (i.checked = false));
+      answers.ageMonths = null;
+      answers.ageLabel = '';
+      answers.priorities = [];
+      answers.timing = '';
+      answers.timingLabel = '';
+      priorityHint.textContent = 'Choose at least one to continue.';
+      delete priorityHint.dataset.over;
+      resultBox.hidden = true;
+      resultBox.innerHTML = '';
+      nav.hidden = false;
+      show(1);
+    });
+  }
+
+  refreshNav();
+</script>

@@ -1,0 +1,297 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { tourStops, videos } from '../../data/gallery';
+import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+const schema = [
+  organizationSchema,
+  breadcrumbSchema([{ name: 'Take a look around', href: '/experience/virtual-tour' }]),
+];
+---
+
+<Base
+  title="Take a look around | Tiny Stars Daycare"
+  description="Walk through Tiny Stars Daycare space by space: entry, classrooms, gross-motor room, kitchen and the fenced outdoor play area, in the centre's own photos and video."
+  image="/assets/images/gallery/gallery-12.webp"
+  schema={schema}
+>
+  <PageHero
+    tone="ink"
+    eyebrow="Take a look around"
+    title="Walk the building before you walk the building"
+    lede="Five areas, in the order you'd see them on a real visit. Everything here is Tiny Stars' own photography and video."
+    crumbs={[{ name: 'Take a look around', href: '/experience/virtual-tour' }]}
+  >
+    <div class="cluster">
+      <a href="/enroll/book-a-tour" class="btn btn--primary" data-track="tour_cta_click" data-track-label="vtour-hero">
+        <Icon name="calendar" size={18} /> Book the real thing
+      </a>
+      <a href="#video" class="btn btn--on-dark">
+        <Icon name="play" size={17} /> Watch the video
+      </a>
+    </div>
+  </PageHero>
+
+  <!-- ---------------------------------------------------------- stops -->
+  <section class="section" aria-labelledby="stops-title">
+    <div class="container">
+      <h2 id="stops-title" class="visually-hidden">The spaces</h2>
+
+      <div class="vt">
+        <nav class="vt__nav" aria-label="Jump to a space">
+          <p class="vt__nav-title">The route</p>
+          <ol>
+            {tourStops.map((s, i) => (
+              <li>
+                <a href={`#${s.id}`} data-vt-link={s.id}>
+                  <span class="vt__n">{i + 1}</span>
+                  {s.name}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <div class="vt__stops">
+          {tourStops.map((s, i) => (
+            <section class="stop" id={s.id} aria-labelledby={`${s.id}-h`} data-reveal>
+              <header class="stop__head">
+                <span class="stop__badge">Stop {i + 1} of {tourStops.length}</span>
+                <h3 id={`${s.id}-h`}>{s.name}</h3>
+                <p>{s.blurb}</p>
+              </header>
+
+              <div class="stop__shots" data-shots={s.id}>
+                <figure class="stop__main">
+                  <img
+                    src={s.photos[0]}
+                    alt={`${s.name} at Tiny Stars Daycare`}
+                    width="900"
+                    height="675"
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    data-main
+                  />
+                </figure>
+
+                {s.photos.length > 1 && (
+                  <div class="stop__thumbs" role="group" aria-label={`More views of ${s.name}`}>
+                    {s.photos.map((p, pi) => (
+                      <button
+                        type="button"
+                        class="stop__thumb"
+                        data-src={p}
+                        aria-pressed={pi === 0 ? 'true' : 'false'}
+                        aria-label={`View ${pi + 1} of ${s.photos.length} of ${s.name}`}
+                      >
+                        <img src={p} alt="" width="160" height="120" loading="lazy" decoding="async" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------- video -->
+  <section class="section section--sunken" id="video" aria-labelledby="video-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">On film</p>
+        <h2 id="video-title">Tiny Stars, moving</h2>
+        <p class="lede">
+          Five short clips from the centre. No sound design, no voiceover — just the rooms.
+        </p>
+      </div>
+
+      <div class="grid grid--3 mt-l">
+        {videos.map((v, i) => (
+          <figure class="vcard card card--flush" data-reveal style={`--reveal-delay:${i * 55}ms`}>
+            <video
+              controls
+              preload="none"
+              poster={v.poster}
+              playsinline
+              width="640"
+              height="360"
+            >
+              <source src={v.src} type="video/mp4" />
+              <p>
+                Your browser cannot play this video.
+                <a href={v.src}>Download it instead</a>.
+              </p>
+            </video>
+            <figcaption>
+              <strong>{v.title}</strong>
+              <span>{v.blurb}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <div class="notice notice--info mt-l" data-reveal>
+        <Icon name="info" size={18} />
+        <span>
+          <strong>Videos load only when you press play.</strong>
+          Nothing streams in the background, which keeps this page fast on a phone.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="You've seen the rooms. Now hear them."
+    lede="The thing a virtual tour genuinely cannot give you is the sound of a room at eleven in the morning."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' }}
+    secondary={[
+      { label: 'Full photo gallery', href: '/experience/gallery', desc: 'All 20 photographs' },
+      { label: 'What to look for', href: '/enroll/tour-guide', desc: 'A checklist for your visit' },
+      { label: 'Programs by age', href: '/programs', desc: 'Which room is yours' },
+    ]}
+  />
+</Base>
+
+<style>
+  .vt { display: grid; gap: var(--space-xl); align-items: start; }
+  @media (min-width: 940px) {
+    .vt { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: var(--space-2xl); }
+    .vt__nav { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+  }
+
+  .vt__nav-title {
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    margin-bottom: 0.75rem;
+  }
+  .vt__nav ol { list-style: none; padding: 0; display: grid; gap: 0.2rem; }
+  .vt__nav a {
+    display: flex; align-items: center; gap: 0.65rem;
+    padding: 0.65rem 0.75rem;
+    min-height: 48px;
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    color: var(--ink-700);
+    font-size: var(--step--1);
+    font-weight: 600;
+    transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+  }
+  .vt__nav a:hover { background: var(--cream-200); color: var(--ink-900); }
+  .vt__nav a[data-current='true'] { background: var(--coral-50); color: var(--coral-700); }
+  .vt__n {
+    display: grid; place-items: center;
+    width: 26px; height: 26px; flex: none;
+    border-radius: var(--radius-pill);
+    background: var(--cream-300);
+    color: var(--ink-700);
+    font-size: 0.7rem; font-weight: 700;
+  }
+  .vt__nav a[data-current='true'] .vt__n { background: var(--coral-500); color: #fff; }
+
+  .vt__stops { display: grid; gap: var(--space-2xl); }
+
+  .stop { scroll-margin-top: calc(var(--header-h) + 2rem); }
+  .stop__head { max-width: 56ch; }
+  .stop__badge {
+    display: inline-block;
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--coral-700);
+  }
+  .stop__head h3 { font-size: var(--step-3); margin-top: 0.4rem; }
+  .stop__head p { margin-top: 0.6rem; font-size: var(--step-0); color: var(--text-muted); line-height: var(--leading-normal); }
+
+  .stop__shots { margin-top: var(--space-m); }
+  .stop__main {
+    margin: 0;
+    border-radius: var(--radius-l);
+    overflow: hidden;
+    box-shadow: var(--shadow-l);
+    aspect-ratio: 4 / 3;
+    background: var(--cream-300);
+  }
+  .stop__main img { width: 100%; height: 100%; object-fit: cover; }
+
+  .stop__thumbs {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    scrollbar-width: thin;
+  }
+  .stop__thumb {
+    flex: none;
+    width: 5.5rem;
+    aspect-ratio: 4 / 3;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: var(--radius-s);
+    overflow: hidden;
+    background: var(--cream-300);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  }
+  .stop__thumb:hover { opacity: 1; }
+  .stop__thumb[aria-pressed='true'] { opacity: 1; border-color: var(--coral-500); }
+  .stop__thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  .vcard { display: flex; flex-direction: column; }
+  .vcard video { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--ink-900); }
+  .vcard figcaption { padding: var(--space-s) var(--space-m) var(--space-m); display: grid; gap: 0.2rem; }
+  .vcard figcaption strong { font-size: var(--step-0); }
+  .vcard figcaption span { font-size: var(--step--1); color: var(--text-muted); }
+</style>
+
+<script>
+  // Thumbnail switching within each stop.
+  document.querySelectorAll<HTMLElement>('[data-shots]').forEach((group) => {
+    const main = group.querySelector<HTMLImageElement>('[data-main]');
+    const thumbs = Array.from(group.querySelectorAll<HTMLButtonElement>('.stop__thumb'));
+    thumbs.forEach((t) =>
+      t.addEventListener('click', () => {
+        if (!main || !t.dataset.src) return;
+        main.src = t.dataset.src;
+        thumbs.forEach((x) => x.setAttribute('aria-pressed', String(x === t)));
+      })
+    );
+  });
+
+  // Highlight the current stop in the side rail.
+  const links = new Map<string, HTMLElement>();
+  document.querySelectorAll<HTMLElement>('[data-vt-link]').forEach((a) =>
+    links.set(a.dataset.vtLink!, a)
+  );
+
+  const stops = Array.from(document.querySelectorAll<HTMLElement>('.stop'));
+  if (stops.length && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          links.forEach((a, id) => a.setAttribute('data-current', String(id === entry.target.id)));
+        });
+      },
+      { rootMargin: '-20% 0px -60% 0px' }
+    );
+    stops.forEach((s) => io.observe(s));
+  }
+
+  // Pause any other playing video when one starts — never two soundtracks at once.
+  const vids = Array.from(document.querySelectorAll<HTMLVideoElement>('video'));
+  vids.forEach((v) =>
+    v.addEventListener('play', () => vids.forEach((other) => other !== v && other.pause()))
+  );
+</script>

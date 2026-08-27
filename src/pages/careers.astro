@@ -1,0 +1,356 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import NextStep from '../components/NextStep.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { byTopic } from '../data/knowledge';
+import { breadcrumbSchema, organizationSchema, faqSchema } from '../lib/schema';
+
+/**
+ * Careers is a genuinely different visitor with a different job to do. It gets its
+ * own tone and its own route — and, critically, no invented benefits, salaries or
+ * job titles, none of which Tiny Stars has published.
+ */
+const ageGroups = [
+  'Infants (12–18 months)',
+  'Toddlers (18 months–3 years)',
+  'Preschool (3–5 years)',
+  'Kindergarten & out-of-school (5–12 years)',
+  'All ages',
+];
+
+const careerEntries = byTopic('careers');
+
+const culture = [
+  {
+    icon: 'heart',
+    title: 'Hired for warmth first',
+    body: 'Tiny Stars says it looks for educators who “truly love children,” and positions teachers as family-like figures in a child’s development.',
+    source: 'tinystars.ca — About Us',
+  },
+  {
+    icon: 'home',
+    title: 'Family owned, one location',
+    body: 'A single centre in Grande Prairie. The people making decisions are the people you would work alongside.',
+    source: 'tinystars.ca — footer',
+  },
+  {
+    icon: 'people',
+    title: 'Experienced team',
+    body: 'Tiny Stars describes its staff as experienced, and the centre as licensed and insured.',
+    source: 'tinystars.ca — footer',
+  },
+];
+---
+
+<Base
+  title="Careers at Tiny Stars | Work in early childhood education"
+  description="Apply to work at Tiny Stars Daycare in Grande Prairie, Alberta. What the application asks for, what the centre says about its team, and how to get in touch."
+  image="/assets/images/sections/talent-and-trust.webp"
+  schema={[
+    organizationSchema,
+    breadcrumbSchema([{ name: 'Careers', href: '/careers' }]),
+    faqSchema(careerEntries),
+  ].filter(Boolean) as Record<string, unknown>[]}
+>
+  <PageHero
+    eyebrow="Careers"
+    title="Work where the job is the children"
+    lede="Tiny Stars accepts applications year-round, whether or not a specific role is advertised. Here is what the form asks for, and what the centre says about its team."
+    crumbs={[{ name: 'Careers', href: '/careers' }]}
+    image="/assets/images/sections/talent-and-trust.webp"
+    imageAlt="Educators and children at Tiny Stars Daycare"
+  >
+    <div class="cluster">
+      <a href="#apply" class="btn btn--primary">
+        <Icon name="arrow-down" size={18} /> Apply now
+      </a>
+      <a href={`mailto:${site.email.general}`} class="btn btn--ghost" data-track="email_click">
+        <Icon name="mail" size={17} /> Email the team
+      </a>
+    </div>
+  </PageHero>
+
+  <!-- --------------------------------------------------------- honesty -->
+  <section class="section section--tight">
+    <div class="container container--narrow">
+      <div class="notice notice--warn" data-reveal>
+        <Icon name="alert" size={20} />
+        <span>
+          <strong>No job titles, wages or benefits are listed on this page.</strong>
+          Tiny Stars hasn't published any, and we're not going to invent them to make a
+          careers page look busier. The application asks for your expected wage, so the
+          conversation starts from what you need.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- culture -->
+  <section class="section section--tight" aria-labelledby="culture-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">What the centre says</p>
+        <h2 id="culture-title">Three things, all sourced</h2>
+      </div>
+
+      <div class="grid grid--3 mt-l">
+        {culture.map((c, i) => (
+          <article class="ccard" data-reveal style={`--reveal-delay:${i * 60}ms`}>
+            <span class="ccard__icon"><Icon name={c.icon as any} size={21} /></span>
+            <h3>{c.title}</h3>
+            <p>{c.body}</p>
+            <p class="source-note"><Icon name="check-circle" size={14} /><span>{c.source}</span></p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ----------------------------------------------------------- apply -->
+  <section class="section section--sunken" id="apply" aria-labelledby="apply-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Apply</p>
+        <h2 id="apply-title">What the application asks for</h2>
+        <p class="lede">
+          These are the real fields from the Tiny Stars careers form. Have your resume
+          ready as a PDF, DOC or DOCX under 5MB.
+        </p>
+      </div>
+
+      <div class="notice notice--demo mt-m" data-reveal>
+        <Icon name="sparkles" size={20} />
+        <span>
+          <strong>Preview form — nothing is submitted.</strong>
+          The live site posts to Tiny Stars' careers endpoint. To apply for real right now,
+          email <a href={`mailto:${site.email.general}`}>{site.email.general}</a> or call
+          {site.phone.label}.
+        </span>
+      </div>
+
+      <form class="panel aform mt-l" data-careers novalidate>
+        <p class="visually-hidden" role="status" aria-live="polite" data-af-announce></p>
+
+        <div class="aform__row">
+          <div class="field">
+            <label class="field__label" for="af-name">Full name</label>
+            <input class="input" type="text" id="af-name" name="name" autocomplete="name" required />
+            <p class="field__error"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="af-date">Application date</label>
+            <input class="input" type="date" id="af-date" name="date" required />
+            <p class="field__error"></p>
+          </div>
+        </div>
+
+        <div class="aform__row">
+          <div class="field">
+            <label class="field__label" for="af-email">Email</label>
+            <input class="input" type="email" id="af-email" name="email" autocomplete="email" inputmode="email" required />
+            <p class="field__error"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="af-phone">Contact number</label>
+            <input class="input" type="tel" id="af-phone" name="phone" autocomplete="tel" inputmode="tel" required />
+            <p class="field__error"></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="af-group">Preferred age group</label>
+          <select class="select" id="af-group" name="ageGroup" required>
+            <option value="">Choose…</option>
+            {ageGroups.map((g) => <option>{g}</option>)}
+          </select>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="af-wage">Expected wage</label>
+          <span class="field__hint">An hourly rate or a range is fine. Tiny Stars doesn't publish a band, so say what you need.</span>
+          <input class="input" type="text" id="af-wage" name="wage" required />
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="af-resume">Resume</label>
+          <span class="field__hint">PDF, DOC or DOCX, up to 5MB. Not uploaded in this preview.</span>
+          <input class="input" type="file" id="af-resume" name="resume" accept=".pdf,.doc,.docx" />
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="af-about">Anything you'd like us to know? <span class="text-subtle">(optional)</span></label>
+          <textarea class="textarea" id="af-about" name="about" maxlength="1200"></textarea>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="field">
+          <label class="acheck">
+            <input type="checkbox" id="af-cert" name="certify" required />
+            <span class="acheck__box" aria-hidden="true"><Icon name="check" size={13} /></span>
+            <span class="acheck__text">
+              I certify that the information above is accurate to the best of my knowledge.
+            </span>
+          </label>
+          <p class="field__error"></p>
+        </div>
+
+        <div class="aform__foot">
+          <p class="cform__privacy">
+            <Icon name="lock" size={14} />
+            Used only to consider your application. Nothing is sent in this preview.
+          </p>
+          <button type="submit" class="btn btn--primary">Submit application</button>
+        </div>
+
+        <div data-af-done hidden></div>
+      </form>
+    </div>
+  </section>
+
+  <NextStep
+    tone="default"
+    title="Rather just talk?"
+    lede="A short conversation tells you more about whether a centre suits you than any application form."
+    primary={{ label: `Call ${site.phone.label}`, href: site.phone.href, desc: 'Ask for the director' }}
+    secondary={[
+      { label: 'Email the team', href: `mailto:${site.email.general}`, desc: site.email.general },
+      { label: 'See the programs', href: '/programs', desc: 'The rooms you might work in' },
+      { label: 'Take a look around', href: '/experience/virtual-tour', desc: 'The spaces themselves' },
+    ]}
+  />
+</Base>
+
+<style>
+  .ccard { display: flex; flex-direction: column; gap: 0.5rem; padding: var(--space-m); border-radius: var(--radius-l); background: var(--bg-raised); border: 1px solid var(--border); }
+  .ccard__icon {
+    display: grid; place-items: center;
+    width: 44px; height: 44px;
+    border-radius: var(--radius-m);
+    background: var(--marigold-100); color: var(--marigold-700);
+    margin-bottom: 0.25rem;
+  }
+  .ccard h3 { font-size: var(--step-1); }
+  .ccard p { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); flex: 1; }
+  .ccard .source-note { flex: none; }
+  .ccard .source-note :global(svg) { color: var(--ok-600); }
+
+  .aform { padding: var(--space-l) var(--space-m); }
+  @media (min-width: 640px) { .aform { padding: var(--space-l); } }
+  .aform__row { display: grid; gap: var(--space-m); }
+  @media (min-width: 560px) { .aform__row { grid-template-columns: 1fr 1fr; } .aform__row .field + .field { margin-top: 0; } }
+  .aform__foot {
+    display: flex; flex-wrap: wrap; gap: var(--space-s);
+    align-items: center; justify-content: space-between;
+    margin-top: var(--space-l); padding-top: var(--space-m);
+    border-top: 1px solid var(--border);
+  }
+  .cform__privacy { display: flex; align-items: center; gap: 0.4rem; font-size: var(--step--2); color: var(--text-muted); max-width: 34ch; }
+
+  .acheck { display: flex; gap: 0.7rem; align-items: flex-start; cursor: pointer; min-height: 44px; }
+  .acheck input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .acheck__box {
+    display: grid; place-items: center;
+    width: 24px; height: 24px; flex: none; margin-top: 0.1rem;
+    border: 2px solid var(--border-strong);
+    border-radius: 7px;
+    background: var(--cream-50);
+    color: transparent;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .acheck input:focus-visible + .acheck__box { outline: 3px solid var(--coral-500); outline-offset: 2px; }
+  .acheck input:checked + .acheck__box { background: var(--teal-600); border-color: var(--teal-600); color: #fff; }
+  .acheck input[aria-invalid='true'] + .acheck__box { border-color: var(--coral-600); }
+  .acheck__text { font-size: var(--step--1); line-height: var(--leading-normal); }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-careers]')!;
+  const done = form.querySelector<HTMLElement>('[data-af-done]')!;
+  const announce = form.querySelector<HTMLElement>('[data-af-announce]')!;
+
+  const setErr = (el: HTMLElement, msg: string) => {
+    el.setAttribute('aria-invalid', 'true');
+    const slot = el.closest('.field')?.querySelector<HTMLElement>('.field__error');
+    if (slot) slot.textContent = msg;
+  };
+  const clearErr = (el: HTMLElement) => {
+    el.removeAttribute('aria-invalid');
+    const slot = el.closest('.field')?.querySelector<HTMLElement>('.field__error');
+    if (slot) slot.textContent = '';
+  };
+
+  form.addEventListener('input', (e) => clearErr(e.target as HTMLElement));
+  form.addEventListener('change', (e) => clearErr(e.target as HTMLElement));
+
+  // Default the date to today, since that is what "application date" means.
+  const dateEl = form.querySelector<HTMLInputElement>('#af-date');
+  if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let firstBad: HTMLElement | null = null;
+
+    form.querySelectorAll<HTMLInputElement>('[required]').forEach((el) => {
+      clearErr(el);
+      if (el.type === 'checkbox') {
+        if (!el.checked) {
+          setErr(el, 'Please confirm before submitting.');
+          firstBad ??= el;
+        }
+        return;
+      }
+      const value = el.value.trim();
+      if (!value) {
+        setErr(el, 'This one is needed.');
+        firstBad ??= el;
+      } else if (el.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
+        setErr(el, 'That email address does not look complete.');
+        firstBad ??= el;
+      }
+    });
+
+    // Resume size check, even though nothing is uploaded here.
+    const file = form.querySelector<HTMLInputElement>('#af-resume');
+    if (file?.files?.length) {
+      const f = file.files[0];
+      if (f.size > 5 * 1024 * 1024) {
+        setErr(file, 'That file is over 5MB. Please attach a smaller one.');
+        firstBad ??= file;
+      }
+    }
+
+    if (firstBad) {
+      announce.textContent = 'Some details still need attention.';
+      firstBad.focus();
+      firstBad.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
+
+    form.querySelectorAll('.field, .aform__row, .aform__foot').forEach(
+      (el) => ((el as HTMLElement).hidden = true)
+    );
+    done.hidden = false;
+    done.innerHTML = `
+      <div class="done__icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+      </div>
+      <span class="badge badge--demo">Preview — nothing was submitted</span>
+      <h3 style="font-size:var(--step-2);margin-top:.7rem">This is where your application would go</h3>
+      <p class="text-muted" style="margin-top:.5rem;font-size:var(--step--1);line-height:var(--leading-normal)">
+        On the live site this posts to the Tiny Stars careers endpoint along with your
+        resume. To apply for real, email
+        <a href="mailto:info@tinystars.ca">info@tinystars.ca</a> or call (780) 230-1599.
+      </p>
+      <div class="cluster" style="margin-top:var(--space-m)">
+        <a class="btn btn--primary" href="mailto:info@tinystars.ca" data-track="email_click">Email your application</a>
+        <a class="btn btn--ghost" href="tel:+17802301599" data-track="phone_click">Call (780) 230-1599</a>
+      </div>`;
+    announce.textContent = 'Preview complete. Nothing was submitted.';
+    done.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+</script>

@@ -1,0 +1,194 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+
+const collected = [
+  {
+    what: 'Nothing, by default',
+    detail:
+      'Browsing this site sends no personal data anywhere. There is no analytics service, no advertising pixel and no third-party script.',
+  },
+  {
+    what: 'What you type into a form',
+    detail:
+      'In this preview it never leaves your browser. On a live version it would go to Tiny Stars only, and only so they can reply to you.',
+  },
+  {
+    what: 'Anonymous interaction counts',
+    detail:
+      'Held in memory for the length of your visit so the Command Centre has something honest to show. Never stored, never transmitted, discarded when you close the tab.',
+  },
+];
+
+const storage = [
+  {
+    key: 'Tour checklist ticks',
+    where: 'localStorage',
+    why: 'So the list survives a refresh while you are standing in a daycare.',
+    clear: 'The "Clear" button on that page.',
+  },
+  {
+    key: 'Form drafts',
+    where: 'sessionStorage',
+    why: 'So a mis-tap on Back does not wipe twenty fields.',
+    clear: 'Automatically, when you close the tab.',
+  },
+  {
+    key: 'Your stated intent',
+    where: 'sessionStorage',
+    why: 'So the site can point you at what you said you were looking for.',
+    clear: 'Automatically, when you close the tab.',
+  },
+];
+---
+
+<Base
+  title="Privacy | Tiny Stars Daycare"
+  description="What this site collects, what it stores on your device, and why a childcare website should collect as little as it possibly can."
+>
+  <PageHero
+    eyebrow="Privacy"
+    title="The least we can get away with"
+    lede="This is a site about children. The safest data is the data that was never collected, so the design starts at zero and adds only what is genuinely needed."
+    crumbs={[{ name: 'Privacy', href: '/privacy' }]}
+  />
+
+  <section class="section section--tight">
+    <div class="container container--narrow prose">
+      <div class="notice notice--info">
+        <Icon name="lock" size={20} />
+        <span>
+          <strong>No cookies are set by this site.</strong>
+          There is no consent banner because there is nothing to consent to.
+        </span>
+      </div>
+
+      <h2>What is collected</h2>
+      <div class="rows">
+        {collected.map((c) => (
+          <div class="row">
+            <strong>{c.what}</strong>
+            <span>{c.detail}</span>
+          </div>
+        ))}
+      </div>
+
+      <h2>What is stored on your device</h2>
+      <p>All of it stays in your browser. None of it reaches Tiny Stars or anyone else.</p>
+      <div class="overflow-guard">
+        <table class="ptable">
+          <caption class="visually-hidden">Browser storage used by this site</caption>
+          <thead>
+            <tr>
+              <th scope="col">What</th>
+              <th scope="col">Where</th>
+              <th scope="col">Why</th>
+              <th scope="col">How to clear it</th>
+            </tr>
+          </thead>
+          <tbody>
+            {storage.map((s) => (
+              <tr>
+                <th scope="row">{s.key}</th>
+                <td><code>{s.where}</code></td>
+                <td>{s.why}</td>
+                <td>{s.clear}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Children's data</h2>
+      <p>
+        No page on this site asks for a child's date of birth, health information,
+        photograph or surname. The tour form asks for a first name and marks it optional.
+        Detailed information about a child belongs in the registration package and in
+        conversation with the centre — not in a web form.
+      </p>
+      <p>
+        The Parent Portal preview uses entirely invented data. No real child appears
+        anywhere on this site, and the photo gallery contains no children at all.
+      </p>
+
+      <h2>Your browser's preferences</h2>
+      <p>
+        Global Privacy Control and Do Not Track are both honoured. If either is set, no
+        interaction counting happens at all — not even in memory.
+      </p>
+
+      <h2>The AI concierge</h2>
+      <p>
+        Star Guide runs entirely on your device. Your questions are not sent to any model
+        or server. Before a message is even routed internally, email addresses, phone
+        numbers and street addresses are stripped out of it.
+      </p>
+
+      <h2>Third parties</h2>
+      <p>
+        Two, and both are optional to the experience: web fonts are served by Google Fonts,
+        and the real booking calendar link opens Calendly in a new tab if you choose it.
+        There is deliberately no embedded map, no social widget and no chat plugin.
+      </p>
+
+      <h2>Questions</h2>
+      <p>
+        Call <a href={site.phone.href}>{site.phone.label}</a> or email
+        <a href={`mailto:${site.email.director}`}>{site.email.director}</a>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .rows { display: grid; gap: 0.5rem; }
+  .row {
+    display: grid; gap: 0.25rem;
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+  }
+  .row strong { font-size: var(--step-0); }
+  .row span { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); }
+
+  .ptable {
+    width: 100%;
+    min-width: 40rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--step--1);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    overflow: hidden;
+  }
+  .ptable th,
+  .ptable td {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  .ptable thead th {
+    background: var(--cream-200);
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+  }
+  .ptable tbody tr:last-child th,
+  .ptable tbody tr:last-child td { border-bottom: 0; }
+  .ptable td { color: var(--text-muted); }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--cream-200);
+    color: var(--ink-800);
+  }
+</style>

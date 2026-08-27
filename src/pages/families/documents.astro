@@ -1,0 +1,262 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import NextStep from '../../components/NextStep.astro';
+import Icon from '../../components/Icon.astro';
+import { documents, site, registrationSections } from '../../data/site';
+import { breadcrumbSchema, organizationSchema, documentsSchema } from '../../lib/schema';
+
+const categories = Array.from(new Set(documents.map((d) => d.category)));
+
+/** What each document is genuinely useful for, at a glance. */
+const useFor: Record<string, string[]> = {
+  'classroom-routine': ['Daily schedule', 'Meals & rest', 'Play & activities'],
+  'parent-handbook': ['Policies', 'Procedures', 'Expectations', 'Fees terms'],
+  'pet-policy': ['Allergies', 'Hygiene', 'Animals on site'],
+  'video-surveillance-policy': ['Cameras', 'Privacy', 'Footage access'],
+};
+---
+
+<Base
+  title="Documents & policies | Tiny Stars Daycare"
+  description="Every document Tiny Stars Daycare publishes — the Parent Handbook, Classroom Routine, Pet Policy and Video Surveillance Policy — searchable and ready to read before you enrol."
+  schema={[
+    organizationSchema,
+    documentsSchema,
+    breadcrumbSchema([
+      { name: 'For families', href: '/families/hub' },
+      { name: 'Documents & policies', href: '/families/documents' },
+    ]),
+  ]}
+>
+  <PageHero
+    eyebrow="Documents & policies"
+    title="Read the rules before you agree to them"
+    lede="Four documents, all published by Tiny Stars, all here. Nothing is behind a form, an email address or a phone call."
+    crumbs={[
+      { name: 'For families', href: '/families/hub' },
+      { name: 'Documents & policies', href: '/families/documents' },
+    ]}
+  >
+    <div class="dsearch">
+      <label class="visually-hidden" for="doc-q">Search documents</label>
+      <Icon name="search" size={18} class="dsearch__icon" />
+      <input
+        type="search"
+        id="doc-q"
+        class="dsearch__input"
+        placeholder="Search — “camera”, “allergy”, “routine”…"
+        autocomplete="off"
+      />
+    </div>
+  </PageHero>
+
+  <section class="section section--tight" aria-labelledby="docs-title">
+    <div class="container">
+      <h2 id="docs-title" class="visually-hidden">Published documents</h2>
+
+      <div class="dfilter" role="group" aria-label="Filter by category">
+        <button type="button" class="gchip" data-cat="all" aria-pressed="true">All ({documents.length})</button>
+        {categories.map((c) => (
+          <button type="button" class="gchip" data-cat={c} aria-pressed="false">{c}</button>
+        ))}
+      </div>
+
+      <p class="visually-hidden" role="status" aria-live="polite" data-doc-announce></p>
+
+      <div class="dgrid mt-l" data-doc-grid>
+        {documents.map((d, i) => (
+          <a
+            href={d.file}
+            class="dcard"
+            data-cat={d.category}
+            data-text={`${d.title} ${d.description} ${d.category} ${(useFor[d.slug] ?? []).join(' ')}`.toLowerCase()}
+            data-reveal
+            style={`--reveal-delay:${i * 55}ms`}
+            data-track="document_download"
+            data-track-label={d.slug}
+          >
+            <span class="dcard__top">
+              <span class="dcard__icon"><Icon name="file" size={24} /></span>
+              <span class="badge badge--verified">Published by Tiny Stars</span>
+            </span>
+            <strong class="dcard__title">{d.title}</strong>
+            <span class="dcard__desc">{d.description}</span>
+            <span class="dcard__tags">
+              {(useFor[d.slug] ?? []).map((t) => <span class="badge">{t}</span>)}
+            </span>
+            <span class="dcard__cta">
+              Open PDF <Icon name="download" size={15} />
+            </span>
+          </a>
+        ))}
+      </div>
+
+      <div class="empty" data-doc-empty hidden>
+        <span class="empty__icon"><Icon name="file" size={44} /></span>
+        <h3>No document matches that</h3>
+        <p>
+          Tiny Stars publishes four documents. If what you're after isn't in one of them,
+          it probably hasn't been published — the team can answer directly.
+        </p>
+        <div class="cluster" style="justify-content:center">
+          <button type="button" class="btn btn--ghost" data-doc-reset>Show all four</button>
+          <a href={site.phone.href} class="btn btn--primary" data-track="phone_click">Call {site.phone.label}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ------------------------------------------------------- registration -->
+  <section class="section section--sunken" aria-labelledby="pkg-title">
+    <div class="container container--narrow">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">The fifth document</p>
+        <h2 id="pkg-title">The registration package</h2>
+        <p class="lede">
+          Not a download — it's completed when you enrol. Eleven sections, listed here so
+          nothing in it is a surprise.
+        </p>
+      </div>
+
+      <ul class="pkglist mt-l" data-reveal>
+        {registrationSections.map((s, i) => (
+          <li><span>{String(i + 1).padStart(2, '0')}</span>{s}</li>
+        ))}
+      </ul>
+
+      <div class="cluster mt-l" data-reveal>
+        <a href="/enroll/guide" class="btn btn--primary">What each section asks for</a>
+        <a href="/enroll/registration" class="btn btn--ghost">Start registration</a>
+      </div>
+    </div>
+  </section>
+
+  <NextStep
+    title="Read something, then come and check it"
+    lede="Policies on paper are worth exactly as much as what you see in the room. Do both."
+    primary={{ label: 'Book a tour', href: '/enroll/book-a-tour', desc: '30 minutes, in person' }}
+    secondary={[
+      { label: 'Trust Centre', href: '/why/trust-centre', desc: 'What each policy covers' },
+      { label: 'Questions & answers', href: '/families/faq', desc: 'Searchable, with sources' },
+      { label: 'Family Hub', href: '/families/hub', desc: 'Guides for every stage' },
+    ]}
+  />
+</Base>
+
+<style>
+  .dsearch {
+    display: flex; align-items: center; gap: 0.7rem;
+    max-width: 30rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--border-strong);
+    background: var(--bg-raised);
+  }
+  .dsearch:focus-within { border-color: var(--coral-500); box-shadow: 0 0 0 3px var(--coral-100); }
+  :global(.dsearch__icon) { color: var(--text-muted); flex: none; }
+  .dsearch__input { flex: 1; min-width: 0; border: 0; background: none; padding: 0.6rem 0; min-height: 40px; }
+  .dsearch__input:focus { outline: none; }
+  .dsearch__input::-webkit-search-cancel-button { display: none; }
+
+  .dfilter { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .gchip {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.5rem 0.95rem; min-height: 42px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid var(--border-strong);
+    background: var(--bg-raised);
+    font-size: var(--step--1); font-weight: 650; color: var(--ink-700);
+    cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-out);
+  }
+  .gchip:hover { border-color: var(--ink-700); color: var(--ink-900); }
+  .gchip[aria-pressed='true'] { background: var(--ink-900); border-color: var(--ink-900); color: var(--cream-100); }
+
+  .dgrid { display: grid; gap: var(--space-m); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+  .dcard {
+    display: flex; flex-direction: column; gap: 0.55rem;
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    text-decoration: none; color: inherit;
+    transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+  }
+  .dcard[hidden] { display: none; }
+  .dcard:hover { transform: translateY(-4px); box-shadow: var(--shadow-l); border-color: var(--border-strong); color: inherit; }
+  .dcard__top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+  .dcard__icon {
+    display: grid; place-items: center;
+    width: 52px; height: 52px;
+    border-radius: var(--radius-m);
+    background: var(--violet-100); color: var(--violet-700);
+  }
+  .dcard__title { font-family: var(--font-display); font-size: var(--step-2); font-weight: 650; }
+  .dcard__desc { font-size: var(--step--1); color: var(--text-muted); line-height: var(--leading-normal); flex: 1; }
+  .dcard__tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .dcard__cta {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: var(--step--1); font-weight: 700; color: var(--coral-700);
+    margin-top: 0.25rem;
+  }
+
+  .pkglist { list-style: none; padding: 0; display: grid; gap: 0.3rem; }
+  .pkglist li {
+    display: flex; align-items: center; gap: 0.85rem;
+    padding: 0.75rem 1.1rem;
+    border-radius: var(--radius-s);
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    font-size: var(--step--1);
+  }
+  .pkglist span {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    font-weight: 700;
+    color: var(--sand-500);
+  }
+</style>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('#doc-q')!;
+  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-cat]')).filter(
+    (el) => el.tagName === 'BUTTON'
+  );
+  const cards = Array.from(document.querySelectorAll<HTMLAnchorElement>('.dcard'));
+  const empty = document.querySelector<HTMLElement>('[data-doc-empty]')!;
+  const grid = document.querySelector<HTMLElement>('[data-doc-grid]')!;
+  const announce = document.querySelector<HTMLElement>('[data-doc-announce]')!;
+
+  let cat = 'all';
+
+  function apply() {
+    const q = input.value.trim().toLowerCase();
+    let shown = 0;
+    cards.forEach((c) => {
+      const catOk = cat === 'all' || c.dataset.cat === cat;
+      const textOk = !q || (c.dataset.text ?? '').includes(q);
+      const on = catOk && textOk;
+      c.hidden = !on;
+      if (on) shown++;
+    });
+    empty.hidden = shown > 0;
+    grid.hidden = shown === 0;
+    announce.textContent = `${shown} document${shown === 1 ? '' : 's'} shown.`;
+  }
+
+  input.addEventListener('input', apply);
+  chips.forEach((c) =>
+    c.addEventListener('click', () => {
+      cat = c.dataset.cat!;
+      chips.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+      apply();
+    })
+  );
+  document.querySelector('[data-doc-reset]')?.addEventListener('click', () => {
+    input.value = '';
+    cat = 'all';
+    chips.forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.cat === 'all')));
+    apply();
+  });
+</script>
