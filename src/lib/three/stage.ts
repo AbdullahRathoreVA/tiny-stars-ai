@@ -85,7 +85,12 @@ export abstract class Stage {
     try {
       // Three.js is only ever fetched here — it is never in the initial bundle.
       this.THREE = await import('three');
-    } catch {
+    } catch (err) {
+      // Logged because this branch and the renderer branch below both end at
+      // the same one-line warning, which makes a failed scene impossible to
+      // diagnose: a chunk that never arrived and a GPU that refused a context
+      // look identical from the outside.
+      if (import.meta.env.DEV) console.error('[tiny-stars] three.js failed to load', err);
       this.fail();
       return false;
     }
@@ -101,7 +106,8 @@ export abstract class Stage {
         // Depth-only scenes do not need a stencil buffer.
         stencil: false,
       });
-    } catch {
+    } catch (err) {
+      if (import.meta.env.DEV) console.error('[tiny-stars] WebGL context refused', err);
       this.fail();
       return false;
     }

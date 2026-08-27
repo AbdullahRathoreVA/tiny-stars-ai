@@ -237,8 +237,9 @@ JS ON FIRST PAINT: 35.5 KB   (three.js, 717 KB, is not in it)
 ```
 
 Keyboard-tested against WCAG 2.2 AA by hand. Known gaps are listed honestly on
-[`/accessibility`](src/pages/accessibility.astro) — video caption tracks and the internal
-tagging of Tiny Stars' own PDFs.
+[`/accessibility`](src/pages/accessibility.astro) — verbatim video captions and the internal
+tagging of Tiny Stars' own PDFs. Clips carry description tracks; run
+`GROQ_API_KEY=... python scripts/captions.py --transcribe` to add real captions.
 
 ---
 

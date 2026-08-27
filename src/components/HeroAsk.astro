@@ -1,0 +1,278 @@
+---
+/**
+ * The small Star Guide in the hero.
+ *
+ * The floating launcher works, but it asks a parent to notice a button and
+ * commit to opening a chat panel before they know whether it is any use. This
+ * is the same assistant, answering in place, so the first answer costs one tap
+ * and no context switch.
+ *
+ * It shares the provider seam with the full concierge, so when a hosted model
+ * is configured this box gets the better wording too, and the trust label and
+ * source are shown here exactly as they are in the panel — a shorter surface is
+ * not a licence to drop the sourcing.
+ *
+ * Anything past the first answer hands over to the full panel, which has the
+ * history, the agent routing display and the handoff actions.
+ */
+import Icon from './Icon.astro';
+
+const suggestions = [
+  'My child is 2 — where do I start?',
+  'How much does it cost?',
+  'Is it safe?',
+];
+---
+
+<div class="hask" data-hero-ask>
+  <form class="hask__form" data-hask-form>
+    <label class="visually-hidden" for="hask-input">Ask Star Guide a question</label>
+    <span class="hask__spark" aria-hidden="true"><Icon name="sparkles" size={17} /></span>
+    <input
+      class="hask__input"
+      id="hask-input"
+      name="q"
+      type="text"
+      autocomplete="off"
+      enterkeyhint="send"
+      placeholder="Ask about ages, safety, a typical day…"
+      maxlength="200"
+    />
+    <button type="submit" class="hask__go" aria-label="Ask">
+      <Icon name="arrow" size={18} />
+    </button>
+  </form>
+
+  <ul class="hask__chips" aria-label="Common questions">
+    {suggestions.map((q) => (
+      <li><button type="button" class="hask__chip" data-hask-ask={q}>{q}</button></li>
+    ))}
+  </ul>
+
+  <!-- Static markup, not innerHTML: Astro scopes styles at build time and never
+       reaches nodes created at runtime. -->
+  <div class="hask__answer" data-hask-answer hidden aria-live="polite">
+    <p class="hask__label">
+      <span class="badge" data-hask-trust></span>
+      <span data-hask-source></span>
+    </p>
+    <p class="hask__text" data-hask-text></p>
+    <div class="hask__actions">
+      <a class="btn btn--primary btn--sm" data-hask-action hidden></a>
+      <button type="button" class="btn btn--ghost btn--sm" data-hask-more>
+        <Icon name="chat" size={16} />
+        Continue in Star Guide
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { getProvider } from '../lib/ai/provider';
+  import '../lib/ai/remote';
+  import '../lib/ai/local';
+
+  const root = document.querySelector<HTMLElement>('[data-hero-ask]');
+
+  if (root) {
+    const form = root.querySelector<HTMLFormElement>('[data-hask-form]')!;
+    const input = root.querySelector<HTMLInputElement>('.hask__input')!;
+    const panel = root.querySelector<HTMLElement>('[data-hask-answer]')!;
+    const textEl = panel.querySelector<HTMLElement>('[data-hask-text]')!;
+    const trustEl = panel.querySelector<HTMLElement>('[data-hask-trust]')!;
+    const sourceEl = panel.querySelector<HTMLElement>('[data-hask-source]')!;
+    const actionEl = panel.querySelector<HTMLAnchorElement>('[data-hask-action]')!;
+    const moreBtn = panel.querySelector<HTMLButtonElement>('[data-hask-more]')!;
+
+    const provider = getProvider();
+    let lastQuestion = '';
+    let busy = false;
+
+    const TRUST_LABEL: Record<string, string> = {
+      verified: 'Published',
+      general: 'General guidance',
+      unknown: 'Ask the team',
+    };
+
+    const openPanel = (ask: string) => {
+      document.dispatchEvent(new CustomEvent('ts:concierge-open', { detail: { ask } }));
+    };
+
+    const ask = async (question: string) => {
+      const q = question.trim();
+      if (!q || busy) return;
+      busy = true;
+      lastQuestion = q;
+
+      panel.hidden = false;
+      textEl.textContent = 'Checking what Tiny Stars has published…';
+      trustEl.textContent = '';
+      trustEl.className = 'badge';
+      sourceEl.textContent = '';
+      actionEl.hidden = true;
+
+      try {
+        const res = await provider.respond({
+          message: q,
+          history: [],
+          context: { path: location.pathname },
+        });
+
+        // The provider returns the assistant's own markdown-ish emphasis; this
+        // surface is one paragraph, so take the text and let the panel handle
+        // the rich version.
+        textEl.textContent = res.text.replace(/\*\*/g, '').split('\n\n')[0];
+
+        const label = TRUST_LABEL[res.trust] ?? 'Ask the team';
+        trustEl.textContent = label;
+        trustEl.className =
+          'badge ' +
+          (res.trust === 'verified'
+            ? 'badge--verified'
+            : res.trust === 'general'
+              ? 'badge--general'
+              : 'badge--unknown');
+
+        sourceEl.textContent = res.sources.length ? res.sources[0].label : '';
+
+        const primary = res.actions.find((a) => a.kind === 'primary') ?? res.actions[0];
+        if (primary) {
+          actionEl.textContent = primary.label;
+          actionEl.href = primary.href;
+          actionEl.hidden = false;
+        }
+      } catch {
+        // The provider already falls back to the offline answer, so reaching
+        // here means something unexpected. Send them to a person, not a retry.
+        textEl.textContent =
+          'Something went wrong on our side. The team can answer this directly — the contact details are in the footer.';
+        trustEl.textContent = 'Ask the team';
+        trustEl.className = 'badge badge--unknown';
+      } finally {
+        busy = false;
+      }
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      ask(input.value);
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-hask-ask]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        input.value = btn.dataset.haskAsk ?? '';
+        ask(input.value);
+      });
+    });
+
+    moreBtn.addEventListener('click', () => openPanel(lastQuestion));
+  }
+</script>
+
+<style>
+  .hask {
+    margin-top: var(--space-m);
+    padding: 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    background: color-mix(in oklab, var(--cream-50) 82%, transparent);
+    backdrop-filter: blur(6px);
+    box-shadow: var(--shadow-s);
+  }
+
+  .hask__form {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .hask__spark { display: grid; place-items: center; padding-left: 0.35rem; color: var(--coral-600); }
+
+  .hask__input {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.5rem 0.25rem;
+    border: 0;
+    background: none;
+    /* 16px minimum: anything smaller and iOS Safari zooms the page on focus. */
+    font-size: max(1rem, var(--step-0));
+    color: var(--ink-900);
+  }
+  .hask__input::placeholder { color: var(--text-subtle); }
+  .hask__input:focus { outline: none; }
+  .hask__form:focus-within { border-radius: var(--radius-m); }
+
+  .hask__go {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 0;
+    border-radius: 50%;
+    background: var(--coral-500);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out);
+  }
+  .hask__go:hover { background: var(--coral-600); }
+
+  .hask__chips {
+    display: flex;
+    gap: 0.35rem;
+    list-style: none;
+    padding: 0.5rem 0.2rem 0.15rem;
+    margin: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .hask__chips::-webkit-scrollbar { display: none; }
+
+  .hask__chip {
+    white-space: nowrap;
+    min-height: 36px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--ink-700);
+    font-size: var(--step--1);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .hask__chip:hover { border-color: var(--coral-500); color: var(--ink-900); }
+
+  .hask__answer {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-m);
+    background: var(--cream-50);
+    border: 1px solid var(--border);
+  }
+  .hask__answer[hidden] { display: none; }
+  .hask__label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0 0 0.4rem;
+    font-size: var(--step--2);
+    color: var(--text-muted);
+  }
+  .hask__text {
+    margin: 0;
+    font-size: var(--step--1);
+    line-height: var(--leading-normal);
+    color: var(--ink-800);
+  }
+  .hask__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+  }
+
+  @media (min-width: 56rem) {
+    .hask { max-width: 34rem; }
+  }
+</style>

@@ -48,7 +48,7 @@ const schema = [
           <div class="flow panel mt-l" data-flow>
             <div class="flow__progress">
               <div class="progress">
-                <span class="progress__label" data-step-label>Step 1 of 6</span>
+                <span class="progress__label" data-step-label>Step 1 of 5</span>
                 <div class="progress__track">
                   <div class="progress__fill" data-progress style="width:16.6%"></div>
                 </div>
@@ -119,12 +119,13 @@ const schema = [
               <legend>
                 <span class="step__n">3</span>
                 <span>
-                  <strong>Which program?</strong>
-                  <small>Not sure is a perfectly good answer.</small>
+                  <strong>What are you looking for?</strong>
+                  <small>All three are preferences — "not sure" is a perfectly good answer to any of them.</small>
                 </span>
               </legend>
               <div class="field">
-                <div class="choices choices--grid" data-required-group="program" data-error-empty="Pick a program, or 'not sure yet'.">
+                <span class="field__label" id="r-prog-label">Program</span>
+                <div class="choices choices--grid" role="group" aria-labelledby="r-prog-label" data-required-group="program" data-error-empty="Pick a program, or 'not sure yet'.">
                   {programs.map((p) => (
                     <label class="choice">
                       <input type="radio" name="program" value={p.name} data-label={`${p.name} · ${p.ageLabel}`} />
@@ -138,19 +139,9 @@ const schema = [
                 </div>
                 <p class="field__error"></p>
               </div>
-            </fieldset>
-
-            <!-- 4 -->
-            <fieldset class="step" data-step="4" hidden>
-              <legend>
-                <span class="step__n">4</span>
-                <span>
-                  <strong>When would you like to start?</strong>
-                  <small>Availability isn't published, so treat this as a preference.</small>
-                </span>
-              </legend>
               <div class="field">
                 <label class="field__label" for="r-start">Preferred start date</label>
+                <span class="field__hint">Availability isn't published, so treat this as a preference.</span>
                 <input class="input" type="date" id="r-start" name="startDate" data-required data-error-empty="Give us a date to aim at." />
                 <p class="field__error"></p>
               </div>
@@ -169,9 +160,9 @@ const schema = [
             </fieldset>
 
             <!-- 5 -->
-            <fieldset class="step" data-step="5" hidden>
+            <fieldset class="step" data-step="4" hidden>
               <legend>
-                <span class="step__n">5</span>
+                <span class="step__n">4</span>
                 <span>
                   <strong>How do we reach you?</strong>
                   <small>Nothing beyond what's needed to reply.</small>
@@ -195,9 +186,9 @@ const schema = [
             </fieldset>
 
             <!-- 6 -->
-            <fieldset class="step" data-step="6" hidden>
+            <fieldset class="step" data-step="5" hidden>
               <legend>
-                <span class="step__n">6</span>
+                <span class="step__n">5</span>
                 <span>
                   <strong>Check it over</strong>
                   <small>Change anything before you finish.</small>
@@ -271,11 +262,11 @@ const schema = [
     { key: 'childName', label: "Child's name", step: 2 },
     { key: 'ageBand', label: 'Age', step: 2 },
     { key: 'program', label: 'Program', step: 3 },
-    { key: 'startDate', label: 'Preferred start', step: 4 },
-    { key: 'schedule', label: 'Schedule', step: 4 },
-    { key: 'email', label: 'Email', step: 5 },
-    { key: 'phone', label: 'Phone', step: 5 },
-    { key: 'questions', label: 'Questions', step: 5 },
+    { key: 'startDate', label: 'Preferred start', step: 3 },
+    { key: 'schedule', label: 'Schedule', step: 3 },
+    { key: 'email', label: 'Email', step: 4 },
+    { key: 'phone', label: 'Phone', step: 4 },
+    { key: 'questions', label: 'Questions', step: 4 },
   ];
 
   track('enrollment_start');

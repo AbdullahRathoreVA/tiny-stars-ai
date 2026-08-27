@@ -4,6 +4,7 @@ import Icon from '../components/Icon.astro';
 import IntentPicker from '../components/IntentPicker.astro';
 import AgeMatch from '../components/AgeMatch.astro';
 import MediaStrip from '../components/MediaStrip.astro';
+import HeroAsk from '../components/HeroAsk.astro';
 import { site, trustMarkers, policyFacts } from '../data/site';
 import { organizationSchema, websiteSchema } from '../lib/schema';
 import Stage3D from '../components/three/Stage3D.astro';
@@ -89,10 +90,9 @@ const schema = [organizationSchema, websiteSchema];
           <a href="/programs" class="btn btn--ghost btn--lg">Explore programs</a>
         </div>
 
-        <button type="button" class="hero__ask" data-concierge-open>
-          <Icon name="sparkles" size={16} />
-          <span>Or ask Star Guide — “My child is 2, where do I start?”</span>
-        </button>
+        <!-- The assistant, in the hero, answering in place. Replaces the link
+             that used to sit here and only opened the panel. -->
+        <HeroAsk />
 
         <ul class="hero__trust">
           {trustMarkers.map((t) => (
