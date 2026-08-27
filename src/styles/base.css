@@ -751,3 +751,137 @@ strong, b { font-weight: 650; }
   font-weight: 700;
   color: var(--coral-700);
 }
+
+
+/* ============================================================ depth system ===
+   CSS-only 3D. Works on every device, costs no GPU memory, needs no WebGL, and
+   degrades to a plain shadow under reduced motion. This — not the canvases — is
+   what gives most of the site its sense of depth.
+
+   `.depth` cards tilt toward the pointer within a hard 4deg ceiling. Anything
+   more starts to distort text, which is the moment 3D stops helping.
+   ============================================================================ */
+
+.depth-scope { perspective: var(--perspective); }
+
+.depth {
+  position: relative;
+  transform-style: preserve-3d;
+  transition:
+    transform var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+  will-change: auto;
+}
+
+/* Pointer-driven tilt, set by the parallax controller as two custom properties.
+   Defaults are zero, so a card with no script behaves as a normal card. */
+/* The tilt is gated positively — it only ever applies on a fine pointer, with
+   motion allowed, at a quality tier above minimal. Expressing the condition once
+   here is far safer than applying it and then trying to win it back with an
+   override, which is a cascade fight waiting to be lost. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :root:not([data-ts-quality='minimal']) .depth[data-tilt] {
+    transform:
+      perspective(var(--perspective))
+      rotateX(calc(var(--ty, 0) * var(--tilt-max) * -1))
+      rotateY(calc(var(--tx, 0) * var(--tilt-max)))
+      translateZ(var(--depth-1));
+  }
+  :root:not([data-ts-quality='minimal']) .depth[data-tilt]:hover {
+    transform:
+      perspective(var(--perspective))
+      rotateX(calc(var(--ty, 0) * var(--tilt-max) * -1))
+      rotateY(calc(var(--tx, 0) * var(--tilt-max)))
+      translateZ(var(--depth-2));
+    box-shadow: var(--shadow-l);
+  }
+}
+
+/* Layers inside a depth card that should sit proud of it. */
+.depth__front { transform: translateZ(var(--depth-2)); }
+.depth__mid { transform: translateZ(var(--depth-1)); }
+
+/* Sheen: a soft highlight that follows the pointer across a card. Purely
+   decorative, and only where a pointer exists to drive it. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :root:not([data-ts-quality='minimal']) .depth[data-tilt]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease-out);
+    background: radial-gradient(
+      18rem 18rem at calc(50% + var(--tx, 0) * 40%) calc(50% + var(--ty, 0) * 40%),
+      color-mix(in oklab, #fff 40%, transparent),
+      transparent 60%
+    );
+    mix-blend-mode: soft-light;
+  }
+  :root:not([data-ts-quality='minimal']) .depth[data-tilt]:hover::after { opacity: 0.7; }
+}
+
+/* Scroll parallax: layers drift at different rates within a hard ceiling. */
+.parallax {
+  transform: translate3d(0, calc(var(--py, 0) * var(--parallax-max)), 0);
+  will-change: transform;
+}
+.parallax--slow { --parallax-rate: 0.35; }
+.parallax--fast { --parallax-rate: 1; }
+
+/* Parallax has no positive gate to hang off, because it is driven by a custom
+   property the controller simply never sets in those modes. These resets exist
+   so a stale `--py` from a previous state cannot linger. */
+@media (prefers-reduced-motion: reduce) {
+  .parallax { transform: none; }
+}
+:root[data-ts-quality='minimal'] .parallax { transform: none; }
+
+/* ---------------------------------------------------------- quality switch */
+.qswitch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in oklab, #fff 14%, transparent);
+  background: color-mix(in oklab, #fff 6%, transparent);
+}
+.qswitch button {
+  padding: 0.35rem 0.75rem;
+  min-height: 34px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--cream-400);
+  font-size: 0.7rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.qswitch button:hover { color: var(--cream-50); }
+.qswitch button[aria-pressed='true'] {
+  background: color-mix(in oklab, #fff 16%, transparent);
+  color: var(--cream-50);
+}
+
+
+/* ------------------------------------------------- inline CTA target size ---
+   The small "Read more ->" links that close a card are standalone controls, not
+   inline prose links, so WCAG 2.2 AA 2.5.8 applies to them. They are laid out as
+   inline-flex almost everywhere, which leaves them at the text height unless
+   they are given one. Handled centrally so a new card cannot forget.
+   --------------------------------------------------------------------------- */
+.value__cta,
+.jstep__cta,
+.hcard__cta,
+.pcard__cta,
+.rlink__cta,
+.doc__cta,
+.dcard__cta,
+.mega__feature-cta,
+.pmore__cta {
+  min-height: 28px;
+  padding-block: 0.25rem;
+}

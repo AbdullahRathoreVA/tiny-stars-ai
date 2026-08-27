@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import { agents, liveAgents, futureAgents } from '../lib/ai/agents';
 import { knowledge, verifiedCount, unknownCount, topicLabels } from '../data/knowledge';
+import Stage3D from '../components/three/Stage3D.astro';
 
 const generalCount = knowledge.length - verifiedCount - unknownCount;
 
@@ -117,8 +118,17 @@ const topicCounts = Object.entries(topicLabels).map(([id, label]) => ({
         <section class="ccpanel" aria-labelledby="agents-title">
           <header class="ccpanel__head">
             <h2 id="agents-title"><Icon name="users" size={18} /> Agents</h2>
-            <p>Each one owns a slice of the knowledge base.</p>
+            <p>
+              Live agents sit on the inner ring, unbuilt ones further out. Nothing
+              pulses until a routed message actually travels the path.
+            </p>
           </header>
+
+          <div class="ccgraph">
+            <Stage3D scene="agents" ratio="4 / 3">
+              <div class="ccgraph__fallback" aria-hidden="true"></div>
+            </Stage3D>
+          </div>
 
           <ul class="ccagents">
             {agents.map((a) => (
@@ -401,6 +411,21 @@ const topicCounts = Object.entries(topicLabels).map(([id, label]) => ({
   .ccout p + p { margin-top: 0.6em; }
 
   /* agents */
+  .ccgraph {
+    position: relative;
+    margin-bottom: var(--space-m);
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background: color-mix(in oklab, #000 22%, transparent);
+    border: 1px solid color-mix(in oklab, #fff 8%, transparent);
+  }
+  .ccgraph__fallback {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(14rem 10rem at 50% 50%, color-mix(in oklab, var(--gold-400) 22%, transparent), transparent 70%);
+  }
+
   .ccagents { list-style: none; padding: 0; display: grid; gap: 0.4rem; max-height: 34rem; overflow-y: auto; }
   .ccagent {
     display: flex; gap: 0.7rem; align-items: flex-start;
@@ -613,6 +638,10 @@ const topicCounts = Object.entries(topicLabels).map(([id, label]) => ({
 
     const agent = agentById(res.agent);
     paintNode('router', `${agent.role} · ${Math.round(res.confidence * 100)}%`);
+    // Light the matching node in the network graph, if it is running.
+    document
+      .querySelector('[data-scene="agents"]')
+      ?.dispatchEvent(new CustomEvent('ts:agent', { detail: { agent: res.agent } }));
     await wait(200);
     paintNode('agent', agent.name);
     await wait(200);

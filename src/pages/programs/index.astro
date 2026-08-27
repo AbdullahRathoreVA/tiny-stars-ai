@@ -6,6 +6,7 @@ import NextStep from '../../components/NextStep.astro';
 import Icon from '../../components/Icon.astro';
 import { programs, enrichment, priorityLabels } from '../../data/programs';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+import Stage3D from '../../components/three/Stage3D.astro';
 
 const schema = [
   organizationSchema,
@@ -40,12 +41,22 @@ const schema = [
   <section class="section section--tight" aria-labelledby="ruler-title">
     <div class="container">
       <h2 id="ruler-title" class="visually-hidden">Programs by age range</h2>
+
+      <!-- Star chart: horizontal position is the child's age, so the picture
+           carries the same information the ruler below it does. -->
+      <div class="pstars" data-reveal>
+        <Stage3D scene="programs" ratio="21 / 9">
+          <div class="pstars__fallback" aria-hidden="true"></div>
+        </Stage3D>
+      </div>
+
       <div class="ruler" data-reveal>
         {programs.map((p) => (
           <a
             href={`/programs/${p.slug}`}
             class="ruler__band"
             data-accent={p.accent}
+            data-program={p.slug}
             style={`--span:${p.ageMaxMonths - p.ageMinMonths}`}
           >
             <span class="ruler__name">{p.name}</span>
@@ -64,7 +75,7 @@ const schema = [
   <section class="section section--tight" aria-labelledby="all-title">
     <div class="container">
       <h2 id="all-title" class="visually-hidden">All programs</h2>
-      <div class="grid grid--3">
+      <div class="grid grid--3 depth-scope">
         {programs.map((p, i) => (
           <div data-reveal style={`--reveal-delay:${i * 60}ms`}>
             <ProgramCard program={p} eager={i < 3} />
@@ -184,7 +195,48 @@ const schema = [
   />
 </Base>
 
+<script>
+  // Hovering or focusing a ruler band lights the matching star, and vice versa.
+  const stage = document.querySelector<HTMLElement>('[data-scene="programs"]');
+  const bands = Array.from(document.querySelectorAll<HTMLElement>('[data-program]'));
+  if (stage && bands.length) {
+    bands.forEach((b) => {
+      const slug = b.dataset.program!;
+      const on = () => stage.dispatchEvent(new CustomEvent('ts:program', { detail: { slug } }));
+      const off = () => stage.dispatchEvent(new CustomEvent('ts:program', { detail: { slug: null } }));
+      b.addEventListener('pointerenter', on);
+      b.addEventListener('focus', on);
+      b.addEventListener('pointerleave', off);
+      b.addEventListener('blur', off);
+    });
+    stage.addEventListener('ts:program-hover', (e) => {
+      const slug = (e as CustomEvent<{ slug: string | null }>).detail?.slug ?? null;
+      bands.forEach((b) => {
+        if (b.dataset.program === slug) b.dataset.active = 'true';
+        else delete b.dataset.active;
+      });
+    });
+  }
+</script>
+
 <style>
+  /* --------------------------------------------------------- stars -- */
+  .pstars {
+    position: relative;
+    margin-bottom: var(--space-m);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: linear-gradient(150deg, var(--ink-800), var(--ink-900));
+  }
+  .pstars__fallback {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(24rem 12rem at 20% 40%, color-mix(in oklab, var(--blush-500) 26%, transparent), transparent 65%),
+      radial-gradient(24rem 12rem at 55% 60%, color-mix(in oklab, var(--teal-400) 24%, transparent), transparent 65%),
+      radial-gradient(24rem 12rem at 85% 45%, color-mix(in oklab, var(--sky-500) 26%, transparent), transparent 65%);
+  }
+
   /* ---------------------------------------------------------- ruler -- */
   .ruler {
     display: flex;
@@ -208,7 +260,8 @@ const schema = [
     border: 1px solid transparent;
     transition: transform var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
   }
-  .ruler__band:hover { transform: translateY(-3px); border-color: var(--strong); color: var(--ink); }
+  .ruler__band:hover,
+  .ruler__band[data-active='true'] { transform: translateY(-3px); border-color: var(--strong); color: var(--ink); }
 
   .ruler__band[data-accent='blush']    { --soft: var(--blush-100);    --strong: var(--blush-500);    --ink: var(--blush-700); }
   .ruler__band[data-accent='marigold'] { --soft: var(--marigold-100); --strong: var(--marigold-500); --ink: var(--marigold-700); }

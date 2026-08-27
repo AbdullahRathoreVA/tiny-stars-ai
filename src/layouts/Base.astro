@@ -104,9 +104,11 @@ const fullTitle = title.includes('Tiny Stars') ? title : `${title} · Tiny Stars
 
     <script>
       import { track, bindDeclarativeTracking } from '../lib/analytics';
+      import { initParallax } from '../lib/parallax';
 
       track('page_view');
       bindDeclarativeTracking();
+      initParallax();
 
       // --- scroll reveal ---------------------------------------------------
       const reveals = document.querySelectorAll<HTMLElement>('[data-reveal]');

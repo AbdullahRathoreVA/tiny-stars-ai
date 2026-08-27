@@ -5,6 +5,7 @@ import NextStep from '../../components/NextStep.astro';
 import Icon from '../../components/Icon.astro';
 import { tourStops, videos } from '../../data/gallery';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+import Stage3D from '../../components/three/Stage3D.astro';
 
 const schema = [
   organizationSchema,
@@ -18,7 +19,9 @@ const schema = [
   image="/assets/images/gallery/gallery-12.webp"
   schema={schema}
 >
-  <PageHero
+  <div class="phero-shell">
+    <Stage3D scene="gallery" fill={true} decorative={true} />
+    <PageHero
     tone="ink"
     eyebrow="Take a look around"
     title="Walk the building before you walk the building"
@@ -34,6 +37,7 @@ const schema = [
       </a>
     </div>
   </PageHero>
+  </div>
 
   <!-- ---------------------------------------------------------- stops -->
   <section class="section" aria-labelledby="stops-title">
@@ -159,6 +163,10 @@ const schema = [
 </Base>
 
 <style>
+  .phero-shell { position: relative; isolation: isolate; }
+  .phero-shell > :global(.stage3d--fill) { z-index: 0; opacity: 0.5; }
+  .phero-shell > :global(section) { position: relative; z-index: 1; }
+
   .vt { display: grid; gap: var(--space-xl); align-items: start; }
   @media (min-width: 940px) {
     .vt { grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: var(--space-2xl); }

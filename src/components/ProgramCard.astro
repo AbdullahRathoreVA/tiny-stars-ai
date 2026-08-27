@@ -10,7 +10,7 @@ interface Props {
 const { program: p, eager = false } = Astro.props;
 ---
 
-<a href={`/programs/${p.slug}`} class="pcard" data-accent={p.accent} data-track="program_view" data-track-label={p.slug}>
+<a href={`/programs/${p.slug}`} class="pcard depth" data-tilt data-accent={p.accent} data-track="program_view" data-track-label={p.slug}>
   <span class="pcard__media">
     <img
       src={p.image}
@@ -23,7 +23,7 @@ const { program: p, eager = false } = Astro.props;
     <span class="pcard__age">{p.ageLabel}</span>
   </span>
 
-  <span class="pcard__body">
+  <span class="pcard__body depth__mid">
     <span class="pcard__head">
       <strong class="pcard__name">{p.name}</strong>
       <span class="pcard__familiar">{p.familiar}</span>
@@ -53,10 +53,14 @@ const { program: p, eager = false } = Astro.props;
       border-color var(--dur) var(--ease-out);
   }
   .pcard:hover {
-    transform: translateY(-5px);
     box-shadow: var(--shadow-l);
     border-color: var(--accent, var(--border-strong));
     color: inherit;
+  }
+  /* Without a fine pointer the depth system is inert, so restore a plain lift. */
+  @media not all and (hover: hover) and (pointer: fine) {
+    .pcard { transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
+    .pcard:active { transform: translateY(-3px); }
   }
 
   .pcard[data-accent='blush']    { --accent: var(--blush-500);    --accent-soft: var(--blush-100);    --accent-ink: var(--blush-700); }

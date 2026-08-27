@@ -5,6 +5,7 @@ import NextStep from '../../components/NextStep.astro';
 import Icon from '../../components/Icon.astro';
 import { photos, categoryLabels, type GalleryCategory } from '../../data/gallery';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+import Stage3D from '../../components/three/Stage3D.astro';
 
 const categories = Object.keys(categoryLabels) as GalleryCategory[];
 const counts = categories.map((c) => ({
@@ -25,7 +26,9 @@ const schema = [
   image="/assets/images/gallery/gallery-15.webp"
   schema={schema}
 >
-  <PageHero
+  <div class="phero-shell">
+    <Stage3D scene="gallery" fill={true} decorative={true} />
+    <PageHero
     eyebrow="Gallery"
     title="Twenty photographs of the actual rooms"
     lede="Not stock imagery, and not a stylist's version of a daycare. These are Tiny Stars' own photographs of the spaces your child would be in."
@@ -40,6 +43,7 @@ const schema = [
       </span>
     </div>
   </PageHero>
+  </div>
 
   <section class="section section--tight" aria-labelledby="g-title">
     <div class="container">
@@ -126,6 +130,10 @@ const schema = [
 </Base>
 
 <style>
+  .phero-shell { position: relative; isolation: isolate; }
+  .phero-shell > :global(.stage3d--fill) { z-index: 0; opacity: 0.5; }
+  .phero-shell > :global(section) { position: relative; z-index: 1; }
+
   /* ------------------------------------------------------------ filter */
   .gfilter { display: flex; flex-wrap: wrap; gap: 0.45rem; }
   .gchip {

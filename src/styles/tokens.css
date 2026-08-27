@@ -155,6 +155,20 @@
 
   --header-h: 74px;
 
+  /* ------------------------------------------------------------- depth 3D */
+  /* One elevation scale shared by CSS depth cards and the WebGL scenes, so a
+     "level 3" card and a level-3 object feel like the same distance away. */
+  --depth-0: 0px;      /* flat on the page */
+  --depth-1: 4px;      /* card at rest */
+  --depth-2: 10px;     /* raised / hovered */
+  --depth-3: 20px;     /* actively engaged */
+  --depth-4: 38px;     /* hero layer */
+
+  --perspective: 1200px;
+  --tilt-max: 4deg;          /* hard ceiling on any card rotation */
+  --parallax-max: 14px;      /* hard ceiling on any layer translation */
+  --lift: translateZ(0);
+
   /* ----------------------------------------------------------------- z */
   --z-sticky: 20;
   --z-header: 40;

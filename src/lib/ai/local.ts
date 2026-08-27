@@ -10,6 +10,8 @@
 import { knowledge, type Entry, type Trust } from '../../data/knowledge';
 import { programs, programForAgeMonths } from '../../data/programs';
 import { site } from '../../data/site';
+import { nodeForTopic } from '../../data/constellation';
+import { zoneForKeyword } from '../../data/dayZones';
 import { Index } from '../text';
 import { agents, agentById, type Agent, type AgentId } from './agents';
 import { checkInput, checkOutput } from './guardrails';
@@ -301,6 +303,27 @@ const localProvider: AIProvider = {
 
     const handoff = trust === 'unknown' || confidence < 0.35;
 
+    // What should the page point at? Derived from what was actually retrieved,
+    // never from the question alone — pointing at the wrong thing while saying
+    // "I don't know" would be worse than pointing at nothing.
+    const spotlight: AIResponse['spotlight'] = {};
+    if (top?.entry) {
+      const node = nodeForTopic(top.entry.topic);
+      if (node) spotlight.node = node;
+    }
+    const zone = zoneForKeyword(message);
+    if (zone) {
+      spotlight.zone = zone;
+      spotlight.node ??= 'day';
+    }
+    if (ageMonths != null) {
+      const p = programForAgeMonths(ageMonths);
+      if (p) {
+        spotlight.program = p.slug;
+        spotlight.node ??= 'programs';
+      }
+    }
+
     return {
       text,
       trust,
@@ -310,6 +333,7 @@ const localProvider: AIProvider = {
       handoff,
       confidence: Math.round(confidence * 100) / 100,
       followUps: followUpsFor(agent, top?.entry),
+      spotlight: Object.keys(spotlight).length ? spotlight : undefined,
       flags: routeScore < 1 ? [...flags, 'low-route-confidence'] : flags,
     };
   },

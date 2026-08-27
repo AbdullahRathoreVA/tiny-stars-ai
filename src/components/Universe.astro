@@ -1,0 +1,222 @@
+---
+import Icon from './Icon.astro';
+import Stage3D from './three/Stage3D.astro';
+import { constellation } from '../data/constellation';
+
+/**
+ * The Tiny Stars universe — the site map as a star map.
+ *
+ * The list on the right is the actual navigation: real anchors, real order,
+ * keyboard-operable, crawlable, and complete on its own. The canvas mirrors it.
+ * Hovering or focusing a link lights the matching star; hovering a star lights
+ * the link. On a device with no WebGL the list simply sits on a warm gradient
+ * and loses nothing but the sparkle.
+ */
+---
+
+<section class="uni" aria-labelledby="uni-title">
+  <div class="container container--wide">
+    <div class="uni__grid">
+      <div class="uni__copy" data-reveal>
+        <p class="eyebrow eyebrow--plain uni__eyebrow">
+          <Icon name="sparkles" size={15} /> The Tiny Stars universe
+        </p>
+        <h2 id="uni-title">Six ways in. Start wherever you are.</h2>
+        <p class="uni__lede">
+          Every parent arrives with a different first question. Pick the one that
+          is actually yours — the rest will still be here.
+        </p>
+      </div>
+
+      <div class="uni__stage-wrap" data-reveal>
+        <Stage3D scene="constellation" class="uni__stage" ratio="1 / 1">
+          <div class="uni__fallback" aria-hidden="true">
+            <span class="uni__core"><Icon name="star" size={26} /></span>
+            {constellation.map((n, i) => (
+              <span
+                class="uni__dot"
+                style={`--a:${n.angle}deg; --c:#${n.color.toString(16).padStart(6, '0')}; --d:${i * 0.4}s`}
+              ></span>
+            ))}
+          </div>
+        </Stage3D>
+      </div>
+
+      <nav class="uni__nav" aria-label="Explore Tiny Stars" data-reveal>
+        <ul>
+          {constellation.map((n) => (
+            <li>
+              <a href={n.href} class="uni__link" data-node={n.id}>
+                <span
+                  class="uni__link-dot"
+                  style={`--c:#${n.color.toString(16).padStart(6, '0')}`}
+                  aria-hidden="true"
+                ></span>
+                <span class="uni__link-text">
+                  <strong>{n.label}</strong>
+                  <small>{n.blurb}</small>
+                </span>
+                <Icon name="arrow" size={16} class="uni__link-go" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </div>
+</section>
+
+<style>
+  .uni {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--section);
+    background:
+      radial-gradient(50rem 32rem at 30% 20%, color-mix(in oklab, var(--violet-500) 18%, transparent), transparent 62%),
+      radial-gradient(46rem 28rem at 80% 80%, color-mix(in oklab, var(--teal-400) 14%, transparent), transparent 60%),
+      linear-gradient(160deg, var(--ink-800), var(--ink-900) 68%);
+    color: var(--cream-200);
+  }
+
+  .uni__grid {
+    position: relative;
+    display: grid;
+    gap: var(--space-xl);
+    align-items: center;
+  }
+
+  .uni__eyebrow { color: var(--gold-400); }
+  .uni__copy h2 { color: var(--cream-50); font-size: var(--step-4); margin-top: 0.6rem; max-width: 16ch; }
+  .uni__lede {
+    margin-top: var(--space-m);
+    color: var(--cream-400);
+    font-size: var(--step-0);
+    line-height: var(--leading-normal);
+    max-width: 42ch;
+  }
+
+  /* ------------------------------------------------------------- stage */
+  .uni__stage-wrap { position: relative; }
+  .uni__stage { width: 100%; max-width: 30rem; margin-inline: auto; }
+
+  /* CSS-only constellation: what a no-WebGL device sees. It is a real
+     composition, not an apology for a missing canvas. */
+  .uni__fallback { position: absolute; inset: 0; display: grid; place-items: center; }
+  .uni__core {
+    display: grid; place-items: center;
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--gold-400) 22%, transparent);
+    color: var(--gold-400);
+    box-shadow: 0 0 40px color-mix(in oklab, var(--gold-400) 40%, transparent);
+  }
+  .uni__core :global(svg) { fill: currentColor; stroke-width: 1; }
+  .uni__dot {
+    position: absolute;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 18px 2px color-mix(in oklab, var(--c) 60%, transparent);
+    transform: rotate(var(--a)) translateY(-36%) rotate(calc(-1 * var(--a)));
+    animation: uniPulse 4.5s var(--ease-in-out) infinite;
+    animation-delay: var(--d);
+  }
+  @keyframes uniPulse {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 0.35; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .uni__dot { animation: none; }
+  }
+
+  /* -------------------------------------------------------------- nav */
+  .uni__nav ul { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+
+  .uni__link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem 1.1rem;
+    min-height: 60px;
+    border-radius: var(--radius-m);
+    border: 1px solid color-mix(in oklab, #fff 12%, transparent);
+    background: color-mix(in oklab, #fff 5%, transparent);
+    color: var(--cream-200);
+    text-decoration: none;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+  .uni__link:hover,
+  .uni__link:focus-visible,
+  .uni__link[data-active='true'] {
+    background: color-mix(in oklab, #fff 11%, transparent);
+    border-color: var(--c, var(--gold-400));
+    color: var(--cream-50);
+    transform: translateX(3px);
+  }
+
+  .uni__link-dot {
+    width: 11px; height: 11px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 12px color-mix(in oklab, var(--c) 65%, transparent);
+    transition: box-shadow var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+  }
+  .uni__link:hover .uni__link-dot,
+  .uni__link[data-active='true'] .uni__link-dot {
+    transform: scale(1.35);
+    box-shadow: 0 0 22px 3px color-mix(in oklab, var(--c) 75%, transparent);
+  }
+
+  .uni__link-text { flex: 1; min-width: 0; }
+  .uni__link-text strong { display: block; font-size: var(--step--1); font-weight: 650; }
+  .uni__link-text small { display: block; font-size: var(--step--2); color: var(--ink-400); line-height: 1.45; }
+  .uni__link-go { flex: none; opacity: 0.35; }
+  .uni__link:hover .uni__link-go { opacity: 0.8; }
+
+  @media (min-width: 900px) {
+    .uni__grid {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 0.95fr);
+      gap: var(--space-2xl);
+    }
+  }
+  @media (max-width: 899px) {
+    .uni__stage { max-width: 22rem; }
+  }
+</style>
+
+<script>
+  import { track } from '../lib/analytics';
+
+  const stage = document.querySelector<HTMLElement>('[data-scene="constellation"]');
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-node]'));
+  if (stage && links.length) {
+    const setActive = (id: string | null) => {
+      links.forEach((a) => {
+        if (a.dataset.node === id) a.dataset.active = 'true';
+        else delete a.dataset.active;
+      });
+    };
+
+    // HTML -> canvas. Focus is included deliberately: a keyboard user should see
+    // the same star light up that a mouse user does.
+    links.forEach((a) => {
+      const id = a.dataset.node!;
+      const on = () => stage.dispatchEvent(new CustomEvent('ts:node', { detail: { id } }));
+      const off = () => stage.dispatchEvent(new CustomEvent('ts:node', { detail: { id: null } }));
+      a.addEventListener('pointerenter', on);
+      a.addEventListener('focus', on);
+      a.addEventListener('pointerleave', off);
+      a.addEventListener('blur', off);
+      a.addEventListener('click', () => track('intent_selected', { intent: id }));
+    });
+
+    // canvas -> HTML
+    stage.addEventListener('ts:node-enter', (e) => {
+      setActive((e as CustomEvent<{ id: string | null }>).detail?.id ?? null);
+    });
+  }
+</script>

@@ -5,6 +5,7 @@ import NextStep from '../components/NextStep.astro';
 import Icon from '../components/Icon.astro';
 import { byTopic } from '../data/knowledge';
 import { breadcrumbSchema, organizationSchema, faqSchema } from '../lib/schema';
+import DayExperience from '../components/DayExperience.astro';
 
 /**
  * Deliberate design decision: NO clock times.
@@ -105,6 +106,8 @@ const schema = [
       </a>
     </div>
   </PageHero>
+
+  <DayExperience />
 
   <!-- --------------------------------------------------- honest note -->
   <section class="section section--tight">

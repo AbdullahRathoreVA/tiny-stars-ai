@@ -61,6 +61,19 @@ export interface AIResponse {
   confidence: number;
   /** Follow-up questions to offer as chips. */
   followUps: string[];
+  /**
+   * What the page should point at while this answer is on screen. Purely a
+   * presentation hint: every scene ignores anything it does not recognise, and
+   * a page with no 3D at all ignores the field entirely.
+   */
+  spotlight?: {
+    /** Constellation node id. */
+    node?: string;
+    /** Day-zone id, for flying the room camera. */
+    zone?: string;
+    /** Program slug. */
+    program?: string;
+  };
   /** Guardrail notes, surfaced in the Command Centre, never to the visitor. */
   flags: string[];
 }

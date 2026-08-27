@@ -1,0 +1,302 @@
+---
+import Icon from './Icon.astro';
+import Stage3D from './three/Stage3D.astro';
+import { dayZones } from '../data/dayZones';
+
+/**
+ * "Walk through a day" — the 3D room, its zone buttons, and the panel.
+ *
+ * The buttons are the interface. They are real `<button>`s in a real toolbar
+ * with roving focus, they work with no canvas at all, and selecting one always
+ * updates the HTML panel. Flying the camera is what happens *in addition*, when
+ * a device can.
+ *
+ * The panel keeps the same trust labelling as the rest of the site, so moving
+ * through a beautiful room never quietly upgrades a general observation into a
+ * Tiny Stars promise.
+ */
+---
+
+<section class="dayx" aria-labelledby="dayx-title">
+  <div class="container container--wide">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow eyebrow--plain dayx__eyebrow">
+        <Icon name="compass" size={15} /> Walk through a day
+      </p>
+      <h2 id="dayx-title">Move through it, moment by moment</h2>
+      <p class="lede">
+        A symbolic room, not a model of the real one — the actual spaces are in the
+        <a href="/experience/gallery">photo gallery</a>. Pick a moment and the view moves there.
+      </p>
+    </div>
+
+    <div class="dayx__frame" data-reveal>
+      <Stage3D scene="day" class="dayx__stage" ratio="16 / 10">
+        <div class="dayx__fallback">
+          <img
+            src="/assets/images/sections/classrooms-and-learning.webp"
+            alt="A classroom at Tiny Stars Daycare"
+            width="1200"
+            height="750"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </Stage3D>
+
+      <p class="dayx__hint" data-day-hint aria-hidden="true">
+        <Icon name="compass" size={14} /> Tap a glowing marker, or use the buttons below
+      </p>
+    </div>
+
+    <div
+      class="dayx__zones"
+      role="toolbar"
+      aria-label="Moments of the day"
+      aria-controls="dayx-panel"
+    >
+      {dayZones.map((z, i) => (
+        <button
+          type="button"
+          class="dayx__zone"
+          data-zone={z.id}
+          aria-pressed="false"
+          tabindex={i === 0 ? 0 : -1}
+          style={`--c:#${z.color.toString(16).padStart(6, '0')}`}
+        >
+          <Icon name={z.icon as any} size={17} />
+          <span>{z.label}</span>
+        </button>
+      ))}
+    </div>
+
+    <div class="dayx__panel panel" id="dayx-panel" role="region" aria-live="polite" data-day-panel>
+      <p class="dayx__placeholder">
+        <Icon name="arrow" size={16} />
+        Choose a moment above to read what happens in it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .dayx {
+    position: relative;
+    padding-block: var(--section);
+    background:
+      radial-gradient(60rem 34rem at 18% 10%, color-mix(in oklab, var(--teal-400) 12%, transparent), transparent 60%),
+      linear-gradient(170deg, var(--ink-800), var(--ink-900) 72%);
+    color: var(--cream-200);
+    overflow: hidden;
+  }
+  .dayx__eyebrow { color: var(--gold-400); }
+  .dayx .section-head h2 { color: var(--cream-50); font-size: var(--step-4); margin-top: 0.6rem; }
+  .dayx .section-head .lede { color: var(--cream-400); }
+  .dayx .section-head a { color: var(--gold-400); }
+
+  .dayx__frame {
+    position: relative;
+    margin-top: var(--space-l);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid color-mix(in oklab, #fff 12%, transparent);
+    background: color-mix(in oklab, #000 22%, transparent);
+    box-shadow: var(--shadow-xl);
+  }
+  .dayx__stage { width: 100%; }
+  .dayx__fallback { position: absolute; inset: 0; }
+  .dayx__fallback img { width: 100%; height: 100%; object-fit: cover; }
+
+  .dayx__hint {
+    position: absolute;
+    left: 50%;
+    bottom: 0.85rem;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--ink-900) 82%, transparent);
+    color: var(--cream-300);
+    font-size: var(--step--2);
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    transition: opacity var(--dur-slow) var(--ease-out);
+    pointer-events: none;
+    z-index: 2;
+  }
+  /* Only offer the canvas affordance once the canvas actually exists. */
+  .dayx__stage[data-stage='ready'] ~ .dayx__hint { opacity: 0.9; }
+  .dayx__hint[data-dismissed='true'] { opacity: 0 !important; }
+
+  /* -------------------------------------------------------------- zones */
+  .dayx__zones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: var(--space-m);
+  }
+  .dayx__zone {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    min-height: 48px;
+    border-radius: var(--radius-pill);
+    border: 1.5px solid color-mix(in oklab, #fff 14%, transparent);
+    background: color-mix(in oklab, #fff 5%, transparent);
+    color: var(--cream-300);
+    font-size: var(--step--1);
+    font-weight: 650;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .dayx__zone :global(svg) { color: var(--c); }
+  .dayx__zone:hover { background: color-mix(in oklab, #fff 11%, transparent); color: var(--cream-50); }
+  .dayx__zone[aria-pressed='true'] {
+    background: color-mix(in oklab, var(--c) 20%, transparent);
+    border-color: var(--c);
+    color: var(--cream-50);
+  }
+
+  /* -------------------------------------------------------------- panel */
+  .dayx__panel {
+    margin-top: var(--space-m);
+    padding: var(--space-m) var(--space-l);
+    background: color-mix(in oklab, #fff 6%, transparent);
+    border-color: color-mix(in oklab, #fff 12%, transparent);
+    min-height: 9rem;
+  }
+  .dayx__placeholder {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ink-400);
+    font-size: var(--step--1);
+  }
+  .dayx__panel :global(.dayx__head) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.6rem;
+  }
+  .dayx__panel :global(h3) {
+    font-size: var(--step-2);
+    color: var(--cream-50);
+  }
+  .dayx__panel :global(.dayx__body) {
+    font-size: var(--step-0);
+    line-height: var(--leading-normal);
+    color: var(--cream-300);
+    max-width: 62ch;
+  }
+  .dayx__panel :global(.dayx__src) {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+    font-size: var(--step--2);
+    color: var(--ink-400);
+  }
+  .dayx__panel :global(.dayx__nav) {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: var(--space-m);
+    padding-top: var(--space-s);
+    border-top: 1px solid color-mix(in oklab, #fff 10%, transparent);
+  }
+</style>
+
+<script>
+  import { dayZones, zoneById } from '../data/dayZones';
+  import { track } from '../lib/analytics';
+
+  const stage = document.querySelector<HTMLElement>('[data-scene="day"]');
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-zone]'));
+  const panel = document.querySelector<HTMLElement>('[data-day-panel]');
+  const hint = document.querySelector<HTMLElement>('[data-day-hint]');
+  if (buttons.length && panel) {
+    let active: string | null = null;
+
+    const esc = (s: string) =>
+      s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+    function render(id: string) {
+      const z = zoneById(id);
+      if (!z || !panel) return;
+      const verified = z.trust === 'verified';
+      panel.innerHTML = `
+        <div class="dayx__head">
+          <h3>${esc(z.label)}</h3>
+          <span class="badge badge--${verified ? 'verified' : 'general'}">
+            ${verified ? 'From Tiny Stars' : 'General guidance'}
+          </span>
+        </div>
+        <p class="dayx__body">${esc(z.body)}</p>
+        ${
+          z.source
+            ? `<p class="dayx__src">
+                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:#7bd39a"><circle cx="12" cy="12" r="8.5"/><path d="m8.4 12.2 2.5 2.5 4.7-4.9"/></svg>
+                 <span>Source: ${esc(z.source)}</span>
+               </p>`
+            : ''
+        }
+        <div class="dayx__nav">
+          <a class="btn btn--primary btn--sm" href="/enroll/book-a-tour" data-track="tour_cta_click" data-track-label="day-3d">See it in person</a>
+          <a class="btn btn--on-dark btn--sm" href="/assets/pdf/classroom-routine.pdf">Classroom Routine (PDF)</a>
+        </div>`;
+    }
+
+    function select(id: string, moveFocus = false) {
+      active = id;
+      buttons.forEach((b) => {
+        const on = b.dataset.zone === id;
+        b.setAttribute('aria-pressed', String(on));
+        b.tabIndex = on ? 0 : -1;
+        if (on && moveFocus) b.focus();
+      });
+      render(id);
+      stage?.dispatchEvent(new CustomEvent('ts:zone', { detail: { id } }));
+      if (hint) hint.dataset.dismissed = 'true';
+      track('program_view', { zone: id });
+    }
+
+    buttons.forEach((b, i) => {
+      b.addEventListener('click', () => select(b.dataset.zone!));
+      // Roving focus, so a toolbar behaves like a toolbar.
+      b.addEventListener('keydown', (e) => {
+        const map: Record<string, number> = {
+          ArrowRight: i + 1,
+          ArrowLeft: i - 1,
+          Home: 0,
+          End: buttons.length - 1,
+        };
+        const next = map[e.key];
+        if (next === undefined) return;
+        e.preventDefault();
+        const target = buttons[(next + buttons.length) % buttons.length];
+        select(target.dataset.zone!, true);
+      });
+    });
+
+    // Canvas -> HTML: clicking a marker selects the matching button.
+    stage?.addEventListener('ts:zone-select', (e) => {
+      const id = (e as CustomEvent<{ id: string }>).detail?.id;
+      if (id && id !== active) select(id);
+    });
+
+    // The concierge can drive this from anywhere on the page.
+    document.addEventListener('ts:day-zone', (e) => {
+      const id = (e as CustomEvent<{ id: string }>).detail?.id;
+      if (!id || !dayZones.some((z) => z.id === id)) return;
+      select(id);
+      document.querySelector('.dayx')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+</script>

@@ -6,6 +6,8 @@ import ProgramCard from '../components/ProgramCard.astro';
 import { programs } from '../data/programs';
 import { site, trustMarkers, policyFacts } from '../data/site';
 import { organizationSchema, websiteSchema } from '../lib/schema';
+import Stage3D from '../components/three/Stage3D.astro';
+import Universe from '../components/Universe.astro';
 
 const values = [
   {
@@ -64,14 +66,18 @@ const schema = [organizationSchema, websiteSchema];
 >
   <!-- ============================================================ HERO -->
   <section class="hero">
-    <div class="starfield" aria-hidden="true">
-      <span style="--s:3px;left:12%;top:18%;--d:4.2s;--o:.8"></span>
-      <span style="--s:2px;left:26%;top:62%;--d:5.4s;--delay:.8s;--o:.55"></span>
-      <span style="--s:4px;left:44%;top:12%;--d:4.8s;--delay:1.4s;--o:.7"></span>
-      <span style="--s:2px;left:62%;top:70%;--d:6s;--delay:.3s;--o:.5"></span>
-      <span style="--s:3px;left:78%;top:24%;--d:5.1s;--delay:2s;--o:.65"></span>
-      <span style="--s:2px;left:90%;top:52%;--d:4.6s;--delay:1.1s;--o:.6"></span>
-    </div>
+    <!-- Ambient 3D layer. The CSS starfield inside is the fallback and stays in
+         the DOM: if WebGL is missing or motion is reduced, this is the hero. -->
+    <Stage3D scene="hero" fill={true} decorative={true}>
+      <div class="starfield">
+        <span style="--s:3px;left:12%;top:18%;--d:4.2s;--o:.8"></span>
+        <span style="--s:2px;left:26%;top:62%;--d:5.4s;--delay:.8s;--o:.55"></span>
+        <span style="--s:4px;left:44%;top:12%;--d:4.8s;--delay:1.4s;--o:.7"></span>
+        <span style="--s:2px;left:62%;top:70%;--d:6s;--delay:.3s;--o:.5"></span>
+        <span style="--s:3px;left:78%;top:24%;--d:5.1s;--delay:2s;--o:.65"></span>
+        <span style="--s:2px;left:90%;top:52%;--d:4.6s;--delay:1.1s;--o:.6"></span>
+      </div>
+    </Stage3D>
 
     <div class="container container--wide hero__grid">
       <div class="hero__copy">
@@ -110,8 +116,8 @@ const schema = [organizationSchema, websiteSchema];
         </ul>
       </div>
 
-      <div class="hero__media">
-        <figure class="hero__figure hero__figure--main">
+      <div class="hero__media depth-scope">
+        <figure class="hero__figure hero__figure--main parallax" data-parallax="0.35">
           <img
             src="/assets/images/sections/who-we-are.webp"
             alt="Children playing and learning together at Tiny Stars Daycare"
@@ -121,7 +127,7 @@ const schema = [organizationSchema, websiteSchema];
             decoding="async"
           />
         </figure>
-        <figure class="hero__figure hero__figure--sub">
+        <figure class="hero__figure hero__figure--sub parallax" data-parallax="0.9">
           <img
             src="/assets/images/gallery/gallery-6.webp"
             alt="A Tiny Stars educator working with a child"
@@ -142,6 +148,9 @@ const schema = [organizationSchema, websiteSchema];
   <!-- ==================================================== INTENT PICKER -->
   <IntentPicker />
 
+  <!-- ========================================================= UNIVERSE -->
+  <Universe />
+
   <!-- =========================================================== VALUES -->
   <section class="section" aria-labelledby="values-title">
     <div class="container">
@@ -154,9 +163,9 @@ const schema = [organizationSchema, websiteSchema];
         </p>
       </div>
 
-      <div class="values">
+      <div class="values depth-scope">
         {values.map((v, i) => (
-          <article class="value" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+          <article class="value depth" data-tilt data-reveal style={`--reveal-delay:${i * 70}ms`}>
             <span class="value__icon"><Icon name={v.icon as any} size={22} /></span>
             <h3>{v.title}</h3>
             <p class="value__line">{v.line}</p>
@@ -189,7 +198,7 @@ const schema = [organizationSchema, websiteSchema];
         </a>
       </div>
 
-      <div class="grid grid--3 mt-l">
+      <div class="grid grid--3 mt-l depth-scope">
         {programs.map((p, i) => (
           <div data-reveal style={`--reveal-delay:${i * 60}ms`}>
             <ProgramCard program={p} eager={i < 3} />
@@ -429,6 +438,7 @@ const schema = [organizationSchema, websiteSchema];
 
   .hero__grid {
     position: relative;
+    z-index: 1;
     display: grid;
     gap: var(--space-xl);
     align-items: center;
@@ -560,7 +570,11 @@ const schema = [organizationSchema, websiteSchema];
     border: 1px solid var(--border);
     transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);
   }
-  .value:hover { transform: translateY(-4px); box-shadow: var(--shadow-m); }
+  .value:hover { box-shadow: var(--shadow-m); }
+  @media not all and (hover: hover) and (pointer: fine) {
+    .value { transition: transform var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out); }
+    .value:active { transform: translateY(-3px); }
+  }
   .value__icon {
     display: grid; place-items: center;
     width: 46px; height: 46px;

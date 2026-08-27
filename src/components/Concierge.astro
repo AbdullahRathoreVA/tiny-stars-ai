@@ -501,6 +501,7 @@ import { site } from '../data/site';
 
     renderBot(typing, res);
     history.push({ role: 'assistant', text: res.text });
+    applySpotlight(res.spotlight);
 
     if (res.handoff) track('concierge_handoff', { agent: res.agent });
 
@@ -513,6 +514,40 @@ import { site } from '../data/site';
     busy = false;
     send.disabled = false;
     input.focus();
+  }
+
+  /**
+   * Point the page at whatever the answer is about.
+   *
+   * Every dispatch is fire-and-forget: a scene that is not on this page, or was
+   * never built because the device did not qualify, simply never hears it. The
+   * answer text is complete on its own — this only adds emphasis.
+   */
+  function applySpotlight(spot: Awaited<ReturnType<typeof provider.respond>>['spotlight']) {
+    if (!spot) return;
+
+    if (spot.node) {
+      document
+        .querySelector('[data-scene="constellation"]')
+        ?.dispatchEvent(new CustomEvent('ts:node', { detail: { id: spot.node } }));
+      // Mirror it onto the HTML list too, so the highlight is visible with no 3D.
+      document.querySelectorAll<HTMLElement>('[data-node]').forEach((a) => {
+        if (a.dataset.node === spot.node) a.dataset.active = 'true';
+        else delete a.dataset.active;
+      });
+    }
+
+    if (spot.program) {
+      document
+        .querySelector('[data-scene="programs"]')
+        ?.dispatchEvent(new CustomEvent('ts:program', { detail: { slug: spot.program } }));
+    }
+
+    // The day room is the one spotlight that moves a camera, so it is also the
+    // one that scrolls — being flown somewhere off-screen helps nobody.
+    if (spot.zone) {
+      document.dispatchEvent(new CustomEvent('ts:day-zone', { detail: { id: spot.zone } }));
+    }
   }
 
   function greet() {
