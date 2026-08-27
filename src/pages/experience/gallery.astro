@@ -360,7 +360,9 @@ const schema = [
     document.body.style.overflow = 'hidden';
     paint();
     track('gallery_open', { index: i });
-    lb.querySelector<HTMLButtonElement>('[data-lb-close]')?.focus();
+    // `[data-lb-close]` is also on the scrim div, which is not focusable — target
+    // the button explicitly so focus actually enters the dialog.
+    lb.querySelector<HTMLButtonElement>('button[data-lb-close]')?.focus();
   }
 
   function close() {
