@@ -115,7 +115,10 @@
   --space-xl:  3rem;
   --space-2xl: 4rem;
   --space-3xl: 6rem;
-  --section:   clamp(3.5rem, 2.2rem + 6.4vw, 7.5rem);
+  /* 3.5rem top and bottom per section is 112px of nothing between every block.
+     Across seven sections that is more than a phone screen of scrolling spent
+     on air, so the small end of the ramp starts lower. Desktop is unchanged. */
+  --section:   clamp(2.25rem, 1.1rem + 6.4vw, 7.5rem);
 
   /* --------------------------------------------------------------- shape */
   --radius-xs: 6px;

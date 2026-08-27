@@ -890,6 +890,10 @@ strong, b { font-weight: 650; }
    (24px) but not a thumb held over a sleeping child, and these are the links
    that carry a parent from a card into the page that answers the question. */
 @media (pointer: coarse) {
+  /* Same reasoning for the compact button size: 40px is a comfortable mouse
+     target and an uncomfortable thumb one. */
+  .btn--sm { min-height: 44px; }
+
   .value__cta,
   .jstep__cta,
   .hcard__cta,
@@ -912,4 +916,10 @@ strong, b { font-weight: 650; }
 .wide-only { display: none; }
 @media (min-width: 900px) {
   .wide-only { display: block; }
+}
+
+/* Companion to .wide-only for elements that are flex/grid when they do show. */
+.wide-only-flex { display: none; }
+@media (min-width: 900px) {
+  .wide-only-flex { display: grid; }
 }

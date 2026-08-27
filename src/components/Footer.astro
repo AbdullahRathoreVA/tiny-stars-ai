@@ -52,15 +52,24 @@ const year = new Date().getFullYear();
         </div>
       </div>
 
+      <!-- Disclosures rather than four stacked lists: on a phone those lists
+           were 900px of footer nobody scrolls to. Rendered `open`, so with no
+           JavaScript and on desktop they are plain columns; the script below
+           closes them only where the height actually costs something. -->
       <div class="ftr__cols">
         {footerNav.map((col) => (
-          <nav class="ftr__col" aria-labelledby={`ftr-${col.title.replace(/\W+/g, '')}`}>
-            <h2 id={`ftr-${col.title.replace(/\W+/g, '')}`}>{col.title}</h2>
-            <ul>
-              {col.links.map((l) => (
-                <li><a href={l.href}>{l.label}</a></li>
-              ))}
-            </ul>
+          <nav aria-labelledby={`ftr-${col.title.replace(/\W+/g, '')}`}>
+            <details class="ftr__col" open>
+              <summary>
+                <h2 id={`ftr-${col.title.replace(/\W+/g, '')}`}>{col.title}</h2>
+                <Icon name="chevron-down" size={18} />
+              </summary>
+              <ul>
+                {col.links.map((l) => (
+                  <li><a href={l.href}>{l.label}</a></li>
+                ))}
+              </ul>
+            </details>
           </nav>
         ))}
       </div>
@@ -208,6 +217,37 @@ const year = new Date().getFullYear();
   }
   .ftr__col a:hover { color: var(--cream-50); }
 
+  .ftr__col > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    cursor: pointer;
+    list-style: none;
+    min-height: 44px;
+  }
+  .ftr__col > summary::-webkit-details-marker { display: none; }
+  .ftr__col > summary :global(svg) {
+    flex: none;
+    opacity: 0.6;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .ftr__col[open] > summary :global(svg) { transform: rotate(180deg); }
+
+  /* Above the breakpoint these are columns, not controls: the script never
+     closes them, so the chevron and the pointer affordance would be lying. */
+  @media (min-width: 55.0625rem) {
+    .ftr__col > summary { cursor: default; min-height: 0; }
+    .ftr__col > summary :global(svg) { display: none; }
+  }
+
+  @media (max-width: 55rem) {
+    .ftr__top { gap: var(--space-m); }
+    .ftr__cols { gap: 0; }
+    .ftr__col { border-top: 1px solid color-mix(in oklab, #fff 14%, transparent); }
+    .ftr__contact { gap: var(--space-xs); }
+  }
+
   .ftr__contact {
     position: relative;
     display: grid;
@@ -257,3 +297,28 @@ const year = new Date().getFullYear();
     .ftr__top { grid-template-columns: minmax(0, 20rem) minmax(0, 1fr); gap: var(--space-3xl); }
   }
 </style>
+
+<script>
+  // Close the footer disclosures on small screens only. They render `open`, so
+  // a visitor with no JavaScript, and every desktop visitor, gets plain columns.
+  const NARROW = window.matchMedia('(max-width: 55rem)');
+  const cols = document.querySelectorAll<HTMLDetailsElement>('.ftr__col');
+
+  const apply = (narrow: boolean) => {
+    cols.forEach((d) => {
+      // Never fight a visitor who has opened one themselves.
+      if (d.dataset.touched === 'true') return;
+      d.open = !narrow;
+    });
+  };
+
+  cols.forEach((d) =>
+    d.addEventListener('toggle', () => {
+      if (d.dataset.ready === 'true') d.dataset.touched = 'true';
+    })
+  );
+
+  apply(NARROW.matches);
+  cols.forEach((d) => (d.dataset.ready = 'true'));
+  NARROW.addEventListener('change', (e) => apply(e.matches));
+</script>

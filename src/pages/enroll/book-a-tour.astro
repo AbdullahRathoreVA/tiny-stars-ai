@@ -53,7 +53,7 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
           <div class="flow panel mt-l" data-flow>
             <div class="flow__progress">
               <div class="progress">
-                <span class="progress__label" data-step-label>Step 1 of 6</span>
+                <span class="progress__label" data-step-label>Step 1 of 5</span>
                 <div class="progress__track">
                   <div class="progress__fill" data-progress style="width:16.6%"></div>
                 </div>
@@ -99,13 +99,26 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
               <legend>
                 <span class="step__n">2</span>
                 <span>
-                  <strong>Which day works?</strong>
-                  <small>Pick a preference — the team will confirm what's actually free.</small>
+                  <strong>When suits you?</strong>
+                  <small>A preference, not a booking — the team will confirm what's actually free.</small>
                 </span>
               </legend>
               <div class="field">
                 <label class="field__label" for="tour-date">Preferred date</label>
                 <input class="input" type="date" id="tour-date" name="date" data-required data-error-empty="Choose a date you'd like to visit." />
+                <p class="field__error"></p>
+              </div>
+              <div class="field">
+                <span class="field__label" id="tour-time-label">Time of day</span>
+                <span class="field__hint">Mid-morning shows the centre at its busiest — often the most useful.</span>
+                <div class="choices choices--grid choices--tight" role="group" aria-labelledby="tour-time-label" data-required-group="time" data-error-empty="Pick a time preference.">
+                  {times.map((t) => (
+                    <label class="choice">
+                      <input type="radio" name="time" value={t} data-label={t} />
+                      <span class="choice__box">{t}</span>
+                    </label>
+                  ))}
+                </div>
                 <p class="field__error"></p>
               </div>
               <div class="notice notice--info mt-m">
@@ -118,32 +131,10 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
               </div>
             </fieldset>
 
-            <!-- 3. time -->
+            <!-- 4. you -->
             <fieldset class="step" data-step="3" hidden>
               <legend>
                 <span class="step__n">3</span>
-                <span>
-                  <strong>What time of day?</strong>
-                  <small>Mid-morning shows the centre at its busiest — often the most useful.</small>
-                </span>
-              </legend>
-              <div class="field">
-                <div class="choices choices--grid choices--tight" data-required-group="time" data-error-empty="Pick a time preference.">
-                  {times.map((t) => (
-                    <label class="choice">
-                      <input type="radio" name="time" value={t} data-label={t} />
-                      <span class="choice__box">{t}</span>
-                    </label>
-                  ))}
-                </div>
-                <p class="field__error"></p>
-              </div>
-            </fieldset>
-
-            <!-- 4. you -->
-            <fieldset class="step" data-step="4" hidden>
-              <legend>
-                <span class="step__n">4</span>
                 <span>
                   <strong>How do we reach you?</strong>
                   <small>Only what's needed to confirm a visit. Nothing more.</small>
@@ -171,9 +162,9 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
             </fieldset>
 
             <!-- 5. child -->
-            <fieldset class="step" data-step="5" hidden>
+            <fieldset class="step" data-step="4" hidden>
               <legend>
-                <span class="step__n">5</span>
+                <span class="step__n">4</span>
                 <span>
                   <strong>About your child</strong>
                   <small>Just enough to show you the right room. No surnames, no birthdates.</small>
@@ -209,9 +200,9 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
             </fieldset>
 
             <!-- 6. review -->
-            <fieldset class="step" data-step="6" hidden>
+            <fieldset class="step" data-step="5" hidden>
               <legend>
-                <span class="step__n">6</span>
+                <span class="step__n">5</span>
                 <span>
                   <strong>Check it over</strong>
                   <small>Change anything before you send.</small>
@@ -300,13 +291,13 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
   const FIELDS: { key: string; label: string; step: number }[] = [
     { key: 'visitType', label: 'Visit type', step: 1 },
     { key: 'date', label: 'Preferred date', step: 2 },
-    { key: 'time', label: 'Preferred time', step: 3 },
-    { key: 'parentName', label: 'Your name', step: 4 },
-    { key: 'email', label: 'Email', step: 4 },
-    { key: 'phone', label: 'Phone', step: 4 },
-    { key: 'childName', label: "Child's name", step: 5 },
-    { key: 'program', label: 'Program', step: 5 },
-    { key: 'notes', label: 'Notes', step: 5 },
+    { key: 'time', label: 'Preferred time', step: 2 },
+    { key: 'parentName', label: 'Your name', step: 3 },
+    { key: 'email', label: 'Email', step: 3 },
+    { key: 'phone', label: 'Phone', step: 3 },
+    { key: 'childName', label: "Child's name", step: 4 },
+    { key: 'program', label: 'Program', step: 4 },
+    { key: 'notes', label: 'Notes', step: 4 },
   ];
 
   track('tour_flow_start');

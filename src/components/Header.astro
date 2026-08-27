@@ -246,6 +246,9 @@ const isActive = (href: string) => path === href || (href !== '/' && path.starts
     white-space: nowrap;
     transition: background-color var(--dur-fast) var(--ease-out);
   }
+  @media (pointer: coarse) {
+    .preview-tag { min-height: 44px; }
+  }
   .preview-tag:hover { background: color-mix(in oklab, var(--violet-500) 20%, transparent); color: var(--violet-700); }
 
   /* ---- primary nav ---- */

@@ -220,6 +220,7 @@ const schema = [
 </script>
 
 <style>
+
   /* --------------------------------------------------------- stars -- */
   .pstars {
     position: relative;
@@ -339,6 +340,18 @@ const schema = [
     font-size: var(--step-0);
   }
   .cmp tbody th a:hover { text-decoration: underline; }
+
+  /* Row links are data-cell controls, not prose links, so the WCAG 2.5.8
+     sentence exception does not cover them. Same selector as the rule above:
+     `.cmp th[scope='row'] a` looks more specific but loses once Astro's scope
+     attribute is added to every compound. */
+  @media (pointer: coarse) {
+    .cmp tbody th a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
   .cmp tbody th small { display: block; font-weight: 450; font-size: var(--step--2); color: var(--text-muted); }
   .cmp__age { white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
   .cmp__tags { display: flex; flex-wrap: wrap; gap: 0.3rem; max-width: 15rem; }

@@ -318,9 +318,14 @@ const pillars = [
   .pillar__doc {
     display: inline-flex; align-items: center; gap: 0.35rem;
     padding-block: 0.3rem;
+    /* Scoped styles outrank the global coarse-pointer rule in base.css, so the
+       touch size has to be stated here too. */
     min-height: 28px;
     font-size: var(--step--2); font-weight: 700; text-decoration: none;
     white-space: nowrap;
+  }
+  @media (pointer: coarse) {
+    .pillar__doc { min-height: 44px; }
   }
 
   /* unknown */

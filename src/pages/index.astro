@@ -168,41 +168,6 @@ const schema = [organizationSchema, websiteSchema];
     </div>
   </section>
 
-  <!-- ============================================================= DAY -->
-  <section class="section" aria-labelledby="day-title">
-    <div class="container">
-      <div class="day">
-        <div class="day__copy" data-reveal>
-          <p class="eyebrow">Picture their day</p>
-          <h2 id="day-title">What happens between goodbye and hello again</h2>
-          <p class="lede">
-            The shape of a Tiny Stars day, in the order it happens.
-          </p>
-          <div class="notice notice--info mt-m">
-            <Icon name="info" size={18} />
-            <span>
-              <strong>We haven't invented a timetable.</strong>
-              Tiny Stars publishes its actual Classroom Routine — exact times come from
-              that document, not from us.
-            </span>
-          </div>
-          <div class="cluster mt-m">
-            <a href="/assets/pdf/classroom-routine.pdf" class="btn btn--ghost" data-track="document_download" data-track-label="classroom-routine">
-              <Icon name="file" size={17} />
-              Read the Classroom Routine
-            </a>
-            <a href="/day" class="btn btn--quiet">
-              More about the day <Icon name="arrow" size={15} />
-            </a>
-          </div>
-        </div>
-
-        <!-- The seven-step rhythm lives on /day. Repeating it here cost most of
-             a phone screen to say what the two links below already promise. -->
-      </div>
-    </div>
-  </section>
-
   <!-- =========================================================== TRUST -->
   <section class="section trust" aria-labelledby="trust-title">
     <div class="container">
@@ -227,7 +192,7 @@ const schema = [organizationSchema, websiteSchema];
           </p>
 
           <ul class="trust__list">
-            {policyFacts.slice(0, 4).map((f) => (
+            {policyFacts.slice(0, 3).map((f) => (
               <li>
                 <Icon name="check-circle" size={18} />
                 <span>
@@ -257,9 +222,6 @@ const schema = [organizationSchema, websiteSchema];
       </div>
     </div>
   </section>
-
-  <!-- ==================================================== INTENT PICKER -->
-  <IntentPicker />
 
   <!-- ========================================================= UNIVERSE -->
   <!-- The star-map navigation is a desktop showpiece. On a phone it was a
@@ -304,7 +266,7 @@ const schema = [organizationSchema, websiteSchema];
           </div>
         </div>
 
-        <ul class="guide__samples" aria-label="Example questions">
+        <ul class="guide__samples wide-only-flex" aria-label="Example questions">
           {[
             'My child is 2 and I’m looking for full-time care',
             'What time do you close?',
@@ -449,7 +411,8 @@ const schema = [organizationSchema, websiteSchema];
       padding-top: var(--space-s);
       gap: 0.4rem 0.9rem;
     }
-    .hero__figure--main { aspect-ratio: 16 / 11; }
+    .hero__figure--main { aspect-ratio: 16 / 10; }
+    .hero__eyebrow { font-size: var(--step--2); }
     .hero__figure--sub { display: none; }
   }
 
@@ -662,8 +625,9 @@ const schema = [organizationSchema, websiteSchema];
      evidence. On a phone it was most of a screen ahead of the claims, so it
      steps aside and the claims start immediately. */
   @media (max-width: 55rem) {
-    .trust__grid { gap: var(--space-l); }
+    .trust__grid { gap: var(--space-m); }
     .trust__media { display: none; }
+    .trust__copy .lede { font-size: var(--step-0); }
   }
 
   .trust__list { list-style: none; padding: 0; display: grid; gap: 0.85rem; margin-top: var(--space-m); }

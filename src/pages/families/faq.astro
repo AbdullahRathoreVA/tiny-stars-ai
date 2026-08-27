@@ -186,6 +186,7 @@ const schema = [
   }
   .fsearch__clear:hover { background: var(--cream-300); }
 
+
   .ffilter { display: flex; flex-wrap: wrap; gap: 0.4rem; }
   .gchip {
     display: inline-flex; align-items: center; gap: 0.45rem;
@@ -202,6 +203,14 @@ const schema = [
   }
   .gchip:hover { border-color: var(--ink-700); color: var(--ink-900); }
   .gchip[aria-pressed='true'] { background: var(--ink-900); border-color: var(--ink-900); color: var(--cream-100); }
+
+  @media (pointer: coarse) {
+    /* Clearing a search and picking a category are both one-thumb actions.
+       Must sit after the .gchip rules above — equal specificity once Astro's
+       scope attribute is applied, so source order decides. */
+    .fsearch__clear { width: 44px; height: 44px; }
+    .gchip { min-height: 44px; }
+  }
 
   .q[hidden] { display: none; }
   .q :global(mark) { background: var(--gold-200); border-radius: 3px; padding: 0 2px; }
