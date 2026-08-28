@@ -184,6 +184,13 @@ function retrieve(message: string, agent: Agent): { entry: Entry; score: number 
     'tell', 'know', 'like', 'want', 'need', 'give', 'take', 'make', 'just', 'also',
     'much', 'many', 'more', 'some', 'any', 'you', 'the', 'and', 'for', 'are',
     'child', 'children', 'kid', 'kids', 'please', 'thanks', 'hello',
+    // Age words are in almost every entry, so they ground anything to the
+    // programs answer: "how do I get my 4 year old to sleep" came back as
+    // "a 2-year-old falls into Comet Stars". The age still routes placement
+    // questions — parseAge reads it separately — it just cannot be the reason
+    // an entry is considered relevant.
+    'year', 'years', 'month', 'months', 'old', 'age', 'ages', 'baby', 'babies',
+    'toddler', 'toddlers', 'preschooler', 'preschoolers',
   ]);
   const asked = (message.toLowerCase().match(/[a-z]{3,}/g) ?? []).filter(
     (w) => w.length >= 4 && !STOP.has(w)
@@ -333,13 +340,25 @@ const localProvider: AIProvider = {
 
     const parts: string[] = [];
     const sources: Source[] = [];
-    let trust: Trust = 'unknown';
+    // Contributions, not a running value. Seeding this as 'unknown' and then
+    // taking the least authoritative meant the seed always won: "what programs
+    // do you offer" came back sourced, confidence 0.95, and labelled unknown —
+    // so it also handed off. Only what actually contributed gets a vote.
+    const trustParts: Trust[] = [];
     let confidence = 0;
 
     if (worried) parts.push(pickEmpathy(message));
 
     // --- age-aware program answer, layered on top of retrieval ---------------
-    if (ageMonths !== null && ageMonths !== undefined) {
+    // Only when the question is actually about placement. An age appearing in a
+    // sentence is not a request for one: "is it normal for a 2 year old to
+    // bite?" was being answered with "a 2-year-old sits in Comet Stars", which
+    // reads as though the question was not listened to.
+    const PLACEMENT =
+      /\b(program|programme|group|room|class|which|what.{0,12}(?:group|program|room)|where.{0,10}(?:start|go|begin)|start|join|enrol|enroll|register|fit|right for|suitable|belong|old enough|age)\b/i;
+    const asksPlacement = PLACEMENT.test(message) || hits.length === 0;
+
+    if (ageMonths !== null && ageMonths !== undefined && asksPlacement) {
       const program = programForAgeMonths(ageMonths);
       if (program) {
         const yrs = ageMonths >= 24 ? `${Math.floor(ageMonths / 12)}` : `${ageMonths} month`;
@@ -348,13 +367,13 @@ const localProvider: AIProvider = {
           `A ${yrs}${unit} sits in **${program.name}** (${program.familiar}, ${program.ageLabel}).`
         );
         sources.push({ label: 'Tiny Stars — Our Programs', href: `/programs/${program.slug}` });
-        trust = 'verified';
+        trustParts.push('verified');
         confidence = Math.max(confidence, 0.85);
       } else if (ageMonths < 12) {
         parts.push(
           'The youngest program Tiny Stars lists is Twinkle Stars, which starts at 12 months. Whether younger babies can be accommodated is not published, so the team is the right place to ask.'
         );
-        trust = 'unknown';
+        trustParts.push('unknown');
         confidence = 0.8;
       }
     }
@@ -365,7 +384,7 @@ const localProvider: AIProvider = {
       // When an answer mixes a verified fact with general guidance, label it by the
       // LEAST authoritative part present. Saying "from Tiny Stars" over a paragraph
       // that is partly our own advice would be the exact failure this site avoids.
-      trust = leastAuthoritative(trust, top.entry.trust);
+      trustParts.push(top.entry.trust);
       confidence = Math.max(confidence, Math.min(0.95, 0.45 + top.score / 12));
       if (top.entry.source) sources.push({ label: top.entry.source });
     } else if (!parts.length) {
@@ -380,7 +399,7 @@ const localProvider: AIProvider = {
       parts.push(
         `Things I can answer well: ${suggestions.join(' · ')}. For anything else, the team will know.`
       );
-      trust = 'unknown';
+      trustParts.push('unknown');
       confidence = 0.2;
     }
 
@@ -390,6 +409,12 @@ const localProvider: AIProvider = {
       );
     }
 
+    // Least authoritative of what actually contributed. Nothing contributing at
+    // all means nothing was found, which is genuinely 'unknown'.
+    let trust: Trust = trustParts.length
+      ? trustParts.reduce((a, b) => leastAuthoritative(a, b))
+      : 'unknown';
+
     let text = parts.join('\n\n');
 
     // --- output guardrail ----------------------------------------------------
@@ -397,6 +422,8 @@ const localProvider: AIProvider = {
     const flags = [...check.flags];
     if (!out.ok) {
       text = out.text;
+      // An override, not a contribution: a blocked answer is unknown whatever
+      // else was in the mix.
       trust = 'unknown';
       confidence = 0.3;
       flags.push(`blocked:${out.violation}`);

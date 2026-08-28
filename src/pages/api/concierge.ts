@@ -84,7 +84,13 @@ export const POST: APIRoute = async ({ request }) => {
   // Step 2a — nothing in the knowledge base, and not a centre-specific fact:
   // answer from general early-childhood knowledge under the "General guidance"
   // label rather than handing off. The label is the honesty, not the silence.
-  if (base.handoff && !CENTRE_SPECIFIC) {
+  // Weak matches count too, not just outright handoffs. "Is it normal for a two
+  // year old to bite?" retrieved the separation-anxiety entry at 0.64 — related
+  // enough to pass the relevance floor, not actually an answer to the question.
+  // Anything the knowledge base is confident about (0.85+) is left alone.
+  const weak = base.handoff || base.confidence < 0.7;
+
+  if (weak && !CENTRE_SPECIFIC) {
     const general = await generalGuidance(req.message);
     if (general.used) {
       const check = checkOutput(general.text, false);
