@@ -274,6 +274,24 @@ export const knowledge: Entry[] = [
     links: [{ label: 'Contact Tiny Stars', href: '/contact' }],
   },
   {
+    // "Are you open on Saturday?" used to retrieve the closing-time entry and
+    // answer with "closes at 6:00 PM", which does not address the question.
+    // Which days the centre operates is genuinely not published, so this entry
+    // exists to say that rather than to let a near-miss answer stand in.
+    id: 'daily-days',
+    topic: 'daily-life',
+    question: 'Which days are you open? Are you open at weekends?',
+    answer:
+      'Which days Tiny Stars operates — including whether it opens at weekends or on statutory holidays — is not published on its website, so we will not state it here. The team can confirm the current schedule directly.',
+    trust: 'unknown',
+    keywords: [
+      'saturday', 'sunday', 'weekend', 'weekends', 'weekday', 'weekdays',
+      'which days', 'what days', 'days open', 'holiday', 'holidays', 'statutory',
+      'monday', 'friday', 'seven days', 'every day',
+    ],
+    links: [{ label: 'Contact Tiny Stars', href: '/contact' }],
+  },
+  {
     id: 'daily-late',
     topic: 'daily-life',
     question: 'What happens if I am late picking up?',

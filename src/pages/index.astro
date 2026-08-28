@@ -4,6 +4,7 @@ import Icon from '../components/Icon.astro';
 import IntentPicker from '../components/IntentPicker.astro';
 import AgeMatch from '../components/AgeMatch.astro';
 import MediaStrip from '../components/MediaStrip.astro';
+import DayTimeline from '../components/DayTimeline.astro';
 import HeroAsk from '../components/HeroAsk.astro';
 import { site, trustMarkers, policyFacts } from '../data/site';
 import { organizationSchema, websiteSchema } from '../lib/schema';
@@ -138,6 +139,9 @@ const schema = [organizationSchema, websiteSchema];
 
   <!-- ====================================================== MEDIA STRIP -->
   <MediaStrip />
+
+  <!-- ========================================================= THE DAY -->
+  <DayTimeline />
 
   <!-- =========================================================== VALUES -->
   <section class="section" aria-labelledby="values-title">

@@ -105,6 +105,11 @@ const fullTitle = title.includes('Tiny Stars') ? title : `${title} · Tiny Stars
     <script>
       import { track, bindDeclarativeTracking } from '../lib/analytics';
       import { initParallax } from '../lib/parallax';
+      import { startBeacon } from '../lib/crm/beacon';
+
+      // Beacon first, so the page_view below is the session's opening event.
+      // With no CRM configured the relay answers 204 and nothing is collected.
+      startBeacon();
 
       track('page_view');
       bindDeclarativeTracking();

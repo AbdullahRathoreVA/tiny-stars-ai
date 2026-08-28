@@ -166,6 +166,7 @@ export const registrationSections = [
  */
 export const unverified = [
   'opening time',
+  'which days of the week the centre operates',
   'tuition and fees',
   'current availability or vacancies',
   'staff names, photographs and credentials',
