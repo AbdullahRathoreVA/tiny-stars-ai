@@ -4,7 +4,9 @@ import PageHero from '../../components/PageHero.astro';
 import NextStep from '../../components/NextStep.astro';
 import Icon from '../../components/Icon.astro';
 import { programs, priorityLabels, type Program } from '../../data/programs';
-import { documents } from '../../data/site';
+import { site, documents, trustMarkers, unverified } from '../../data/site';
+import MediaStrip from '../../components/MediaStrip.astro';
+import { publishable, type MediaTopic } from '../../data/media';
 import { breadcrumbSchema, organizationSchema, programSchema } from '../../lib/schema';
 
 export function getStaticPaths() {
@@ -37,6 +39,32 @@ const schema = [
 
 const relatedDocs = documents.filter((d) =>
   ['classroom-routine', 'parent-handbook'].includes(d.slug)
+);
+
+/**
+ * Which parts of the centre a family looking at this group would actually be
+ * looking at. A parent of a one-year-old cares about the room; a parent of a
+ * nine-year-old cares about the yard and where they go after school.
+ */
+const TOPICS_FOR: Record<string, MediaTopic[]> = {
+  'twinkle-stars': ['rooms', 'activities'],
+  'comet-stars': ['rooms', 'activities', 'playground'],
+  'nova-stars': ['activities', 'playground', 'rooms'],
+  'galaxy-stars': ['playground', 'activities', 'outings'],
+  'cosmic-stars': ['playground', 'outings', 'activities'],
+};
+
+const wanted = TOPICS_FOR[p.slug] ?? ['rooms', 'playground'];
+const programMedia = publishable()
+  .filter((m) => !m.generated && wanted.includes(m.topic))
+  // Keep the authored topic order, so the first card is the most relevant one.
+  .sort((a, b) => wanted.indexOf(a.topic) - wanted.indexOf(b.topic))
+  .slice(0, 8);
+
+/** What Tiny Stars has not published, phrased for a parent looking at one group. */
+const notPublished = unverified.filter((u) =>
+  ['tuition and fees', 'current availability or vacancies', 'educator-to-child ratios',
+   'staff names, photographs and credentials'].includes(u)
 );
 
 /** Clamp to a word boundary so descriptions stay inside a healthy SERP length. */
@@ -151,6 +179,75 @@ const metaDescription = clamp(
     </div>
   </section>
 
+  <!-- ------------------------------------------------------- spaces -->
+  {programMedia.length > 0 && (
+    <MediaStrip
+      items={programMedia}
+      eyebrow="The spaces"
+      heading={`Where ${p.familiar.toLowerCase()} spend their day`}
+      lede="Tiny Stars' own photographs and clips of the rooms and yard this group uses."
+    />
+  )}
+
+  <!-- ------------------------------------------------------- safety -->
+  <!-- Parents rank safety and cleanliness above curriculum, qualifications and
+       cost when choosing a centre, and this template had nothing about either.
+       It is paired with what is not published, because on this site those two
+       belong in the same breath: here is what can be shown, here is what only a
+       person can tell you. -->
+  <section class="section psafe" aria-labelledby="safe-title">
+    <div class="container">
+      <div class="psafe__grid">
+        <div data-reveal>
+          <p class="eyebrow eyebrow--teal">Before anything else</p>
+          <h2 id="safe-title">Safety, for {p.name}</h2>
+          <p class="lede">
+            The same published policies cover every group. They are written down, and you
+            can read them before you commit to them.
+          </p>
+          <ul class="psafe__list">
+            {trustMarkers.map((t) => (
+              <li>
+                <Icon name={t.icon as any} size={18} />
+                {t.label}
+              </li>
+            ))}
+          </ul>
+          <div class="cluster mt-m">
+            <a href="/why/trust-centre" class="btn btn--teal">Open the Trust Centre</a>
+            <a href="/assets/pdf/video-surveillance-policy.pdf" class="btn btn--quiet" data-track="document_download" data-track-label="video-surveillance-policy">
+              <Icon name="file" size={16} /> Surveillance policy
+            </a>
+          </div>
+        </div>
+
+        <div class="psafe__gap" data-reveal>
+          <p class="eyebrow eyebrow--plain">
+            <Icon name="alert" size={15} /> What this page can't tell you
+          </p>
+          <p>
+            For {p.name} specifically, Tiny Stars has not published:
+          </p>
+          <ul class="psafe__unpub">
+            {notPublished.map((u) => <li>{u}</li>)}
+          </ul>
+          <p class="psafe__note">
+            We will not estimate any of them. The team answers these directly, and a tour is
+            the fastest way to ask.
+          </p>
+          <div class="cluster mt-m">
+            <a href="/enroll/book-a-tour" class="btn btn--primary btn--sm" data-track="tour_cta_click" data-track-label={`program-${p.slug}`}>
+              <Icon name="calendar" size={16} /> Book a tour
+            </a>
+            <a href={site.phone.href} class="btn btn--ghost btn--sm" data-track="phone_click">
+              <Icon name="phone" size={15} /> {site.phone.label}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ---------------------------------------------------- questions -->
   <section class="section section--sunken" aria-labelledby="q-title">
     <div class="container container--narrow">
@@ -241,6 +338,74 @@ const metaDescription = clamp(
 </Base>
 
 <style>
+  /* ------------------------------------------------------------ safety */
+  .psafe { background: var(--bg-sunken); }
+  .psafe__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+    align-items: start;
+  }
+  .psafe__grid > * { min-width: 0; }
+
+  .psafe__list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+    margin-top: var(--space-m);
+  }
+  .psafe__list li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    color: var(--ink-800);
+  }
+  .psafe__list :global(svg) { color: var(--teal-600); flex: none; }
+
+  .psafe__gap {
+    padding: var(--space-l);
+    border-radius: var(--radius-l);
+    background: var(--warn-100);
+    border: 1px solid color-mix(in oklab, var(--warn-600) 24%, transparent);
+  }
+  .psafe__gap .eyebrow { color: var(--warn-600); }
+  .psafe__gap > p { margin-top: var(--space-s); color: var(--ink-800); }
+
+  .psafe__unpub {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+    margin-top: var(--space-s);
+  }
+  .psafe__unpub li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-weight: 650;
+    color: var(--ink-900);
+  }
+  .psafe__unpub li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--warn-600);
+  }
+  .psafe__note {
+    margin-top: var(--space-s);
+    font-size: var(--step--1);
+    color: var(--ink-700);
+  }
+
+  @media (min-width: 60rem) {
+    .psafe__grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: var(--space-2xl); }
+  }
+
   .split { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
   .split > * { min-width: 0; }
   @media (min-width: 900px) {
