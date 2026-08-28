@@ -1,0 +1,137 @@
+---
+/**
+ * A published document, with the things a parent actually wants before tapping.
+ *
+ * Size matters here: the Parent Handbook is 2.2 MB, and someone on mobile data
+ * in a car park deserves to know that before it starts downloading. Page count
+ * tells them whether this is a one-page policy or an evening's reading.
+ *
+ * "File dated", not "last updated". The date is the PDF's own CreationDate —
+ * when the file was written. Re-saving a document to fix a typo moves it
+ * without changing a word of policy, so calling it "updated" would be a claim
+ * about Tiny Stars' review process that nobody has published.
+ *
+ * View and download are separate, because they are different intentions: one
+ * is reading it now, the other is keeping it. A single link that does whichever
+ * the browser feels like is the version that annoys people.
+ */
+import Icon from './Icon.astro';
+import { metaFor } from '../data/docmeta';
+
+interface Props {
+  slug: string;
+  title: string;
+  description: string;
+  file: string;
+  category?: string;
+}
+
+const { slug, title, description, file, category } = Astro.props;
+const meta = metaFor(slug);
+
+const facts = [
+  meta?.size,
+  meta?.pages ? `${meta.pages} page${meta.pages === 1 ? '' : 's'}` : null,
+].filter(Boolean) as string[];
+---
+
+<article class="doccard">
+  <span class="doccard__icon" aria-hidden="true"><Icon name="file" size={20} /></span>
+
+  <div class="doccard__body">
+    <h3 class="doccard__title">{title}</h3>
+    {category && <p class="doccard__cat">{category}</p>}
+    <p class="doccard__desc">{description}</p>
+
+    <p class="doccard__facts">
+      <span>PDF</span>
+      {facts.map((f) => <span>{f}</span>)}
+      {meta?.fileDate && <span class="doccard__date">File dated {meta.fileDate}</span>}
+    </p>
+
+    <div class="doccard__actions">
+      <a
+        href={file}
+        class="btn btn--ghost btn--sm"
+        target="_blank"
+        rel="noopener"
+        data-track="document_view"
+        data-track-label={slug}
+      >
+        <Icon name="eye" size={15} /> Read it here
+      </a>
+      <a
+        href={file}
+        class="btn btn--quiet btn--sm"
+        download
+        data-track="document_download"
+        data-track-label={slug}
+      >
+        <Icon name="download" size={15} /> Save a copy
+      </a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .doccard {
+    display: flex;
+    gap: var(--space-s);
+    padding: var(--space-m);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+    background: var(--bg-raised);
+    min-width: 0;
+  }
+
+  .doccard__icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex: none;
+    border-radius: var(--radius-m);
+    background: var(--violet-100);
+    color: var(--violet-700);
+  }
+
+  .doccard__body { min-width: 0; flex: 1; }
+  .doccard__title { font-size: var(--step-1); }
+  .doccard__cat {
+    margin-top: 0.15rem;
+    font-size: var(--step--2);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .doccard__desc {
+    margin-top: 0.5rem;
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    line-height: var(--leading-normal);
+  }
+
+  .doccard__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.45rem;
+    margin-top: 0.7rem;
+    font-size: var(--step--2);
+    color: var(--ink-700);
+  }
+  .doccard__facts span {
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--cream-200);
+    font-weight: 650;
+  }
+  .doccard__date { background: transparent !important; color: var(--text-subtle); font-weight: 600 !important; }
+
+  .doccard__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: var(--space-s);
+  }
+</style>

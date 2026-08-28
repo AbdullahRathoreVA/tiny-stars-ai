@@ -1,9 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
+import DocCard from '../../components/DocCard.astro';
 import NextStep from '../../components/NextStep.astro';
 import Icon from '../../components/Icon.astro';
-import { site } from '../../data/site';
+import { site, documents } from '../../data/site';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
 
 /**
@@ -190,6 +191,35 @@ const settling = [
     </div>
   </section>
 
+  <!-- ---------------------------------------------------- documents -->
+  <!-- Every published Tiny Stars document in one place, with what a parent
+       wants before tapping: how big, how long, and when the file was written.
+       The handbook is 2.2 MB — worth saying to someone on mobile data. -->
+  <section class="section section--sunken" id="documents" aria-labelledby="docs-title">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">Everything in writing</p>
+        <h2 id="docs-title">The published documents</h2>
+        <p class="lede">
+          All four, as Tiny Stars publishes them. Read one here or keep a copy — and the
+          sizes are real, so nothing surprises you on mobile data.
+        </p>
+      </div>
+
+      <div class="docgrid mt-l" data-reveal>
+        {documents.map((d) => (
+          <DocCard slug={d.slug} title={d.title} description={d.description} file={d.file} category={d.category} />
+        ))}
+      </div>
+
+      <p class="docnote">
+        Dates are when each file was written, not a promise about when the policy was last
+        reviewed — that is not something Tiny Stars publishes. If a document looks out of
+        date to you, the team is the right place to ask.
+      </p>
+    </div>
+  </section>
+
   <NextStep
     title="Nothing here answering your question?"
     lede="Ask the concierge, search everything, or go straight to a person. All three take about the same amount of effort."
@@ -203,6 +233,18 @@ const settling = [
 </Base>
 
 <style>
+  .docgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--space-m);
+  }
+  .docnote {
+    margin-top: var(--space-l);
+    max-width: var(--measure);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
   .stagenav {
     display: flex;
     gap: 0.3rem;
