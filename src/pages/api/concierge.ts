@@ -82,6 +82,10 @@ export const POST: APIRoute = async ({ request }) => {
     'availab\\w*', 'vacanc\\w*', 'openings?', 'waitlist', 'wait list', 'spots?',
     'ratios?', 'staff.to.child', 'how many (?:staff|educators|children|kids)',
     'closing time', 'opening time', 'what time (?:do|does|are)', 'hours',
+    // Which days the centre runs is unpublished too, and "are you open on
+    // Saturday" contains none of the words above.
+    'saturdays?', 'sundays?', 'weekends?', 'which days', 'what days',
+    'days (?:are |do )?(?:you )?open', 'open on', 'statutory', 'public holidays?',
     'menus?', 'meal plan',
     'licen[cs]\\w*', 'accredit\\w*',
     'staff names?', 'qualifications?', 'credentials?', 'who (?:works|looks after)',

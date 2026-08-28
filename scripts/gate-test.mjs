@@ -20,6 +20,8 @@ const PATTERNS = [
   'availab\\w*', 'vacanc\\w*', 'openings?', 'waitlist', 'wait list', 'spots?',
   'ratios?', 'staff.to.child', 'how many (?:staff|educators|children|kids)',
   'closing time', 'opening time', 'what time (?:do|does|are)', 'hours',
+  'saturdays?', 'sundays?', 'weekends?', 'which days', 'what days',
+  'days (?:are |do )?(?:you )?open', 'open on', 'statutory', 'public holidays?',
   'menus?', 'meal plan',
   'licen[cs]\\w*', 'accredit\\w*',
   'staff names?', 'qualifications?', 'credentials?', 'who (?:works|looks after)',
@@ -27,6 +29,8 @@ const PATTERNS = [
 const hit = (m) => PATTERNS.some((p) => new RegExp(`\\b${p}\\b`, 'i').test(m));
 
 const MUST_BLOCK = [
+  'Are you open on Saturday?', 'Are you open on weekends?', 'What days are you open?',
+  'Which days do you run?', 'Do you open on public holidays?',
   'How much is it per month exactly?', 'What do you charge?', 'Is it expensive?',
   'How much per week?', 'What is the monthly amount?',
   'How much does it cost?', 'What are your fees?', 'What is the monthly price?',
