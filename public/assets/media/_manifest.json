@@ -504,5 +504,47 @@
   "file": "video/ts-32.mp4",
   "poster": "posters/ts-32.webp",
   "src": "WhatsApp Video 2026-08-27 at 11.15.50 PM.mp4"
+ },
+ {
+  "slug": "ts-33",
+  "kind": "video",
+  "src": "rooms-walkthrough.mp4",
+  "natural": [
+   540,
+   720
+  ],
+  "dur": 70.8,
+  "mb": 2.97,
+  "srcMb": 171.35,
+  "file": "video/ts-33.mp4",
+  "poster": "posters/ts-33.webp"
+ },
+ {
+  "slug": "ts-34",
+  "kind": "video",
+  "src": "yard-drone-scan.mp4",
+  "natural": [
+   1280,
+   720
+  ],
+  "dur": 23.5,
+  "mb": 5.03,
+  "srcMb": 82.38,
+  "file": "video/ts-34.mp4",
+  "poster": "posters/ts-34.webp"
+ },
+ {
+  "slug": "ts-35",
+  "kind": "video",
+  "src": "yard-drone-topdown.mp4",
+  "natural": [
+   1280,
+   720
+  ],
+  "dur": 8.1,
+  "mb": 0.8,
+  "srcMb": 30.17,
+  "file": "video/ts-35.mp4",
+  "poster": "posters/ts-35.webp"
  }
 ]

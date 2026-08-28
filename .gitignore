@@ -17,3 +17,6 @@ Thumbs.db
 
 # Vercel adapter build output
 .vercel/
+
+# Python bytecode from scripts/
+__pycache__/

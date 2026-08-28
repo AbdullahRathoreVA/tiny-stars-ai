@@ -77,6 +77,17 @@ export const media: MediaItem[] = [
     w: 1050,
     h: 1400,
   },
+  {
+    id: 'ts-33',
+    kind: 'video',
+    alt: 'A walk through the Tiny Stars rooms: the Nova Stars and Comet Stars doorways, classrooms with child-height tables and chairs, low shelves of blocks and labelled bins, coat cubbies, and a nappy-change counter. An adult passes through the frame; no children are in shot.',
+    caption: 'A walk through the rooms, one door at a time',
+    topic: 'rooms',
+    people: 'adults',
+    w: 540,
+    h: 720,
+    dur: 70.8,
+  },
 
   // ------------------------------------------------------- playground --
   {
@@ -109,6 +120,28 @@ export const media: MediaItem[] = [
     w: 576,
     h: 1024,
     dur: 15.8,
+  },
+  {
+    id: 'ts-34',
+    kind: 'video',
+    alt: 'A drone flight down the length of the fenced outdoor play area, passing climbing frames with slides, playhouses, picnic tables and a shade canopy on green turf, with the fence running along both sides.',
+    caption: 'The yard from above, one end to the other',
+    topic: 'playground',
+    people: 'none',
+    w: 1280,
+    h: 720,
+    dur: 23.5,
+  },
+  {
+    id: 'ts-35',
+    kind: 'video',
+    alt: 'A drone view looking straight down on the outdoor play area: two fenced runs of green turf divided by a wooden fence, each with its own play equipment and shade canopy.',
+    caption: 'Straight down — two fenced runs, side by side',
+    topic: 'playground',
+    people: 'none',
+    w: 1280,
+    h: 720,
+    dur: 8.1,
   },
   {
     id: 'ts-25',
@@ -379,7 +412,7 @@ export const publishable = (): MediaItem[] =>
  * short: a parent deciding in thirty seconds needs a taste, not the archive.
  * Generated footage is never in here — the strip's job is to show the real place.
  */
-export const FEATURED_IDS = ['ts-15', 'ts-05', 'ts-02', 'ts-31', 'ts-06', 'ts-09', 'ts-28', 'ts-26'];
+export const FEATURED_IDS = ['ts-34', 'ts-05', 'ts-33', 'ts-02', 'ts-35', 'ts-06', 'ts-31', 'ts-09'];
 
 export const featured = (): MediaItem[] => {
   const pool = publishable().filter((m) => !m.generated);

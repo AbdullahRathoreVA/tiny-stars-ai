@@ -67,25 +67,45 @@ def ts(seconds: float) -> str:
     return f"{h:02d}:{m:02d}:{s:02d}.{ms:03d}"
 
 
+CUE_COLS = 42   # characters per line, so a player does not render one long line
+CUE_LINES = 4   # lines per cue, so a cue does not cover the picture
+
+
 def write_descriptions(items: dict[str, dict]) -> int:
-    """One cue spanning the clip: what a viewer who cannot see it would miss."""
+    """Cues spanning the clip: what a viewer who cannot see it would miss.
+
+    A description longer than one cue is split across several, spread over the
+    clip, rather than truncated. Cutting it mid-clause used to lose the end of
+    the sentence — "each with its own play equipment and shade" — which reads
+    to a screen reader as though the description simply stopped.
+    """
     made = 0
     for ident, meta in items.items():
         if meta["kind"] != "video" or not meta["alt"]:
             continue
         dur = meta["dur"] or 10
-        # Wrap long alt text so a player does not render one unreadable line.
+
         words, lines, line = meta["alt"].split(), [], ""
         for word in words:
-            if len(line) + len(word) + 1 > 42:
+            if len(line) + len(word) + 1 > CUE_COLS:
                 lines.append(line)
                 line = word
             else:
                 line = f"{line} {word}".strip()
         lines.append(line)
-        body = "\n".join(lines[:4])
-        vtt = f"WEBVTT\nKind: descriptions\nLanguage: en\n\n1\n{ts(0)} --> {ts(dur)}\n{body}\n"
-        (OUT_DIR / f"{ident}.desc.vtt").write_text(vtt, encoding="utf-8")
+
+        # Balanced, not greedy: five lines over two cues is 3 + 2, never 4 + 1,
+        # because a cue holding the single orphan word "canopy." for four
+        # seconds is worse than the truncation this replaced.
+        n_cues = -(-len(lines) // CUE_LINES)
+        per = -(-len(lines) // n_cues)
+        cues = [lines[i:i + per] for i in range(0, len(lines), per)]
+        span = dur / len(cues)
+        out = ["WEBVTT", "Kind: descriptions", "Language: en", ""]
+        for n, cue in enumerate(cues):
+            start, end = n * span, min(dur, (n + 1) * span)
+            out += [str(n + 1), f"{ts(start)} --> {ts(end)}", "\n".join(cue), ""]
+        (OUT_DIR / f"{ident}.desc.vtt").write_text("\n".join(out), encoding="utf-8")
         made += 1
     return made
 

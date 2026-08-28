@@ -89,10 +89,37 @@ def do_photo(src: Path, slug: str) -> dict:
             "natural": [w0, h0], "renditions": made}
 
 
+def letterbox_crop(src: Path, dur: float) -> str | None:
+    """The crop filter that removes black bars, or None if there are none.
+
+    The centre exports some clips for social, which pads a 3:4 picture into a
+    9:16 canvas. Encoding that as-is bakes the bars into the file and into the
+    poster frame, so the card renders a black-topped rectangle. cropdetect is
+    sampled a quarter of the way in, because clip openings are often a fade.
+    """
+    at = max(0.0, dur * 0.25)
+    r = sh(["ffmpeg", "-v", "info", "-nostats", "-ss", f"{at:.2f}", "-i", str(src),
+            "-vf", "cropdetect=limit=24:round=2", "-frames:v", "40", "-f", "null", "-"])
+    crops = [ln.split("crop=")[-1].strip() for ln in r.stderr.splitlines() if "crop=" in ln]
+    if not crops:
+        return None
+    w, h, x, y = (int(v) for v in crops[-1].split(":"))
+    if w <= 0 or h <= 0:
+        return None
+    full_w, full_h = probe(src)["w"], probe(src)["h"]
+    # Ignore a couple of stray rows; only act on a real bar.
+    if full_h - h < 8 and full_w - w < 8:
+        return None
+    return f"crop={w}:{h}:{x}:{y}"
+
+
 def do_video(src: Path, slug: str) -> dict:
     info = probe(src)
-    h = info.get("h") or VIDEO_MAX_H
+    crop = letterbox_crop(src, info.get("dur") or 1)
+    h = (int(crop.split(":")[1]) if crop else info.get("h")) or VIDEO_MAX_H
     vf = "scale=-2:'min(%d,ih)'" % VIDEO_MAX_H if h > VIDEO_MAX_H else "scale=-2:ih"
+    if crop:
+        vf = f"{crop},{vf}"
 
     mp4 = VIDEO_DIR / f"{slug}.mp4"
     r = sh([
@@ -112,7 +139,9 @@ def do_video(src: Path, slug: str) -> dict:
     poster = POSTER_DIR / f"{slug}.webp"
     at = max(0.1, (info.get("dur") or 1) * 0.25)
     tmp = POSTER_DIR / f"{slug}-tmp.png"
-    sh(["ffmpeg", "-v", "error", "-y", "-ss", f"{at:.2f}", "-i", str(src),
+    # Grabbed from the encoded file, not the original, so the poster is framed
+    # exactly like the video — any letterbox crop is already applied.
+    sh(["ffmpeg", "-v", "error", "-y", "-ss", f"{at:.2f}", "-i", str(mp4),
         "-frames:v", "1", "-vf", "scale=-2:720", str(tmp)])
     if tmp.exists():
         Image.open(tmp).convert("RGB").save(poster, "WEBP", quality=78, method=6)
@@ -146,24 +175,47 @@ def main() -> int:
         print("no media found in .media-inbox/")
         return 1
 
-    only = sys.argv[1] if len(sys.argv) > 1 else None
+    manifest_path = OUT / "_manifest.json"
+    published: dict[str, dict] = {}
+    if manifest_path.exists():
+        for r in json.loads(manifest_path.read_text(encoding="utf-8")):
+            published[r["slug"]] = r
+
+    # Slugs are pinned to the original filename, via the manifest the last run
+    # wrote. They used to be the file's position in the sorted listing, which
+    # was fine until a new clip sorted above an existing one: adding a file
+    # named "rooms-walkthrough.mp4" renumbered all 32 published assets, and
+    # ts-05 in media.ts silently became a different photograph. A new file now
+    # takes the next free number and nothing already published ever moves.
+    by_src = {r["src"]: slug for slug, r in published.items() if r.get("src")}
+    next_n = max((int(s.split("-")[1]) for s in published), default=0) + 1
+    slugs: dict[Path, str] = {}
+    for path in files:
+        if path.name in by_src:
+            slugs[path] = by_src[path.name]
+        else:
+            slugs[path] = f"ts-{next_n:02d}"
+            next_n += 1
+
+    # `video` / `photo` filter by kind; anything else is a filename, so a newly
+    # dropped clip can be encoded on its own instead of re-encoding the set.
+    args = set(sys.argv[1:])
+    kinds = args & {"video", "photo"}
+    names = args - kinds
+
     report = []
     for i, path in enumerate(files, 1):
-        slug = f"ts-{i:02d}"
+        slug = slugs[path]
         kind = "video" if path.suffix.lower() in {".mp4", ".mov"} else "photo"
-        if only and kind != only:
+        if (kinds and kind not in kinds) or (names and path.name not in names):
             report.append({"slug": slug, "kind": kind, "src": path.name, "skipped": True})
             continue
-        print(f"[{i:02d}/{len(files)}] {kind:5} {path.name}", flush=True)
+        print(f"[{i:02d}/{len(files)}] {slug} {kind:5} {path.name}", flush=True)
         report.append(do_video(path, slug) if kind == "video" else do_photo(path, slug))
 
     # A filtered run must not drop the entries it skipped, so merge by slug over
     # whatever the last full run wrote.
-    manifest_path = OUT / "_manifest.json"
-    merged: dict[str, dict] = {}
-    if manifest_path.exists():
-        for r in json.loads(manifest_path.read_text(encoding="utf-8")):
-            merged[r["slug"]] = r
+    merged: dict[str, dict] = dict(published)
     for r in report:
         if not r.get("skipped"):
             merged[r["slug"]] = r
