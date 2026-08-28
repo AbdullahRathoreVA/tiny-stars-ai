@@ -40,7 +40,7 @@ let workingModel: string | null = null;
 
 /** A parent waiting on an answer will not wait long. */
 const TIMEOUT_MS = 6000;
-const MAX_TOKENS = 320;
+const MAX_TOKENS = 800;
 
 const SYSTEM = `You rewrite answers for Tiny Stars Daycare's website assistant, "Stella".
 
@@ -108,7 +108,18 @@ async function call(
         method: 'POST',
         signal: control.signal,
         headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
-        body: JSON.stringify({ model, temperature, max_tokens: MAX_TOKENS, messages }),
+        body: JSON.stringify({
+          model,
+          temperature,
+          max_tokens: MAX_TOKENS,
+          messages,
+          // gpt-oss models think before they answer, and the reasoning is
+          // billed against the same budget. At 320 tokens a long draft could
+          // use the lot and return empty content, which showed up as the
+          // rewrite silently never applying. Low effort is right anyway: this
+          // is rephrasing, not a problem to solve.
+          ...(model.startsWith('openai/gpt-oss') ? { reasoning_effort: 'low' } : {}),
+        }),
       });
 
       // 404 and 400 are "this model id is wrong or gone" — try the next one.
