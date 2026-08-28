@@ -19,7 +19,7 @@
 import type { APIRoute } from 'astro';
 import { localProvider } from '../../lib/ai/local';
 import { checkOutput } from '../../lib/ai/guardrails';
-import { rewrite, groqConfigured } from '../../lib/ai/groq';
+import { rewrite, generalGuidance, groqConfigured } from '../../lib/ai/groq';
 import type { AIRequest } from '../../lib/ai/provider';
 
 export const prerender = false;
@@ -65,6 +65,43 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (!groqConfigured()) {
     return json({ ...base, flags: [...base.flags, 'groq:not-configured'] });
+  }
+
+  // Questions that are about THIS centre and are not published. These never go
+  // to general guidance: a model answering "what are the ratios" with a
+  // sensible-sounding industry figure is exactly the failure this whole site
+  // is built to avoid, and a parent has no way to tell it apart from a fact.
+  const CENTRE_SPECIFIC = [
+    'fees?', 'costs?', 'prices?', 'pricing', 'tuition', 'rates?', 'subsid\\w*', 'afford\\w*', 'deposit',
+    'availab\\w*', 'vacanc\\w*', 'openings?', 'waitlist', 'wait list', 'spots?',
+    'ratios?', 'staff.to.child', 'how many (?:staff|educators|children|kids)',
+    'closing time', 'opening time', 'what time (?:do|does|are)', 'hours',
+    'menus?', 'meal plan',
+    'licen[cs]\\w*', 'accredit\\w*',
+    'staff names?', 'qualifications?', 'credentials?', 'who (?:works|looks after)',
+  ].some((pattern) => new RegExp(`\\b${pattern}\\b`, 'i').test(req.message));
+
+  // Step 2a — nothing in the knowledge base, and not a centre-specific fact:
+  // answer from general early-childhood knowledge under the "General guidance"
+  // label rather than handing off. The label is the honesty, not the silence.
+  if (base.handoff && !CENTRE_SPECIFIC) {
+    const general = await generalGuidance(req.message);
+    if (general.used) {
+      const check = checkOutput(general.text, false);
+      if (check.ok) {
+        return json({
+          ...base,
+          text: general.text,
+          trust: 'general',
+          sources: [{ label: 'General early-childhood guidance, not Tiny Stars policy' }],
+          handoff: false,
+          confidence: 0.55,
+          flags: [...base.flags, `groq:general:${general.model}:${general.ms}ms`],
+        });
+      }
+      return json({ ...base, flags: [...base.flags, `groq:general-rejected:${check.violation}`] });
+    }
+    return json({ ...base, flags: [...base.flags, `groq:general-skipped:${general.reason}`] });
   }
 
   // Step 2 — rewrite for warmth, with the draft as the only source material.

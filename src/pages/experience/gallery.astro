@@ -3,15 +3,90 @@ import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import NextStep from '../../components/NextStep.astro';
 import Icon from '../../components/Icon.astro';
-import { photos, categoryLabels, type GalleryCategory } from '../../data/gallery';
+import { photos } from '../../data/gallery';
+import MediaViewer from '../../components/MediaViewer.astro';
+import {
+  publishable,
+  photoSrc,
+  posterSrc,
+  videoSrc,
+  type MediaItem,
+} from '../../data/media';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
 import Stage3D from '../../components/three/Stage3D.astro';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 
-const categories = Object.keys(categoryLabels) as GalleryCategory[];
-const counts = categories.map((c) => ({
-  id: c,
-  label: categoryLabels[c],
-  n: photos.filter((p) => p.category === c).length,
+/**
+ * Two sets of imagery, deliberately kept apart in the filters and joined in
+ * one grid.
+ *
+ * The `rooms` set is Tiny Stars' own professional photography of empty spaces,
+ * mirrored from its site. The `life` set is the photographs and clips the
+ * centre supplied later, which do show children. They answer different
+ * questions — "what is the place" and "what happens in it" — and they have
+ * different provenance, so the chips let a parent ask for either.
+ */
+const TRACK_DIR = join(process.cwd(), 'public', 'assets', 'media', 'tracks');
+const hasTrack = (f: string) => existsSync(join(TRACK_DIR, f));
+const tracksFor = (m: MediaItem) => ({
+  descriptions: hasTrack(`${m.id}.desc.vtt`) ? `/assets/media/tracks/${m.id}.desc.vtt` : '',
+  captions: hasTrack(`${m.id}.vtt`) ? `/assets/media/tracks/${m.id}.vtt` : '',
+});
+
+type Tile = {
+  group: 'rooms' | 'life';
+  filter: string;
+  kind: 'photo' | 'video';
+  thumb: string;
+  alt: string;
+  caption: string;
+  wide?: boolean;
+  viewer: Record<string, unknown>;
+};
+
+const roomTiles: Tile[] = photos.map((p) => ({
+  group: 'rooms',
+  filter: p.category === 'outdoors' ? 'outdoors' : 'rooms',
+  kind: 'photo',
+  thumb: p.src,
+  alt: p.alt,
+  caption: p.caption,
+  wide: p.wide,
+  viewer: { kind: 'photo', img: p.src, alt: p.alt, caption: p.caption },
+}));
+
+const lifeTiles: Tile[] = publishable().map((m) => ({
+  group: 'life',
+  filter: m.kind === 'video' ? 'video' : m.topic === 'playground' ? 'outdoors' : 'life',
+  kind: m.kind,
+  thumb: m.kind === 'video' ? posterSrc(m.id) : photoSrc(m.id, 700),
+  alt: m.alt,
+  caption: m.caption,
+  viewer: {
+    kind: m.kind,
+    alt: m.alt,
+    caption: m.caption,
+    generated: !!m.generated,
+    img: m.kind === 'photo' ? photoSrc(m.id, 1400) : '',
+    video: m.kind === 'video' ? videoSrc(m.id) : '',
+    poster: m.kind === 'video' ? posterSrc(m.id) : '',
+    tracks: m.kind === 'video' ? tracksFor(m) : {},
+  },
+}));
+
+const tiles: Tile[] = [...lifeTiles, ...roomTiles];
+
+const FILTERS = [
+  { id: 'all', label: 'Everything' },
+  { id: 'life', label: 'Life here' },
+  { id: 'rooms', label: 'The rooms' },
+  { id: 'outdoors', label: 'Outdoors' },
+  { id: 'video', label: 'Video' },
+];
+const counts = FILTERS.map((f) => ({
+  ...f,
+  n: f.id === 'all' ? tiles.length : tiles.filter((t) => t.filter === f.id).length,
 }));
 
 const schema = [
@@ -21,8 +96,8 @@ const schema = [
 ---
 
 <Base
-  title="Photo gallery | Inside Tiny Stars Daycare"
-  description="Twenty photographs of the rooms, play spaces, kitchen and outdoor area at Tiny Stars Daycare in Grande Prairie — the actual spaces, photographed as they are."
+  title="Gallery | Inside Tiny Stars Daycare"
+  description="Photographs and video from inside Tiny Stars Daycare in Grande Prairie — the rooms, the playground, and real days at the centre."
   image="/assets/images/gallery/gallery-15.webp"
   schema={schema}
 >
@@ -30,18 +105,18 @@ const schema = [
     <Stage3D scene="gallery" fill={true} decorative={true} />
     <PageHero
     eyebrow="Gallery"
-    title="Twenty photographs of the actual rooms"
-    lede="Not stock imagery, and not a stylist's version of a daycare. These are Tiny Stars' own photographs of the spaces your child would be in."
+    title="Come and have a look around"
+    lede="Tiny Stars' own photographs and clips — the rooms as they are, and the days that happen in them. No stock imagery anywhere on this page."
     crumbs={[{ name: 'Gallery', href: '/experience/gallery' }]}
   >
     <div class="notice notice--info" style="max-width:44rem">
       <Icon name="info" size={18} />
       <span>
-        <strong>This gallery is the rooms, empty.</strong>
-        Every photograph here is of a space rather than a person, so you can look at what the
-        place actually is. Photographs and clips of children at the centre, supplied by Tiny
-        Stars, appear under <a href="/#mstrip-title">Inside Tiny Stars</a>. To see the rooms
-        in use, come on a tour.
+        <strong>Two kinds of picture here, and it is worth knowing which is which.</strong>
+        <em>The rooms</em> are professionally photographed and empty, so you can see the
+        space itself. <em>Life here</em> was supplied by the centre and does show children
+        at Tiny Stars. One clip in the set is AI-generated and is labelled as such when
+        you open it.
       </span>
     </div>
   </PageHero>
@@ -51,12 +126,14 @@ const schema = [
     <div class="container">
       <h2 id="g-title" class="visually-hidden">Photographs, filterable by area</h2>
 
-      <div class="gfilter" role="group" aria-label="Filter photographs by area">
-        <button type="button" class="gchip" data-filter="all" aria-pressed="true">
-          All <span class="gchip__n">{photos.length}</span>
-        </button>
-        {counts.map((c) => (
-          <button type="button" class="gchip" data-filter={c.id} aria-pressed="false">
+      <div class="gfilter" role="group" aria-label="Filter by what you want to see">
+        {counts.map((c, i) => (
+          <button
+            type="button"
+            class="gchip"
+            data-filter={c.id}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+          >
             {c.label} <span class="gchip__n">{c.n}</span>
           </button>
         ))}
@@ -65,25 +142,28 @@ const schema = [
       <p class="visually-hidden" role="status" aria-live="polite" data-g-announce></p>
 
       <div class="gmasonry mt-l" data-grid>
-        {photos.map((p, i) => (
+        {tiles.map((t, i) => (
           <button
             type="button"
-            class={`gitem${p.wide ? ' gitem--wide' : ''}`}
-            data-category={p.category}
+            class={`gitem${t.wide ? ' gitem--wide' : ''}`}
+            data-category={t.filter}
             data-index={i}
-            aria-label={`Open larger: ${p.caption}`}
+            aria-label={`Open: ${t.caption}`}
           >
             <img
-              src={p.src}
-              alt={p.alt}
+              src={t.thumb}
+              alt={t.alt}
               width="640"
               height="480"
               loading={i < 6 ? 'eager' : 'lazy'}
               decoding="async"
             />
+            {t.kind === 'video' && (
+              <span class="gitem__play" aria-hidden="true"><Icon name="play" size={17} /></span>
+            )}
             <span class="gitem__cap">
-              <span>{p.caption}</span>
-              <Icon name="search" size={15} />
+              <span>{t.caption}</span>
+              <Icon name={t.kind === 'video' ? 'play' : 'search'} size={15} />
             </span>
           </button>
         ))}
@@ -98,26 +178,9 @@ const schema = [
     </div>
   </section>
 
-  <!-- ------------------------------------------------------- lightbox -->
-  <div class="lb" data-lightbox hidden>
-    <div class="lb__scrim" data-lb-close></div>
-    <div class="lb__panel" role="dialog" aria-modal="true" aria-label="Photograph viewer">
-      <button type="button" class="lb__btn lb__btn--close" data-lb-close aria-label="Close viewer">
-        <Icon name="x" size={20} />
-      </button>
-      <button type="button" class="lb__btn lb__btn--prev" data-lb-prev aria-label="Previous photograph">
-        <Icon name="chevron" size={22} />
-      </button>
-      <figure class="lb__figure">
-        <img data-lb-img src="" alt="" width="1200" height="900" />
-        <figcaption data-lb-cap></figcaption>
-      </figure>
-      <button type="button" class="lb__btn lb__btn--next" data-lb-next aria-label="Next photograph">
-        <Icon name="chevron" size={22} />
-      </button>
-      <p class="lb__count" data-lb-count></p>
-    </div>
-  </div>
+  <script type="application/json" data-gallery-viewer set:html={JSON.stringify(tiles.map((t) => t.viewer))} />
+
+  <MediaViewer />
 
   <NextStep
     title="Photographs only get you so far"
@@ -224,92 +287,6 @@ const schema = [
     .gitem__cap { opacity: 1; transform: none; }
   }
 
-  /* --------------------------------------------------------- lightbox */
-  .lb { position: fixed; inset: 0; z-index: var(--z-overlay); }
-  .lb__scrim {
-    position: absolute; inset: 0;
-    background: color-mix(in oklab, var(--ink-900) 92%, transparent);
-    animation: lbFade var(--dur) var(--ease-out);
-  }
-  @keyframes lbFade { from { opacity: 0; } to { opacity: 1; } }
-
-  .lb__panel {
-    position: relative;
-    height: 100%;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: var(--space-s);
-    padding: var(--space-m);
-  }
-
-  .lb__figure {
-    grid-column: 2;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-s);
-    min-width: 0;
-    max-height: 100%;
-  }
-  .lb__figure img {
-    max-width: 100%;
-    max-height: calc(100dvh - 11rem);
-    width: auto;
-    border-radius: var(--radius-m);
-    box-shadow: var(--shadow-xl);
-    object-fit: contain;
-    animation: lbPop var(--dur-slow) var(--ease-out);
-  }
-  @keyframes lbPop { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
-  @media (prefers-reduced-motion: reduce) {
-    .lb__scrim, .lb__figure img { animation: none; }
-  }
-  .lb__figure figcaption {
-    color: var(--cream-200);
-    font-size: var(--step--1);
-    text-align: center;
-    max-width: 46ch;
-  }
-
-  .lb__btn {
-    display: grid; place-items: center;
-    width: 48px; height: 48px;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: color-mix(in oklab, #fff 12%, transparent);
-    color: var(--cream-100);
-    cursor: pointer;
-    transition: background-color var(--dur-fast) var(--ease-out);
-  }
-  .lb__btn:hover { background: color-mix(in oklab, #fff 24%, transparent); }
-  .lb__btn--prev { grid-column: 1; }
-  .lb__btn--prev :global(svg) { transform: rotate(180deg); }
-  .lb__btn--next { grid-column: 3; }
-  .lb__btn--close { position: absolute; top: var(--space-m); right: var(--space-m); z-index: 1; }
-
-  .lb__count {
-    position: absolute;
-    bottom: var(--space-m);
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: var(--step--2);
-    color: var(--ink-400);
-    font-variant-numeric: tabular-nums;
-  }
-
-  @media (max-width: 640px) {
-    .lb__panel { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-    .lb__figure { grid-column: 1; }
-    .lb__btn--prev, .lb__btn--next {
-      grid-column: 1;
-      position: absolute;
-      bottom: 3.25rem;
-    }
-    .lb__btn--prev { left: 25%; }
-    .lb__btn--next { right: 25%; }
-  }
 </style>
 
 <script>
@@ -318,6 +295,9 @@ const schema = [
 
   const grid = document.querySelector<HTMLElement>('[data-grid]')!;
   const items = Array.from(grid.querySelectorAll<HTMLButtonElement>('.gitem'));
+  const VIEWER = JSON.parse(
+    document.querySelector('[data-gallery-viewer]')?.textContent || '[]'
+  );
   const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter]'));
   const emptyState = document.querySelector<HTMLElement>('[data-empty]')!;
   const announce = document.querySelector<HTMLElement>('[data-g-announce]')!;
@@ -342,81 +322,16 @@ const schema = [
   chips.forEach((c) => c.addEventListener('click', () => applyFilter(c.dataset.filter!)));
   document.querySelector('[data-show-all]')?.addEventListener('click', () => applyFilter('all'));
 
-  /* --------------------------------------------------------- lightbox */
-  const lb = document.querySelector<HTMLElement>('[data-lightbox]')!;
-  const lbImg = lb.querySelector<HTMLImageElement>('[data-lb-img]')!;
-  const lbCap = lb.querySelector<HTMLElement>('[data-lb-cap]')!;
-  const lbCount = lb.querySelector<HTMLElement>('[data-lb-count]')!;
-
-  let index = 0;
-  let lastFocus: HTMLElement | null = null;
-
-  /** Indices currently visible, so arrows walk the filtered set. */
-  const visible = () => items.filter((el) => !el.hidden).map((el) => Number(el.dataset.index));
-
-  function paint() {
-    const p = photos[index];
-    lbImg.src = p.src;
-    lbImg.alt = p.alt;
-    lbCap.textContent = p.caption;
-    const list = visible();
-    lbCount.textContent = `${list.indexOf(index) + 1} of ${list.length}`;
-  }
-
-  function open(i: number) {
-    lastFocus = document.activeElement as HTMLElement;
-    index = i;
-    lb.hidden = false;
-    document.body.style.overflow = 'hidden';
-    paint();
-    track('gallery_open', { index: i });
-    // `[data-lb-close]` is also on the scrim div, which is not focusable — target
-    // the button explicitly so focus actually enters the dialog.
-    lb.querySelector<HTMLButtonElement>('button[data-lb-close]')?.focus();
-  }
-
-  function close() {
-    lb.hidden = true;
-    document.body.style.overflow = '';
-    lastFocus?.focus();
-  }
-
-  function step(dir: 1 | -1) {
-    const list = visible();
-    if (!list.length) return;
-    const at = list.indexOf(index);
-    index = list[(at + dir + list.length) % list.length];
-    paint();
-  }
-
-  items.forEach((el) => el.addEventListener('click', () => open(Number(el.dataset.index))));
-  lb.querySelectorAll('[data-lb-close]').forEach((el) => el.addEventListener('click', close));
-  lb.querySelector('[data-lb-next]')?.addEventListener('click', () => step(1));
-  lb.querySelector('[data-lb-prev]')?.addEventListener('click', () => step(-1));
-
-  document.addEventListener('keydown', (e) => {
-    if (lb.hidden) return;
-    if (e.key === 'Escape') close();
-    else if (e.key === 'ArrowRight') step(1);
-    else if (e.key === 'ArrowLeft') step(-1);
-  });
-
-  // Swipe on touch devices.
-  let startX = 0;
-  lb.addEventListener('touchstart', (e) => { startX = e.changedTouches[0].clientX; }, { passive: true });
-  lb.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - startX;
-    if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
-  }, { passive: true });
-
-  // Keep focus inside the viewer.
-  lb.addEventListener('keydown', (e) => {
-    if (e.key !== 'Tab') return;
-    const list = Array.from(lb.querySelectorAll<HTMLElement>('button')).filter((b) => b.offsetParent !== null);
-    if (!list.length) return;
-    const first = list[0];
-    const last = list[list.length - 1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-  });
+  /* ----------------------------------------------------------- viewer */
+  // Arrows walk whatever the filter is currently showing, not the whole set —
+  // stepping out of the category a parent just chose is disorienting.
+  items.forEach((el) =>
+    el.addEventListener('click', () => {
+      const visible = items.filter((x) => !x.hidden);
+      const list = visible.map((x) => VIEWER[Number(x.dataset.index)]);
+      const at = visible.indexOf(el);
+      track('gallery_open', { index: Number(el.dataset.index) });
+      window.tsViewer?.open(list, at, el);
+    })
+  );
 </script>

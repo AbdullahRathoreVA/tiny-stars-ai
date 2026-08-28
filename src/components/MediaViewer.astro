@@ -1,0 +1,235 @@
+---
+/**
+ * One media viewer for the whole site.
+ *
+ * The homepage strip and the gallery both need a full-screen photo/video
+ * viewer with keyboard and swipe navigation. Building it twice would mean two
+ * focus traps to keep correct and two places for a video to keep playing after
+ * close, so the markup lives here once and callers hand it a list:
+ *
+ *   window.tsViewer.open(items, index)
+ *
+ * `items` is an array of { kind, alt, caption, img, video, poster, generated,
+ * tracks }. Anything a caller does not supply is simply absent, so a page that
+ * only has photographs never touches the video branch.
+ */
+import Icon from './Icon.astro';
+---
+
+<div class="mv" data-media-viewer hidden>
+  <div class="mv__scrim" data-mv-close></div>
+  <div class="mv__panel" role="dialog" aria-modal="true" aria-label="Media viewer">
+    <button type="button" class="mv__btn mv__btn--close" data-mv-close aria-label="Close">
+      <Icon name="x" size={20} />
+    </button>
+    <button type="button" class="mv__btn mv__btn--prev" data-mv-step="-1" aria-label="Previous">
+      <Icon name="chevron" size={22} />
+    </button>
+
+    <figure class="mv__figure">
+      <img data-mv-image alt="" hidden />
+      <video data-mv-video controls playsinline preload="none" hidden></video>
+      <figcaption>
+        <span data-mv-caption></span>
+        <small data-mv-note hidden>AI-generated. Not footage of the real centre.</small>
+      </figcaption>
+    </figure>
+
+    <button type="button" class="mv__btn mv__btn--next" data-mv-step="1" aria-label="Next">
+      <Icon name="chevron" size={22} />
+    </button>
+    <p class="mv__count" data-mv-count></p>
+  </div>
+</div>
+
+<script is:inline>
+  (() => {
+    const viewer = document.querySelector('[data-media-viewer]');
+    if (!viewer) return;
+    const image = viewer.querySelector('[data-mv-image]');
+    const video = viewer.querySelector('[data-mv-video]');
+    const caption = viewer.querySelector('[data-mv-caption]');
+    const note = viewer.querySelector('[data-mv-note]');
+    const count = viewer.querySelector('[data-mv-count]');
+    const panel = viewer.querySelector('.mv__panel');
+
+    let items = [];
+    let index = 0;
+    let opener = null;
+
+    const show = (i) => {
+      if (!items.length) return;
+      index = (i + items.length) % items.length;
+      const m = items[index];
+
+      // Stop the previous clip before swapping source, or its audio keeps
+      // running underneath the next one.
+      video.pause();
+      video.querySelectorAll('track').forEach((t) => t.remove());
+
+      if (m.kind === 'video') {
+        video.src = m.video;
+        if (m.poster) video.poster = m.poster;
+        video.setAttribute('aria-label', m.alt || '');
+        const tracks = m.tracks || {};
+        if (tracks.captions) {
+          const t = document.createElement('track');
+          t.kind = 'captions'; t.label = 'English captions'; t.srclang = 'en';
+          t.src = tracks.captions; t.default = true;
+          video.appendChild(t);
+        }
+        if (tracks.descriptions) {
+          const d = document.createElement('track');
+          d.kind = 'descriptions'; d.label = 'English descriptions'; d.srclang = 'en';
+          d.src = tracks.descriptions;
+          video.appendChild(d);
+        }
+        video.hidden = false;
+        image.hidden = true;
+        image.removeAttribute('src');
+      } else {
+        image.src = m.img;
+        image.alt = m.alt || '';
+        image.hidden = false;
+        video.hidden = true;
+        video.removeAttribute('src');
+        video.load();
+      }
+
+      caption.textContent = m.caption || '';
+      note.hidden = !m.generated;
+      count.textContent = `${index + 1} of ${items.length}`;
+    };
+
+    const close = () => {
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+      viewer.hidden = true;
+      document.documentElement.style.overflow = '';
+      if (opener && document.contains(opener)) opener.focus();
+      opener = null;
+    };
+
+    window.tsViewer = {
+      open(list, i, from) {
+        if (!list || !list.length) return;
+        items = list;
+        opener = from || null;
+        viewer.hidden = false;
+        document.documentElement.style.overflow = 'hidden';
+        show(i || 0);
+        panel.querySelector('.mv__btn--close').focus();
+      },
+      close,
+    };
+
+    viewer.querySelectorAll('[data-mv-close]').forEach((el) =>
+      el.addEventListener('click', close)
+    );
+    viewer.querySelectorAll('[data-mv-step]').forEach((el) =>
+      el.addEventListener('click', () => show(index + Number(el.dataset.mvStep)))
+    );
+
+    document.addEventListener('keydown', (e) => {
+      if (viewer.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowRight') show(index + 1);
+      else if (e.key === 'ArrowLeft') show(index - 1);
+      else if (e.key === 'Tab') {
+        const focusable = [...panel.querySelectorAll('button, video[controls]')].filter(
+          (el) => !el.hidden && el.offsetParent !== null
+        );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+
+    // Swipe, for the hand already holding the phone.
+    let x0 = null;
+    panel.addEventListener('touchstart', (e) => { x0 = e.changedTouches[0].clientX; }, { passive: true });
+    panel.addEventListener('touchend', (e) => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 55) show(index + (dx < 0 ? 1 : -1));
+      x0 = null;
+    }, { passive: true });
+  })();
+</script>
+
+<style>
+  .mv {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay, 70);
+    display: grid;
+    place-items: center;
+  }
+  .mv[hidden] { display: none; }
+  .mv__scrim {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklab, var(--ink-900) 88%, transparent);
+    backdrop-filter: blur(4px);
+  }
+  .mv__panel {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-xs);
+    width: min(100%, 68rem);
+    padding: 3.2rem 0.5rem calc(2.6rem + env(safe-area-inset-bottom, 0px));
+  }
+  .mv__figure {
+    grid-column: 2;
+    margin: 0;
+    display: grid;
+    justify-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+  .mv__figure img,
+  .mv__figure video {
+    max-width: 100%;
+    max-height: min(70vh, 40rem);
+    border-radius: var(--radius-m);
+    background: #000;
+  }
+  .mv__figure figcaption {
+    color: var(--cream-100);
+    font-size: var(--step--1);
+    text-align: center;
+    display: grid;
+    gap: 0.2rem;
+  }
+  .mv__figure small { color: var(--gold-400); font-weight: 650; }
+
+  .mv__btn {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 0;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--cream-50) 18%, transparent);
+    color: #fff;
+    cursor: pointer;
+  }
+  .mv__btn:hover { background: color-mix(in oklab, var(--cream-50) 30%, transparent); }
+  .mv__btn--close { position: absolute; top: 0.6rem; right: 0.6rem; }
+  .mv__btn--prev :global(svg) { transform: rotate(180deg); }
+  .mv__count {
+    position: absolute;
+    bottom: calc(0.8rem + env(safe-area-inset-bottom, 0px));
+    inset-inline: 0;
+    text-align: center;
+    color: color-mix(in oklab, var(--cream-100) 70%, transparent);
+    font-size: var(--step--2);
+    margin: 0;
+  }
+</style>
