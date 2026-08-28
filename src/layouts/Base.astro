@@ -75,9 +75,15 @@ const fullTitle = title.includes('Tiny Stars') ? title : `${title} · Tiny Stars
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Upright as a full variable range; italic as ONE instance (opsz 144,
+         weight 600), which is all the hero headline uses. Without an italic
+         face the browser synthesised an oblique by slanting the upright, which
+         on a serif looks like a mistake. The full italic range is +171KB and
+         the SOFT/WONK axes another +254KB on top; one instance is +19KB for a
+         latin visitor, which is the version worth paying for. -->
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@400..700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,144,600&family=Inter:wght@400..700&display=swap"
     />
 
     {schema.map((s) => (
