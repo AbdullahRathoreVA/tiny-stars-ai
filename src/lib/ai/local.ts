@@ -125,7 +125,7 @@ const SMALL_TALK: { test: RegExp; reply: string; followUps: string[] }[] = [
   {
     test: /^\s*(hi|hii+|hey+|hello+|yo|hiya|howdy|salam|assalamu? ?alaikum|good (morning|afternoon|evening))\b(\s+(there|guys|team|all|everyone|star guide))?[\s!.,?]*$/i,
     reply: [
-      "Hello. I'm Star Guide, the assistant for Tiny Stars. Ask me about the programs, what a day looks like, safety, or booking a tour.",
+      "Hello. I'm Stella, the Tiny Stars star guide. Ask me about the programs, what a day looks like, safety, or booking a tour.",
       "One thing worth knowing up front: I only use what Tiny Stars has actually published. If something has not been published — fees, availability, ratios — I will tell you that rather than guess, and point you at someone who can answer properly.",
     ].join('\n\n'),
     followUps: ['What programs do you offer?', 'What happens during the day?', 'How do I book a tour?'],
@@ -145,7 +145,7 @@ const SMALL_TALK: { test: RegExp; reply: string; followUps: string[] }[] = [
   {
     test: /\b(what can you do|what do you do|who are you|what are you|are you (a )?(real|human|person|bot|robot|ai)|how do you work|are you chatgpt)\b/i,
     reply: [
-      "I'm Star Guide — software, not a person, and I will not pretend otherwise.",
+      "I'm Stella — software, not a person, and I will not pretend otherwise.",
       "I answer from what Tiny Stars has published and show you where each answer came from. I can help you find the right program for your child's age, explain what a day looks like, walk through the published safety policies, and get you to a tour booking. What I cannot do is invent a fee, a vacancy or a ratio, so when those come up I hand you to the team.",
     ].join('\n\n'),
     followUps: ['What programs do you offer?', 'Tell me about safety', 'How do I book a tour?'],

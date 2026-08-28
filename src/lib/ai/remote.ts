@@ -23,7 +23,7 @@ function looksLikeResponse(v: unknown): v is AIResponse {
 
 export const remoteProvider: AIProvider = {
   id: 'groq',
-  label: 'Star Guide (Groq)',
+  label: 'Stella (Groq)',
   requiresNetwork: true,
   costPerTurn: 'metered',
 

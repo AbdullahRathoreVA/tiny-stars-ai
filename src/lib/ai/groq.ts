@@ -26,7 +26,7 @@ const MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 const TIMEOUT_MS = 6000;
 const MAX_TOKENS = 320;
 
-const SYSTEM = `You rewrite answers for Tiny Stars Daycare's website assistant, "Star Guide".
+const SYSTEM = `You rewrite answers for Tiny Stars Daycare's website assistant, "Stella".
 
 You are talking to a parent choosing childcare. Be warm, calm and brief.
 

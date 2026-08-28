@@ -246,7 +246,7 @@ const schema = [organizationSchema, websiteSchema];
 
         <div class="guide__copy">
           <p class="eyebrow eyebrow--plain guide__eyebrow">
-            <Icon name="sparkles" size={15} /> Star Guide
+            <Icon name="sparkles" size={15} /> Stella
           </p>
           <h2 id="guide-title">An assistant that would rather say “I don't know”</h2>
           <p>
@@ -257,7 +257,7 @@ const schema = [organizationSchema, websiteSchema];
           <div class="guide__actions">
             <button type="button" class="btn btn--primary" data-concierge-open>
               <Icon name="chat" size={18} />
-              Ask Star Guide
+              Ask Stella
             </button>
             <a href="/command-center" class="btn btn--on-dark">
               See how it works
@@ -745,7 +745,7 @@ const schema = [organizationSchema, websiteSchema];
 </style>
 
 <script>
-  // Sample questions on the Star Guide panel open the concierge pre-loaded.
+  // Sample questions on Stella's panel open the concierge pre-loaded.
   document.querySelectorAll<HTMLButtonElement>('.guide__sample[data-ask]').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.dispatchEvent(

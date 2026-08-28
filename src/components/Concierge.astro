@@ -1,11 +1,12 @@
 ---
 import Icon from './Icon.astro';
+import StellaMark from './StellaMark.astro';
 import { site } from '../data/site';
 ---
 
 <button type="button" class="cg-launch" data-concierge-open aria-haspopup="dialog" aria-controls="concierge">
-  <span class="cg-launch__mark" aria-hidden="true"><Icon name="star" size={17} /></span>
-  <span class="cg-launch__text">Ask Star&nbsp;Guide</span>
+  <span class="cg-launch__mark" aria-hidden="true"><StellaMark size={22} /></span>
+  <span class="cg-launch__text">Ask Stella</span>
 </button>
 
 <div class="cg" id="concierge" hidden>
@@ -13,12 +14,12 @@ import { site } from '../data/site';
 
   <div class="cg__panel" role="dialog" aria-modal="true" aria-labelledby="cg-title">
     <header class="cg__head">
-      <span class="cg__avatar" aria-hidden="true"><Icon name="star" size={18} /></span>
+      <span class="cg__avatar" aria-hidden="true"><StellaMark size={24} /></span>
       <div class="cg__id">
-        <h2 id="cg-title">Star Guide</h2>
-        <p data-cg-status>Tiny Stars concierge · answers from published information</p>
+        <h2 id="cg-title">Stella</h2>
+        <p data-cg-status>Star Guide · Tiny Stars’ assistant, not a person</p>
       </div>
-      <button type="button" class="cg__close" data-concierge-close aria-label="Close Star Guide">
+      <button type="button" class="cg__close" data-concierge-close aria-label="Close Stella">
         <Icon name="x" size={19} />
       </button>
     </header>
@@ -30,7 +31,7 @@ import { site } from '../data/site';
     <div class="cg__chips" data-cg-chips></div>
 
     <form class="cg__form" data-cg-form>
-      <label for="cg-input" class="visually-hidden">Ask Star Guide a question</label>
+      <label for="cg-input" class="visually-hidden">Ask Stella a question</label>
       <input
         type="text"
         id="cg-input"
@@ -46,7 +47,7 @@ import { site } from '../data/site';
     </form>
 
     <footer class="cg__foot">
-      <span>Star Guide only uses what Tiny Stars has published.</span>
+      <span>Stella only uses what Tiny Stars has published.</span>
       <a href={site.phone.href} data-track="concierge_handoff">Talk to a person</a>
     </footer>
   </div>
@@ -83,11 +84,10 @@ import { site } from '../data/site';
     color: var(--gold-400);
     flex: none;
   }
-  .cg-launch__mark :global(svg) { fill: currentColor; stroke-width: 1.2; }
 
   /* On a phone the launcher becomes a circle and sits above the mobile bar.
      It used to hide entirely and hand the job to the bar's "Ask" button, which
-     made the assistant invisible — nothing on screen said Star Guide existed.
+     made the assistant invisible — nothing on screen said Stella existed.
      The bar gave up that slot in exchange, so there is still exactly one way
      in, and now it is one you can see. */
   @media (max-width: 900px) {
@@ -165,7 +165,6 @@ import { site } from '../data/site';
     color: var(--gold-400);
     flex: none;
   }
-  .cg__avatar :global(svg) { fill: currentColor; stroke-width: 1.2; }
   .cg__id { flex: 1; min-width: 0; }
   .cg__id h2 {
     font-family: var(--font-display);
@@ -444,7 +443,7 @@ import { site } from '../data/site';
     const el = document.createElement('div');
     el.className = 'cg-msg cg-msg--bot';
     el.innerHTML =
-      '<div class="cg-bubble"><span class="cg-typing" role="status" aria-label="Star Guide is thinking"><span></span><span></span><span></span></span></div>';
+      '<div class="cg-bubble"><span class="cg-typing" role="status" aria-label="Stella is thinking"><span></span><span></span><span></span></span></div>';
     log.append(el);
     scrollDown();
     return el;
@@ -576,7 +575,7 @@ import { site } from '../data/site';
     el.className = 'cg-msg cg-msg--bot';
     el.innerHTML = `
       <div class="cg-bubble">
-        <p>Hello — I’m Star Guide.</p>
+        <p>Hello — I’m Stella.</p>
         <p>I can help you find the right program, understand how enrolment works, or get you booked in for a visit. I only use what Tiny Stars has actually published, and I’ll say so plainly when something hasn’t been.</p>
       </div>`;
     log.append(el);

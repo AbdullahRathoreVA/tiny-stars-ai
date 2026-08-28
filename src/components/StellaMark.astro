@@ -1,0 +1,58 @@
+---
+/**
+ * Stella's mark — the star from the Tiny Stars logo, redrawn as vector.
+ *
+ * The logo is a 264px raster, so lifting the star out of it by cropping would
+ * give a soft 40px smudge on a retina screen. This is the same five-pointed
+ * shape at the same proportions, filled with the logo's own gold and outlined
+ * in its purple, so it stays crisp at any size and still reads as coming from
+ * the wordmark rather than from an icon set.
+ *
+ * `tone="on-dark"` drops the purple outline: against the deep purple panel it
+ * would only muddy the edge.
+ */
+interface Props {
+  size?: number;
+  tone?: 'on-light' | 'on-dark';
+  class?: string;
+}
+const { size = 24, tone = 'on-dark', class: cls = '' } = Astro.props;
+const uid = `stella-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<svg
+  class:list={['stella-mark', cls]}
+  width={size}
+  height={size}
+  viewBox="0 0 48 48"
+  fill="none"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <linearGradient id={uid} x1="24" y1="4" x2="24" y2="44" gradientUnits="userSpaceOnUse">
+      <!-- The gradient in the logo's TINY: gold at the top, amber at the foot. -->
+      <stop offset="0" stop-color="#ffd05c" />
+      <stop offset="0.55" stop-color="#f0b830" />
+      <stop offset="1" stop-color="#f0a058" />
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M24 3.5 30.1 17.2 45 18.9 34 29.1 37 43.8 24 36.4 11 43.8 14 29.1 3 18.9 17.9 17.2Z"
+    fill={`url(#${uid})`}
+    stroke={tone === 'on-light' ? '#402078' : 'none'}
+    stroke-width={tone === 'on-light' ? 2.6 : 0}
+    stroke-linejoin="round"
+  />
+  <!-- The small sparkle that sits beside the star in the artwork. -->
+  <path
+    d="M39.5 8.2 40.6 11.1 43.5 12.2 40.6 13.3 39.5 16.2 38.4 13.3 35.5 12.2 38.4 11.1Z"
+    fill={tone === 'on-light' ? '#e078b0' : '#ffe0f2'}
+    opacity="0.95"
+  />
+</svg>
+
+<style>
+  .stella-mark { display: block; flex: none; }
+</style>
