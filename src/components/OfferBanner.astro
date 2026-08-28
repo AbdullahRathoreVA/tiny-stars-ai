@@ -1,0 +1,216 @@
+---
+/**
+ * The current promotion, as a band rather than a modal.
+ *
+ * tinystars.ca runs this as a pop-up that covers the page on arrival. That is
+ * the one interaction a tired parent on a phone reliably resents: it arrives
+ * before they have read anything, it has to be dismissed to see the site, and
+ * on a small screen the close control is the smallest thing on it. The offer is
+ * worth showing — it is real, and $100 matters — so it stays, in a form that
+ * does not stand in front of the page.
+ *
+ * It also does something the original cannot: it says what the offer does not
+ * state. An end date, whether it stacks with subsidy, and how it lands on an
+ * invoice are the first three things a parent will ask, and none are published.
+ * Saying so is the difference between an advert and information.
+ *
+ * Dismissal is remembered per browser, session-scoped, and never leaves the
+ * device.
+ */
+import Icon from './Icon.astro';
+import { offer } from '../data/offer';
+import { site } from '../data/site';
+---
+
+{offer.active && (
+  <aside class="offer" data-offer aria-labelledby="offer-title" hidden>
+    <div class="container offer__inner">
+      <span class="offer__mark" aria-hidden="true">
+        <Icon name="star" size={18} />
+      </span>
+
+      <p class="offer__copy">
+        <strong id="offer-title">{offer.headline}</strong>
+        <span>{offer.terms}</span>
+        <small>{offer.reason}</small>
+      </p>
+
+      <span class="offer__actions">
+        <a href="/enroll/book-a-tour" class="offer__cta" data-track="tour_cta_click" data-track-label="offer">
+          Book a tour
+        </a>
+        <a href={site.phone.href} class="offer__call" data-track="phone_click">
+          <Icon name="phone" size={15} />
+          <span class="offer__call-text">{site.phone.label}</span>
+        </a>
+      </span>
+
+      <details class="offer__terms">
+        <summary>What this doesn't say</summary>
+        <p>
+          Tiny Stars publishes the offer, not its conditions — {offer.unstated.join(', ')} are
+          not stated anywhere. Ask the team and they will tell you.
+          <span class="offer__src">Quoted from {offer.source}, checked {offer.confirmedOn}.</span>
+        </p>
+      </details>
+
+      <button type="button" class="offer__close" data-offer-close aria-label="Dismiss this offer">
+        <Icon name="x" size={16} />
+      </button>
+    </div>
+  </aside>
+)}
+
+<script>
+  // Rendered hidden and revealed here, so a returning visitor who dismissed it
+  // never sees it flash in before the script runs.
+  const KEY = 'ts:offer-dismissed';
+  const band = document.querySelector<HTMLElement>('[data-offer]');
+
+  if (band) {
+    let dismissed = false;
+    try {
+      dismissed = sessionStorage.getItem(KEY) === '1';
+    } catch {
+      /* private mode — showing it again is the harmless failure */
+    }
+    band.hidden = dismissed;
+
+    band.querySelector('[data-offer-close]')?.addEventListener('click', () => {
+      band.hidden = true;
+      try {
+        sessionStorage.setItem(KEY, '1');
+      } catch {
+        /* nothing to do; it simply reappears next visit */
+      }
+    });
+  }
+</script>
+
+<style>
+  .offer {
+    position: relative;
+    /* The logo's three colours, in the logo's order. */
+    background: linear-gradient(100deg, var(--ink-900) 0%, var(--violet-700) 42%, var(--blush-700) 100%);
+    color: var(--cream-50);
+  }
+  .offer[hidden] { display: none; }
+
+  .offer__inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-block: 0.6rem;
+    padding-right: 2.5rem;
+    min-width: 0;
+  }
+
+  .offer__mark {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--gold-400) 24%, transparent);
+    color: var(--gold-400);
+  }
+  .offer__mark :global(svg) { fill: currentColor; }
+
+  .offer__copy {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.55rem;
+    margin: 0;
+    min-width: 0;
+    flex: 1 1 14rem;
+  }
+  .offer__copy strong {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    color: var(--gold-400);
+    line-height: 1.1;
+  }
+  .offer__copy span { font-size: var(--step--1); font-weight: 600; }
+  .offer__copy small {
+    font-size: var(--step--2);
+    color: color-mix(in oklab, var(--cream-100) 76%, transparent);
+    flex-basis: 100%;
+  }
+
+  .offer__actions { display: flex; align-items: center; gap: 0.5rem; flex: none; }
+
+  .offer__cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 1rem;
+    border-radius: var(--radius-pill);
+    background: var(--gold-400);
+    color: var(--ink-900);
+    font-size: var(--step--1);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .offer__cta:hover { background: var(--gold-200); color: var(--ink-900); }
+
+  .offer__call {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 44px;
+    padding: 0 0.7rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid color-mix(in oklab, #fff 34%, transparent);
+    color: var(--cream-50);
+    font-size: var(--step--1);
+    font-weight: 650;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .offer__call:hover { background: color-mix(in oklab, #fff 12%, transparent); color: var(--cream-50); }
+
+  .offer__terms { flex-basis: 100%; font-size: var(--step--2); }
+  .offer__terms summary {
+    cursor: pointer;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    color: color-mix(in oklab, var(--cream-100) 82%, transparent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .offer__terms p {
+    margin: 0.35rem 0 0.2rem;
+    max-width: 60ch;
+    line-height: var(--leading-normal);
+    color: color-mix(in oklab, var(--cream-100) 88%, transparent);
+  }
+  .offer__src { display: block; margin-top: 0.2rem; opacity: 0.72; }
+
+  .offer__close {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.5rem;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: color-mix(in oklab, var(--cream-100) 82%, transparent);
+    cursor: pointer;
+  }
+  .offer__close:hover { background: color-mix(in oklab, #fff 14%, transparent); color: #fff; }
+
+  /* The phone number itself is long; on a narrow row the icon carries it and
+     the label is still there for a screen reader. */
+  @media (max-width: 30rem) {
+    .offer__call-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    .offer__call { padding-inline: 0.75rem; }
+  }
+</style>

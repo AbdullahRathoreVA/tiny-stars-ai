@@ -1,4 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="8" fill="#17162b"/>
-  <path d="M16 6.5 18.7 12.6 25.3 13.2 20.3 17.5 21.8 24 16 20.6 10.2 24 11.7 17.5 6.7 13.2 13.3 12.6Z" fill="#f2be4c"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Tiny Stars">
+  <!-- The star that replaces the A in the Tiny Stars wordmark. The full logo is
+       unreadable at 16px; this is the part of it that survives. Gold on the
+       brand purple reads on both a light and a dark tab strip. -->
+  <rect width="32" height="32" rx="7" fill="#402078"/>
+  <path d="M16 4.6 19.1 12.1 27.2 12.8 21.1 18.1 22.9 26 16 21.8 9.1 26 10.9 18.1 4.8 12.8 12.9 12.1Z" fill="#ffd05c"/>
+  <path d="M16 6.2 18.9 13.2 26.4 13.9 20.7 18.9 22.4 26.2 16 22.4 9.6 26.2 11.3 18.9 5.6 13.9 13.1 13.2Z" fill="#f0b830"/>
 </svg>

@@ -1,0 +1,19 @@
+{
+  "name": "Tiny Stars Daycare",
+  "short_name": "Tiny Stars",
+  "description": "Family-owned, licensed and insured childcare in Grande Prairie, Alberta, for children 12 months to 12 years.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8fe",
+  "theme_color": "#faf8fe",
+  "icons": [
+    { "src": "/assets/brand/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/brand/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "/assets/brand/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
