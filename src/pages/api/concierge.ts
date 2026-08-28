@@ -73,6 +73,12 @@ export const POST: APIRoute = async ({ request }) => {
   // is built to avoid, and a parent has no way to tell it apart from a fact.
   const CENTRE_SPECIFIC = [
     'fees?', 'costs?', 'prices?', 'pricing', 'tuition', 'rates?', 'subsid\\w*', 'afford\\w*', 'deposit',
+    // Money without the word: "how much is it per month" contains none of the
+    // terms above, and slipped through to the general model. It answered safely
+    // because the prompt forbids fees, but the gate is what must hold — the
+    // prompt is the second line of defence, not the first.
+    'how much (?:is|are|do|does|would|will|per|for|to)', 'per month', 'per week', 'per day', 'a month', 'monthly', 'weekly',
+    'charge', 'charges', 'expensive', 'cheap', 'budget',
     'availab\\w*', 'vacanc\\w*', 'openings?', 'waitlist', 'wait list', 'spots?',
     'ratios?', 'staff.to.child', 'how many (?:staff|educators|children|kids)',
     'closing time', 'opening time', 'what time (?:do|does|are)', 'hours',
