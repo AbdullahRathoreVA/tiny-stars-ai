@@ -394,7 +394,7 @@ const schema = [
          </div>`
       : program
         ? `<div class="rmatch">
-             <img src="${program.image}" alt="Children in the ${esc(program.name)} program at Tiny Stars" width="360" height="270" loading="lazy" decoding="async" />
+             <img src="${program.image}" alt="${esc(program.imageAlt)}" width="360" height="270" loading="lazy" decoding="async" />
              <div>
                <p class="rmatch__age">${esc(program.ageLabel)}</p>
                <p class="rmatch__name">${esc(program.name)} <span style="font-size:var(--step--1);font-weight:450;color:var(--text-muted)">· ${esc(program.familiar)}</span></p>

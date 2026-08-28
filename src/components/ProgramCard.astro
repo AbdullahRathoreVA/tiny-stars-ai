@@ -14,7 +14,7 @@ const { program: p, eager = false } = Astro.props;
   <span class="pcard__media">
     <img
       src={p.image}
-      alt={`Children in the ${p.name} program at Tiny Stars`}
+      alt={p.imageAlt}
       width="480"
       height="320"
       loading={eager ? 'eager' : 'lazy'}

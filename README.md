@@ -261,8 +261,17 @@ Still to wire up before launch, all of them deliberate gaps rather than oversigh
 
 ## Assets
 
-All photography, video and PDFs are Tiny Stars' own, mirrored from tinystars.ca. There is no
-stock imagery anywhere. The `/experience/gallery` set is spaces only. The "Inside Tiny Stars"
-media added later does show children at the centre; it was supplied by Tiny Stars, and
-`SHOW_CHILDREN` in [`src/data/media.ts`](src/data/media.ts) turns all of it off in one edit if
-a family asks. One supplied clip is AI-generated and is labelled as such wherever it appears.
+All photography, video and PDFs are Tiny Stars' own. The `/experience/gallery` set is spaces
+only. The "Inside Tiny Stars" media does show children at the centre; it was supplied by Tiny
+Stars, and `SHOW_CHILDREN` in [`src/data/media.ts`](src/data/media.ts) turns all of it off in
+one edit if a family asks. One supplied clip is AI-generated and is labelled as such wherever
+it appears.
+
+The section and program headers used to be an exception, and this file used to claim they were
+not. They were stock photography — other people's children, carried over when the page was
+mirrored from tinystars.ca — on a site whose entire argument is that it shows the real place.
+They now come from the centre's own footage: a 4K drone scan of the yard, a walkthrough of the
+rooms, and two supplied room photographs.
+[`scripts/stills.py`](scripts/stills.py) cuts them, and records the exact clip and timestamp
+behind every file — so any one of them can be re-cut, or replaced from a newer shoot, without
+guesswork.

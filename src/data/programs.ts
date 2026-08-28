@@ -36,6 +36,14 @@ export interface Program {
   stageNotes: string[];
   priorities: Priority[];
   image: string;
+  /**
+   * Written after looking at the photograph, describing only what is in it.
+   * The alt used to be generated from the program name — "Children in the
+   * Twinkle Stars program" — which was wrong twice over: the photographs are
+   * of rooms and the yard with nobody in them, and nothing Tiny Stars has
+   * published says which room belongs to which program.
+   */
+  imageAlt: string;
   accent: 'blush' | 'marigold' | 'teal' | 'violet' | 'sky';
   questions: ProgramQuestion[];
 }
@@ -59,6 +67,8 @@ export const programs: Program[] = [
     ],
     priorities: ['safety', 'routine', 'communication'],
     image: '/assets/images/programs/infant.webp',
+    imageAlt:
+      'A Tiny Stars room with a painted rainbow-and-cloud mural along one wall, a round alphabet rug, low wooden shelves of toys and a high chair',
     accent: 'blush',
     questions: [
       {
@@ -96,6 +106,8 @@ export const programs: Program[] = [
     ],
     priorities: ['learning', 'social', 'outdoor', 'creativity'],
     image: '/assets/images/programs/toddler.webp',
+    imageAlt:
+      'Low open shelving in a Tiny Stars room, stacked with wooden and plastic toy trucks, buses and cars within reach',
     accent: 'marigold',
     questions: [
       {
@@ -128,6 +140,8 @@ export const programs: Program[] = [
     ],
     priorities: ['learning', 'social', 'creativity', 'routine'],
     image: '/assets/images/programs/preschool.webp',
+    imageAlt:
+      'A Tiny Stars room with low shelves of blocks and sorting trays, a round alphabet rug and an activity table at child height',
     accent: 'teal',
     questions: [
       {
@@ -159,6 +173,8 @@ export const programs: Program[] = [
     ],
     priorities: ['safety', 'social', 'routine'],
     image: '/assets/images/programs/kindergarden.webp',
+    imageAlt:
+      'A Tiny Stars classroom with child-height tables and chairs, low wooden shelving stocked with materials, and a blue feature wall',
     accent: 'violet',
     questions: [
       {
@@ -185,6 +201,8 @@ export const programs: Program[] = [
     ],
     priorities: ['learning', 'social', 'creativity', 'routine'],
     image: '/assets/images/programs/out-of-school.webp',
+    imageAlt:
+      'The fenced outdoor play area at Tiny Stars seen from above: green turf, a climbing frame with a slide, picnic benches and a shade canopy',
     accent: 'sky',
     questions: [
       {
@@ -204,6 +222,8 @@ export const enrichment = {
     'Optional small group enrichment classes allowing children to explore their favourite interests or strengthen important skills during the day.',
   officialSource: 'tinystars.ca — Our Programs',
   image: '/assets/images/programs/enrichment.webp',
+  imageAlt:
+    'A Tiny Stars classroom with a large storybook landscape mural, child-height tables and chairs, and an activity table topped with coloured squares',
 };
 
 export const priorityLabels: Record<Priority, { label: string; help: string }> = {
