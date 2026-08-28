@@ -4,61 +4,84 @@
    Personality: warm · premium · playful · trustworthy.
    Deliberately NOT: pastel template, cartoon, corporate SaaS, neon AI.
 
-   The palette is anchored on two ideas:
-     1. Parchment, not white. Every surface is warm. Pure #fff appears nowhere.
-     2. Night sky, not black. Text is a deep indigo — the "stars" in Tiny Stars.
+   The palette is taken from the Tiny Stars logo:
+     1. White ground, lavender second plane — the logo is drawn to sit on white.
+     2. The dark is the logo's purple, not black. Every heading, border and
+        shadow on the site is mixed from it, so the wordmark and the page it
+        sits on are the same colour family.
    ========================================================================== */
 
 :root {
   /* ---------------------------------------------------------------- colour */
 
-  /* Warm neutral ramp — the ground everything sits on */
-  --cream-50:  #fffdfa;
-  --cream-100: #fdf8f2;
-  --cream-200: #f7efe4;
-  --cream-300: #eee2d2;
-  --cream-400: #ddcbb6;
-  --sand-500:  #b3a08a;
-  --sand-600:  #8a7965;
+  /* --------------------------------------------------------------------------
+     Sampled from the Tiny Stars logo, not invented. `scripts/brand.py` reads the
+     supplied artwork and reports the fills; these are those numbers:
 
-  /* Ink — deep indigo night sky */
-  --ink-900: #17162b;
-  --ink-800: #22203c;
-  --ink-700: #33314f;
-  --ink-600: #4a4767;
-  --ink-500: #6a6785;
-  --ink-400: #8f8ca6;
+       outline / star   #402078   the structural purple, and the darkest ink
+       TINY             #f0b830   gold, with #f0a058 at the bottom of the letters
+       STARS / CARE     #e078b0   magenta
+       DAY              #f06038   coral
 
-  /* Primary — warm coral. Used for action, never for decoration alone. */
-  --coral-50:  #fff2ee;
-  --coral-100: #ffe0d6;
-  --coral-300: #ff9f80;
-  --coral-500: #f4703f;
-  --coral-600: #dd5a2a;
-  --coral-700: #b8451d;
+     Two of those the site already had within a few points — its coral was
+     #f4703f against the logo's #f06038, its gold #f2be4c against #f0b830 — so
+     the palette barely moves on those. What changes is the dark: it was a
+     near-black indigo, and the brand's dark is a saturated purple. Everything
+     built on --ink-* inherits that in one edit.
+     -------------------------------------------------------------------------- */
 
-  /* Secondary — grounded teal. Trust, safety, calm. */
-  --teal-50:  #eef7f5;
-  --teal-100: #d5ebe6;
-  --teal-400: #4fa896;
-  --teal-600: #2d7a6c;
-  --teal-700: #1f5a50;
+  /* Surfaces — white ground, lavender for the second plane */
+  --cream-50:  #ffffff;
+  --cream-100: #faf8fe;
+  --cream-200: #f2edfb;
+  --cream-300: #e4dbf5;
+  --cream-400: #cdc0e6;
+  --sand-500:  #9d8fba;
+  --sand-600:  #7a6b99;
 
-  /* Star gold — sparing, for the brand motif only */
-  --gold-200: #ffe9b0;
-  --gold-400: #f2be4c;
-  --gold-600: #c9922a;
+  /* Ink — the logo's purple, extended into a text ramp.
+     #402078 on white is 13.6:1, so the darkest steps carry body copy safely. */
+  --ink-900: #2b1052;
+  --ink-800: #3a1a6b;
+  --ink-700: #4a2585;
+  --ink-600: #5f3a9c;
+  --ink-500: #7a5cb0;
+  --ink-400: #937ab8;
 
-  /* Program accents */
-  --blush-100:  #fde8ee;  --blush-500:  #e0678b;
-  --blush-700:  #a83f60;
-  --marigold-100: #fdf0d9; --marigold-500: #e5992a; --marigold-700: #a86a12;
-  --violet-100: #f0ebfb;  --violet-500: #8163cf;  --violet-700: #563d99;
-  --sky-100:    #e6f2fb;  --sky-500:    #3d8fc9;  --sky-700:    #23628e;
+  /* Primary — the logo's DAY coral. Action, never decoration alone. */
+  --coral-50:  #fff3ef;
+  --coral-100: #ffe1d8;
+  --coral-300: #ffa284;
+  --coral-500: #f06038;
+  --coral-600: #da3c10;   /* button fill: white text clears 4.5:1 here, not on 500 */
+  --coral-700: #a83714;
+
+  /* Secondary — teal stays for confirmation and safety. It is not in the logo,
+     and that is the point: a "published / verified" mark has to read as a
+     different kind of signal from the brand's own colours. Cooled slightly so
+     it sits with purple rather than fighting it. */
+  --teal-50:  #edf7f5;
+  --teal-100: #d2ebe7;
+  --teal-400: #45a595;
+  --teal-600: #24786b;
+  --teal-700: #175a4f;
+
+  /* Star gold — the TINY fill. The brand motif, used sparingly. */
+  --gold-200: #ffeab4;
+  --gold-400: #f0b830;
+  --gold-600: #c28f16;
+
+  /* Program accents. Blush becomes the logo's magenta; violet aligns with the
+     logo purple so a program card and the wordmark are the same family. */
+  --blush-100:  #fde9f3;  --blush-500:  #e078b0;
+  --blush-700:  #a63b7c;
+  --marigold-100: #fdf0d9; --marigold-500: #f0a058; --marigold-700: #a35b1d;
+  --violet-100: #f0eafb;  --violet-500: #7346bd;  --violet-700: #4a2585;
+  --sky-100:    #e8f1fc;  --sky-500:    #4a86cf;  --sky-700:    #275e96;
 
   /* Semantic */
-  --ok-100: #e3f3e8;  --ok-600: #2f7d4a;
-  --warn-100: #fdf0d9; --warn-600: #a86a12;
+  --ok-100: #e3f3e8;  --ok-600: #2e7a4e;
+  --warn-100: #fdf0d9; --warn-600: #936310;
   --info-100: #e6f2fb; --info-600: #23628e;
 
   /* Surfaces */

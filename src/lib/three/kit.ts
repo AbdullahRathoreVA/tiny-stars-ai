@@ -20,31 +20,31 @@ type THREE = typeof THREE_NS;
 
 /** Mirrors src/styles/tokens.css. Keep in sync. */
 export const PALETTE = {
-  cream50: 0xfffdfa,
-  cream100: 0xfdf8f2,
-  cream200: 0xf7efe4,
-  cream300: 0xeee2d2,
-  sand: 0xb3a08a,
+  cream50: 0xffffff,
+  cream100: 0xfaf8fe,
+  cream200: 0xf2edfb,
+  cream300: 0xe4dbf5,
+  sand: 0x9d8fba,
 
-  ink900: 0x17162b,
-  ink800: 0x22203c,
-  ink700: 0x33314f,
-  ink500: 0x6a6785,
+  ink900: 0x2b1052,
+  ink800: 0x3a1a6b,
+  ink700: 0x4a2585,
+  ink500: 0x7a5cb0,
 
-  coral300: 0xff9f80,
-  coral500: 0xf4703f,
-  coral700: 0xb8451d,
+  coral300: 0xffa284,
+  coral500: 0xf06038,
+  coral700: 0xa83714,
 
-  teal400: 0x4fa896,
-  teal600: 0x2d7a6c,
+  teal400: 0x45a595,
+  teal600: 0x24786b,
 
-  gold200: 0xffe9b0,
-  gold400: 0xf2be4c,
+  gold200: 0xffeab4,
+  gold400: 0xf0b830,
 
-  blush: 0xe0678b,
-  marigold: 0xe5992a,
-  violet: 0x8163cf,
-  sky: 0x3d8fc9,
+  blush: 0xe078b0,
+  marigold: 0xf0a058,
+  violet: 0x7346bd,
+  sky: 0x4a86cf,
 } as const;
 
 /** Per-program accent, matching the 2D program cards exactly. */

@@ -6,6 +6,15 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--", "--port", "4321"],
       "port": 4321
+    },
+    {
+      "name": "crm",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "--disable-warning=ExperimentalWarning",
+        "D:/projects/al-amin-al-tajir-crm/packages/server/src/main.ts"
+      ],
+      "port": 4317
     }
   ]
 }

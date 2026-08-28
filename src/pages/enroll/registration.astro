@@ -286,6 +286,15 @@ const schema = [
       const child = flow.labelFor('childName') || 'your child';
       const program = flow.labelFor('program');
 
+      // Hand it to the Command Center, if one is wired up. This is deliberately
+      // NOT awaited: the parent sees their confirmation immediately, and the
+      // wording upgrades itself a moment later if the CRM accepted it. With no
+      // CRM configured the endpoint answers "not-configured" and the preview
+      // wording below is exactly what it has always been.
+      submitToCrm(data).then((delivered) => {
+        if (delivered) markDelivered(child, program);
+      });
+
       flow.finish(
         `<div class="done__icon">
            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
@@ -316,6 +325,57 @@ const schema = [
       );
     },
   });
+
+  /**
+   * Posts to our own /api/registration, which signs and forwards it to the
+   * private CRM. The browser never learns the CRM address or its secret.
+   * Returns false for every failure mode, so a submission problem can never
+   * turn into a broken confirmation screen for a parent.
+   */
+  async function submitToCrm(data: Record<string, string>): Promise<boolean> {
+    try {
+      const res = await fetch('/api/registration', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          parentName: data.parentName,
+          relationship: data.relationship,
+          childName: data.childName,
+          ageBand: data.ageBand,
+          program: flow.labelFor('program') || data.program,
+          startDate: data.startDate,
+          schedule: flow.labelFor('schedule') || data.schedule,
+          email: data.email,
+          phone: data.phone,
+          questions: data.questions,
+          completedSteps: 5,
+          totalSteps: 5,
+        }),
+      });
+      const body = (await res.json()) as { delivered?: boolean };
+      return body.delivered === true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Swaps the preview wording for a real confirmation, once one is earned. */
+  function markDelivered(child: string, program: string) {
+    const badge = root.querySelector<HTMLElement>('.badge--demo');
+    if (badge) {
+      badge.textContent = 'Received by Tiny Stars';
+      badge.classList.remove('badge--demo');
+    }
+    const heading = root.querySelector<HTMLElement>('.done h3, h3');
+    if (heading) heading.textContent = 'We have your enquiry';
+    const lede = root.querySelector<HTMLElement>('.done .lede, .lede');
+    if (lede) {
+      lede.innerHTML =
+        `Tiny Stars has received an enrolment enquiry for <strong>${esc(child)}</strong>` +
+        `${program ? ` in <strong>${esc(program)}</strong>` : ''}. Someone will be in touch, ` +
+        `and you do not need to fill anything in twice.`;
+    }
+  }
 
   function renderReview() {
     reviewEl.innerHTML =

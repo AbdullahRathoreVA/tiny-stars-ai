@@ -216,8 +216,11 @@ strong, b { font-weight: 650; }
   opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none;
 }
 
-.btn--primary { --btn-bg: var(--coral-500); }
-.btn--primary:hover { --btn-bg: var(--coral-600); }
+/* coral-600, not 500: white on the logo's coral is 3.26:1, which is under AA
+   for the button's 16px semibold label. The lighter coral stays the brand
+   colour everywhere text is not sitting on top of it. */
+.btn--primary { --btn-bg: var(--coral-600); }
+.btn--primary:hover { --btn-bg: var(--coral-700); }
 
 .btn--ink { --btn-bg: var(--ink-900); }
 .btn--ink:hover { --btn-bg: var(--ink-800); }

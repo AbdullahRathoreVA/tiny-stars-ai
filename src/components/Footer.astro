@@ -20,7 +20,17 @@ const year = new Date().getFullYear();
     <div class="ftr__top">
       <div class="ftr__brand">
         <a href="/" class="ftr__logo">
-          <span class="ftr__mark" aria-hidden="true"><Icon name="star" size={20} /></span>
+          <img
+            class="ftr__logo-img"
+            src="/assets/brand/logo-256.png"
+            srcset="/assets/brand/logo-128.png 128w, /assets/brand/logo-256.png 256w"
+            sizes="64px"
+            width="256"
+            height="255"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
           <span>
             <strong>Tiny Stars</strong>
             <small>Daycare · Grande Prairie, Alberta</small>
@@ -131,6 +141,17 @@ const year = new Date().getFullYear();
     display: grid;
     gap: var(--space-xl);
     grid-template-columns: 1fr;
+  }
+
+  /* On the dark footer the logo's own purple outline disappears, so it sits on
+     a soft light plate — the artwork is drawn for a white ground. */
+  .ftr__logo-img {
+    width: 64px;
+    height: auto;
+    flex: none;
+    padding: 6px;
+    border-radius: 14px;
+    background: color-mix(in oklab, #fff 92%, transparent);
   }
 
   .ftr__logo {
