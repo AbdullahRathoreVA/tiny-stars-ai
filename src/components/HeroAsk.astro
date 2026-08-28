@@ -171,6 +171,7 @@ const suggestions = [
 
 <style>
   .hask {
+    min-width: 0;
     margin-top: var(--space-m);
     padding: 0.6rem;
     border: 1px solid var(--border);
@@ -219,6 +220,9 @@ const suggestions = [
 
   .hask__chips {
     display: flex;
+    /* A scroll container still reports its content's min-content width to the
+       layout above unless it is told it may shrink. */
+    min-width: 0;
     gap: 0.35rem;
     list-style: none;
     padding: 0.5rem 0.2rem 0.15rem;

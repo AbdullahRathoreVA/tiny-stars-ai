@@ -85,9 +85,24 @@ import { site } from '../data/site';
   }
   .cg-launch__mark :global(svg) { fill: currentColor; stroke-width: 1.2; }
 
+  /* On a phone the launcher becomes a circle and sits above the mobile bar.
+     It used to hide entirely and hand the job to the bar's "Ask" button, which
+     made the assistant invisible — nothing on screen said Star Guide existed.
+     The bar gave up that slot in exchange, so there is still exactly one way
+     in, and now it is one you can see. */
   @media (max-width: 900px) {
-    /* The mobile bar owns the bottom edge — the launcher steps aside. */
-    .cg-launch { display: none; }
+    .cg-launch {
+      right: 0.75rem;
+      /* Clear of the bar and of the home indicator underneath it. */
+      bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+      width: 56px;
+      height: 56px;
+      min-height: 0;
+      padding: 0;
+      justify-content: center;
+      box-shadow: var(--shadow-l);
+    }
+    .cg-launch__text { display: none; }
   }
 
   /* ---------------------------------------------------------------- panel */

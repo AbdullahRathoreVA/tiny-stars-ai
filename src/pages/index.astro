@@ -321,9 +321,16 @@ const schema = [organizationSchema, websiteSchema];
     position: relative;
     z-index: 1;
     display: grid;
+    /* Explicit, and floored at 0. Without this the column takes its width from
+       the widest min-content inside it — the ask box's nowrap suggestion chips
+       — and the hero copy renders 558px wide inside a 375px phone. body has
+       overflow-x: hidden, so the page does not scroll sideways to show it: it
+       is simply cut off, which is what a parent reports as "I can't see it". */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-xl);
     align-items: center;
   }
+  .hero__grid > * { min-width: 0; }
 
   .hero__eyebrow { align-items: flex-start; line-height: 1.5; }
   .hero__eyebrow :global(svg) { flex: none; margin-top: 0.15em; }

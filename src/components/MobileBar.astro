@@ -8,10 +8,6 @@ import { site } from '../data/site';
     <Icon name="phone" size={20} />
     <span>Call</span>
   </a>
-  <button type="button" class="mbar__item" data-concierge-open>
-    <Icon name="sparkles" size={20} />
-    <span>Ask</span>
-  </button>
   <a href="/enroll/book-a-tour" class="mbar__item mbar__item--primary" data-track="tour_cta_click" data-track-label="mobilebar">
     <Icon name="calendar" size={20} />
     <span>Book a tour</span>
@@ -25,7 +21,10 @@ import { site } from '../data/site';
     bottom: 0;
     z-index: var(--z-mobilebar);
     display: grid;
-    grid-template-columns: 1fr 1fr 1.5fr;
+    /* Two items, not three: asking Star Guide moved to the floating
+       launcher above this bar, so the bar carries only the two things a
+       decided parent reaches for. */
+    grid-template-columns: 1fr 1.6fr;
     gap: 0.4rem;
     padding: 0.5rem 0.6rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
     background: color-mix(in oklab, var(--cream-50) 92%, transparent);
