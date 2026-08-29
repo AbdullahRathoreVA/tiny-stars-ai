@@ -260,10 +260,20 @@ const live = crmConfigured();
           </div>
 
           <div class="panel sidecard mt-m" data-reveal>
-            <h3>Prefer to just book?</h3>
+            <h3>{live ? 'Prefer to pick a time yourself?' : 'Prefer to just book?'}</h3>
             <p class="sidecard__note">
-              Tiny Stars uses a real 30-minute booking calendar. This link goes straight to
-              it — it works today, and it is the only booking on this site that does.
+              {live ? (
+                <Fragment>
+                  The form above sends a request and someone confirms the time with you. If you
+                  would rather choose a slot and have it settled straight away, the 30-minute
+                  calendar does that.
+                </Fragment>
+              ) : (
+                <Fragment>
+                  Tiny Stars uses a real 30-minute booking calendar. This link goes straight to
+                  it — it works today, and it is the only booking on this site that does.
+                </Fragment>
+              )}
             </p>
             <a
               href={site.calendly}
@@ -274,7 +284,7 @@ const live = crmConfigured();
               data-track-label="calendly-real"
             >
               <Icon name="calendar" size={16} />
-              Open the real calendar
+              {live ? 'Pick a time now' : 'Open the real calendar'}
             </a>
             <p class="sidecard__note mt-s">
               Or call <a href={site.phone.href} data-track="phone_click">{site.phone.label}</a>.
@@ -435,6 +445,12 @@ const live = crmConfigured();
         `touch to agree a time. If you would rather pick one yourself right now, the ` +
         `30-minute calendar below books instantly.`;
     }
+    // The button said "the real calendar" back when this form sent nothing and the
+    // calendar was the only thing on the page that worked. The request above just
+    // reached Tiny Stars, so calling the other route the real one now calls this
+    // one fake. Both are real; one is instant.
+    const calendar = root.querySelector<HTMLElement>('[data-track-label="calendly-after-demo"]');
+    if (calendar) calendar.textContent = 'Pick a time now';
   }
 
   function renderReview() {
