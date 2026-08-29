@@ -2,9 +2,27 @@
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Icon from '../../components/Icon.astro';
+import MediaStrip from '../../components/MediaStrip.astro';
 import NextStep from '../../components/NextStep.astro';
 import { site } from '../../data/site';
+import { publishable, type MediaTopic } from '../../data/media';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+
+/**
+ * What a tour actually walks through, in the order you meet it: the rooms
+ * first, then the yard.
+ *
+ * This page asks someone to give up half an hour and drive across town, and
+ * until now it argued for that in prose alone. Generated footage is excluded —
+ * the section exists to show the real building to somebody deciding whether to
+ * come and stand in it.
+ */
+const TOUR_TOPICS: MediaTopic[] = ['rooms', 'playground'];
+const tourMedia = publishable()
+  .filter((m) => !m.generated && TOUR_TOPICS.includes(m.topic))
+  // Keep the authored order, so the first card is a room rather than the yard.
+  .sort((a, b) => TOUR_TOPICS.indexOf(a.topic) - TOUR_TOPICS.indexOf(b.topic))
+  .slice(0, 8);
 
 const journey = [
   {
@@ -61,6 +79,8 @@ const journey = [
     title="Five steps, in the order they actually happen"
     lede="No maze, no mystery. Here is the whole path from “we might need childcare” to “our child starts on Monday” — including the bits most centres leave vague."
     crumbs={[{ name: 'Enrol', href: '/enroll' }]}
+    image="/assets/images/sections/cta.webp"
+    imageAlt="Play equipment on the turf inside the fenced Tiny Stars yard: two playhouses, a climbing frame with a slide, and an orange shade canopy"
   >
     <div class="cluster">
       <a href="/enroll/book-a-tour" class="btn btn--primary" data-track="tour_cta_click" data-track-label="enroll-hero">
@@ -91,6 +111,18 @@ const journey = [
       </ol>
     </div>
   </section>
+
+  <!-- The spaces, before the part about what isn't published. Here is what can
+       be shown; then, immediately below, here is what only a person can tell
+       you. Same pairing the program pages use. -->
+  {tourMedia.length > 0 && (
+    <MediaStrip
+      items={tourMedia}
+      eyebrow="Before you come"
+      heading="What the tour walks you through"
+      lede="The rooms and the yard, in Tiny Stars' own photographs and clips. Thirty minutes in person still shows you more than any page can."
+    />
+  )}
 
   <section class="section section--sunken" aria-labelledby="honest-title">
     <div class="container container--narrow">

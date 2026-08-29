@@ -13,11 +13,16 @@ them can be done without hearing the audio:
       `captions` track with timings. This is the one that serves a deaf parent,
       and it needs a key because it needs a model that can hear.
 
-Why not guess: every clip here has an audio track (measured, mean -46 to -10 dB),
-and there is no way to tell from the video frames whether anyone is speaking.
-A caption file that claims "[children playing]" over someone explaining the
-pick-up policy is worse than no caption file, because a player will present it
-as though it were the truth.
+Why not guess: the phone clips all carry real audio (measured, mean -46 to
+-10 dB), and there is no way to tell from the video frames whether anyone is
+speaking. A caption file that claims "[children playing]" over someone
+explaining the pick-up policy is worse than no caption file, because a player
+will present it as though it were the truth.
+
+The drone and walkthrough clips are the exception: they have an AAC stream that
+is digitally silent (-91 dB). Those are detected and skipped rather than
+uploaded, since the transcriber can only come back with what ffmpeg already
+knows.
 """
 from __future__ import annotations
 
@@ -158,16 +163,35 @@ def transcribe(audio: Path, key: str) -> dict | None:
     return None
 
 
+# Below this there is nothing for a transcriber to hear. Digital silence reads
+# as -91 dB, and even a very quiet room records well above -60.
+SILENCE_DB = -60.0
+
+
+def mean_volume_db(video: Path) -> float | None:
+    """Mean audio level in dB, or None if there is no audio stream at all."""
+    r = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-nostats", "-i", str(video),
+         "-af", "volumedetect", "-f", "null", "-"],
+        capture_output=True, text=True)
+    m = re.search(r"mean_volume:\s*(-?\d+(?:\.\d+)?) dB", r.stderr)
+    return float(m.group(1)) if m else None
+
+
+def write_no_speech(ident: str) -> bool:
+    """Say so in the file rather than inventing a cue: a player showing nothing
+    is honest, an empty caption file is not."""
+    vtt = "WEBVTT\nKind: captions\nLanguage: en\n\nNOTE No speech detected in this clip.\n"
+    (OUT_DIR / f"{ident}.vtt").write_text(vtt, encoding="utf-8")
+    return True
+
+
 def write_captions(ident: str, data: dict) -> bool:
     segments = data.get("segments") or []
     text = (data.get("text") or "").strip()
 
     if not segments and not text:
-        # Whisper heard nothing usable. Say so in the file rather than inventing
-        # a cue: a player showing "[silence]" is honest, an empty file is not.
-        vtt = "WEBVTT\nKind: captions\nLanguage: en\n\nNOTE No speech detected in this clip.\n"
-        (OUT_DIR / f"{ident}.vtt").write_text(vtt, encoding="utf-8")
-        return True
+        return write_no_speech(ident)
 
     lines = ["WEBVTT", "Kind: captions", "Language: en", ""]
     for i, seg in enumerate(segments, 1):
@@ -205,11 +229,23 @@ def main() -> int:
         return 1
 
     tmp = OUT_DIR / "_audio.mp3"
-    ok = fail = 0
+    ok = fail = silent = 0
     for ident in sorted(videos):
         video = VIDEO_DIR / f"{ident}.mp4"
         if not video.exists():
             continue
+
+        # The drone clips carry an AAC stream that is digitally silent. Sending
+        # one costs a request to be told what ffmpeg already knows, and the
+        # answer written either way is the same.
+        level = mean_volume_db(video)
+        if level is None or level < SILENCE_DB:
+            heard = "no audio stream" if level is None else f"{level:.0f} dB"
+            print(f"  {ident} … silent ({heard}), not sent")
+            write_no_speech(ident)
+            silent += 1
+            continue
+
         print(f"  {ident} …", flush=True)
         if not extract_audio(video, tmp):
             print("    could not extract audio")
@@ -221,7 +257,7 @@ def main() -> int:
         else:
             fail += 1
     tmp.unlink(missing_ok=True)
-    print(f"\ncaptions: {ok} written, {fail} failed")
+    print(f"\ncaptions: {ok} transcribed, {silent} silent, {fail} failed")
     return 1 if fail else 0
 
 
