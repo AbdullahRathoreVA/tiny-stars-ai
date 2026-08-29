@@ -13,9 +13,8 @@ import {
   type MediaItem,
 } from '../../data/media';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+import { tracksFor } from '../../lib/tracks';
 import Stage3D from '../../components/three/Stage3D.astro';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 
 /**
  * Two sets of imagery, deliberately kept apart in the filters and joined in
@@ -27,12 +26,6 @@ import { join } from 'node:path';
  * questions — "what is the place" and "what happens in it" — and they have
  * different provenance, so the chips let a parent ask for either.
  */
-const TRACK_DIR = join(process.cwd(), 'public', 'assets', 'media', 'tracks');
-const hasTrack = (f: string) => existsSync(join(TRACK_DIR, f));
-const tracksFor = (m: MediaItem) => ({
-  descriptions: hasTrack(`${m.id}.desc.vtt`) ? `/assets/media/tracks/${m.id}.desc.vtt` : '',
-  captions: hasTrack(`${m.id}.vtt`) ? `/assets/media/tracks/${m.id}.vtt` : '',
-});
 
 type Tile = {
   group: 'rooms' | 'life';
@@ -71,7 +64,7 @@ const lifeTiles: Tile[] = publishable().map((m) => ({
     img: m.kind === 'photo' ? photoSrc(m.id, 1400) : '',
     video: m.kind === 'video' ? videoSrc(m.id) : '',
     poster: m.kind === 'video' ? posterSrc(m.id) : '',
-    tracks: m.kind === 'video' ? tracksFor(m) : {},
+    tracks: m.kind === 'video' ? tracksFor(m.id) : {},
   },
 }));
 

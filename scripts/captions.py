@@ -151,6 +151,12 @@ def transcribe(audio: Path, key: str) -> dict | None:
         headers={
             "Authorization": f"Bearer {key}",
             "Content-Type": f"multipart/form-data; boundary={boundary}",
+            # Groq sits behind Cloudflare, which answers the default
+            # "Python-urllib/3.x" agent with 403 error 1010 — a banned browser
+            # signature, not an auth failure. It looks exactly like a bad key
+            # from here, which is why this path had never once succeeded.
+            "User-Agent": "tiny-stars-captions/1.0",
+            "Accept": "application/json",
         },
     )
     try:
@@ -178,27 +184,106 @@ def mean_volume_db(video: Path) -> float | None:
     return float(m.group(1)) if m else None
 
 
-def write_no_speech(ident: str) -> bool:
+SILENT_NOTE = "No speech detected in this clip."
+UNRELIABLE_NOTE = (
+    "Automatic transcription of this clip was not reliable enough to publish. "
+    "The audio is ambient rather than spoken to camera."
+)
+
+
+def write_no_speech(ident: str, note: str = SILENT_NOTE) -> bool:
     """Say so in the file rather than inventing a cue: a player showing nothing
-    is honest, an empty caption file is not."""
-    vtt = "WEBVTT\nKind: captions\nLanguage: en\n\nNOTE No speech detected in this clip.\n"
+    is honest, an empty caption file is not.
+
+    The two reasons are kept apart on purpose. "No speech detected" is a
+    measured fact about a silent clip; claiming it for a clip that may well have
+    someone talking in the background would be its own small untruth.
+    """
+    vtt = f"WEBVTT\nKind: captions\nLanguage: en\n\nNOTE {note}\n"
     (OUT_DIR / f"{ident}.vtt").write_text(vtt, encoding="utf-8")
     return True
 
 
-def write_captions(ident: str, data: dict) -> bool:
-    segments = data.get("segments") or []
-    text = (data.get("text") or "").strip()
+# Whisper never returns "I heard nothing". Played ambient room noise it invents
+# fluent, confident-looking speech. Measured over this set:
+#
+#   clip    avg_logprob  words  transcript
+#   ts-14        -0.19      25  "Every child is a little star, full of …"
+#   ts-15        -0.19      28  "Every child is a little star, full of …"
+#   ts-12        -0.70       2  "Thank you."
+#   ts-13        -0.64       3  "Lapsy, Lapsy, Lapsy."
+#   ts-25        -0.84      12  "The 40s, the 40s, the 40s, the 40s. …"
+#   ts-26        -1.10       4  "I have my own."
+#
+# Two things that pass judgement here rather than taste. `no_speech_prob` is
+# 0.00 on every clip including the inventions, so it carries no information and
+# is not used. And ts-26 transcribed as "I got my phone" repeated four times on
+# one run and "I have my own." on the next — same audio, same model. Output that
+# unstable is not a record of anything, and it was going to be published as a
+# verbatim account of what a parent's child was hearing.
+#
+# What survives is sustained narration: the brand reels are scripted voiceover,
+# loud and continuous, and they score an order of magnitude better than a phone
+# held near a playground. Both thresholds sit in the gap, and a clip has to
+# clear both.
+AVG_LOGPROB_MIN = -0.40  # good -0.19; best invention -0.46
+MIN_WORDS = 15           # good 25+; longest invention 12
+COMPRESSION_MAX = 2.4    # high ratio means it fell into a repetition loop
+REPEAT_MAX = 2           # the same line three times is a loop, not a transcript
 
-    if not segments and not text:
-        return write_no_speech(ident)
 
-    lines = ["WEBVTT", "Kind: captions", "Language: en", ""]
-    for i, seg in enumerate(segments, 1):
+def usable_segments(segments: list[dict]) -> tuple[list[dict], list[str]]:
+    """Segments worth publishing, and why the rest were dropped."""
+    kept, why = [], []
+    for seg in segments:
         body = (seg.get("text") or "").strip()
         if not body:
             continue
-        lines += [str(i), f"{ts(seg['start'])} --> {ts(seg['end'])}", body, ""]
+        lp = seg.get("avg_logprob")
+        cr = seg.get("compression_ratio")
+        if lp is not None and lp < AVG_LOGPROB_MIN:
+            why.append(f"logprob={lp:.2f}")
+        elif cr is not None and cr > COMPRESSION_MAX:
+            why.append(f"repetition={cr:.2f}")
+        else:
+            kept.append(seg)
+
+    # A line repeated past REPEAT_MAX is a decoder loop even when each
+    # individual segment scored well.
+    counts: dict[str, int] = {}
+    for seg in kept:
+        k = (seg.get("text") or "").strip().lower()
+        counts[k] = counts.get(k, 0) + 1
+    looped = {k for k, n in counts.items() if n > REPEAT_MAX}
+    if looped:
+        why.append(f"looped x{max(counts.values())}")
+        kept = [s for s in kept if (s.get("text") or "").strip().lower() not in looped]
+
+    # A handful of words over ambient noise is the shape every invention here
+    # took. Real narration keeps talking.
+    words = sum(len((s.get("text") or "").split()) for s in kept)
+    if kept and words < MIN_WORDS:
+        why.append(f"only {words} words")
+        kept = []
+    return kept, why
+
+
+def write_captions(ident: str, data: dict) -> bool:
+    segments = data.get("segments") or []
+    kept, why = usable_segments(segments)
+
+    if not kept:
+        detail = f" ({'; '.join(dict.fromkeys(why))})" if why else ""
+        print(f"    not publishable{detail}")
+        return write_no_speech(ident, UNRELIABLE_NOTE)
+
+    if len(kept) < len([s for s in segments if (s.get("text") or "").strip()]):
+        print(f"    kept {len(kept)}/{len(segments)} segments ({'; '.join(dict.fromkeys(why))})")
+
+    lines = ["WEBVTT", "Kind: captions", "Language: en", ""]
+    for i, seg in enumerate(kept, 1):
+        lines += [str(i), f"{ts(seg['start'])} --> {ts(seg['end'])}",
+                  (seg.get("text") or "").strip(), ""]
     (OUT_DIR / f"{ident}.vtt").write_text("\n".join(lines), encoding="utf-8")
     return True
 
@@ -207,6 +292,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--transcribe", action="store_true",
                     help="call Groq Whisper and write real caption tracks")
+    ap.add_argument("--force", action="store_true",
+                    help="ignore the cached Whisper responses and call the API again")
     args = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -228,8 +315,15 @@ def main() -> int:
         print("\nGROQ_API_KEY is not set. Set it in the environment; do not paste it into a file.")
         return 1
 
+    # Whisper responses are cached, because the free tier rate-limits after
+    # roughly fifteen clips and because the thresholds above were picked by
+    # looking at real responses — tuning them should not cost another pass over
+    # the whole set. Lives in .media-inbox/, which is already gitignored.
+    cache = ROOT / ".media-inbox" / "_whisper"
+    cache.mkdir(parents=True, exist_ok=True)
+
     tmp = OUT_DIR / "_audio.mp3"
-    ok = fail = silent = 0
+    ok = fail = silent = cached = 0
     for ident in sorted(videos):
         video = VIDEO_DIR / f"{ident}.mp4"
         if not video.exists():
@@ -246,18 +340,29 @@ def main() -> int:
             silent += 1
             continue
 
+        blob = cache / f"{ident}.json"
+        if blob.exists() and not args.force:
+            print(f"  {ident} … cached")
+            write_captions(ident, json.loads(blob.read_text(encoding="utf-8")))
+            cached += 1
+            continue
+
         print(f"  {ident} …", flush=True)
         if not extract_audio(video, tmp):
             print("    could not extract audio")
             fail += 1
             continue
         data = transcribe(tmp, key)
-        if data and write_captions(ident, data):
+        if data:
+            blob.write_text(json.dumps(data), encoding="utf-8")
+            write_captions(ident, data)
             ok += 1
         else:
             fail += 1
     tmp.unlink(missing_ok=True)
-    print(f"\ncaptions: {ok} transcribed, {silent} silent, {fail} failed")
+    print(f"\ncaptions: {ok} transcribed, {cached} from cache, {silent} silent, {fail} failed")
+    if fail:
+        print("Rate-limited responses are not cached; re-run to pick up where it stopped.")
     return 1 if fail else 0
 
 
