@@ -19,7 +19,15 @@ export interface ForwardResult {
   crm?: unknown;
 }
 
-const TIMEOUT_MS = 6000;
+/**
+ * Deliberately generous, and deliberately under Vercel's 10s function limit.
+ *
+ * The parent's confirmation is never blocked on this — it is already on screen
+ * by the time this runs — so a couple of extra seconds costs them nothing. What
+ * a short timeout costs is a lost registration when the CRM is briefly slow,
+ * and that is the one failure this whole system exists to prevent.
+ */
+const TIMEOUT_MS = 8000;
 
 /**
  * Reads a server-side variable from whichever place actually holds it.
