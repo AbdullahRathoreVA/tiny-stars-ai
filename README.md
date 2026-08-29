@@ -237,9 +237,18 @@ JS ON FIRST PAINT: 35.5 KB   (three.js, 717 KB, is not in it)
 ```
 
 Keyboard-tested against WCAG 2.2 AA by hand. Known gaps are listed honestly on
-[`/accessibility`](src/pages/accessibility.astro) — verbatim video captions and the internal
-tagging of Tiny Stars' own PDFs. Clips carry description tracks; run
-`GROQ_API_KEY=... python scripts/captions.py --transcribe` to add real captions.
+[`/accessibility`](src/pages/accessibility.astro) — the remaining video captions and the
+internal tagging of Tiny Stars' own PDFs.
+
+Every clip carries a description track. The transcription pass has been run
+(`GROQ_API_KEY=... python scripts/captions.py --transcribe`) and three narrated clips carry
+real verbatim captions. Three are digitally silent. The other sixteen do not, and that is a
+decision rather than a backlog item: over ambient playground audio the model invented fluent
+speech — "Thank you." on four separate clips, and a line repeated four times over a pan of an
+empty yard — and returned a *different* transcript for the same clip on a second run.
+`scripts/captions.py` scores every response and publishes only what clears both thresholds;
+the rest get a note saying so. Closing that gap properly means a person listening to the
+clips, not a larger model.
 
 ---
 
