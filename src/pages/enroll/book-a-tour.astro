@@ -5,6 +5,7 @@ import Icon from '../../components/Icon.astro';
 import { site } from '../../data/site';
 import { programs } from '../../data/programs';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+import { crmConfigured } from '../../lib/crm/forward';
 
 const schema = [
   organizationSchema,
@@ -15,6 +16,15 @@ const schema = [
 ];
 
 const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM'];
+
+/**
+ * Whether a CRM is actually wired up behind this page, decided at build time
+ * from the server-side environment. The form's own confirmation still waits for
+ * a real delivery before it claims one — this only decides which promise the
+ * page makes before you press anything. A page that says "nothing is sent"
+ * while quietly sending is the one failure mode worth spending a branch on.
+ */
+const live = crmConfigured();
 ---
 
 <Base
@@ -43,10 +53,21 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
           <div class="notice notice--demo" data-reveal>
             <Icon name="sparkles" size={20} />
             <span>
-              <strong>This is a preview of the booking experience.</strong>
-              Nothing here reaches Tiny Stars. On the live site this flow connects to the
-              centre's real 30-minute booking calendar — the same one linked at the bottom
-              of this page, which does work today.
+              {live ? (
+                <Fragment>
+                  <strong>This sends a real request to Tiny Stars.</strong>
+                  It is a request, not a confirmed booking — someone will contact you to
+                  agree a time. If you would rather pick a slot yourself, the 30-minute
+                  calendar at the bottom of this page books one instantly.
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <strong>This is a preview of the booking experience.</strong>
+                  Nothing here reaches Tiny Stars. On the live site this flow connects to the
+                  centre's real 30-minute booking calendar — the same one linked at the bottom
+                  of this page, which does work today.
+                </Fragment>
+              )}
             </span>
           </div>
 
@@ -318,6 +339,14 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
 
       const when = [flow.labelFor('date'), flow.labelFor('time')].filter(Boolean).join(' · ');
 
+      // NOT awaited: the parent sees their confirmation immediately, and the
+      // wording upgrades itself a moment later if the CRM accepted it. With no
+      // CRM configured the endpoint answers "not-configured" and the preview
+      // wording below is exactly what it has always been.
+      submitToCrm(data).then((delivered) => {
+        if (delivered) markDelivered(when);
+      });
+
       flow.finish(
         `<div class="done__icon">
            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
@@ -347,6 +376,66 @@ const times = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM
       );
     },
   });
+
+  /**
+   * Posts to our own /api/tour, which signs and forwards it to the private CRM.
+   * The browser never learns the CRM address or its secret. Returns false for
+   * every failure mode, so a submission problem can never turn into a broken
+   * confirmation screen for a parent.
+   */
+  async function submitToCrm(data: Record<string, string>): Promise<boolean> {
+    try {
+      const res = await fetch('/api/tour', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          parentName: data.parentName,
+          email: data.email,
+          phone: data.phone,
+          childName: data.childName,
+          program: flow.labelFor('program') || data.program,
+          date: data.date,
+          time: flow.labelFor('time') || data.time,
+          visitType: flow.labelFor('visitType') || data.visitType,
+          notes: data.notes,
+        }),
+      });
+      const body = (await res.json()) as { delivered?: boolean };
+      return body.delivered === true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Swaps the preview wording for a real confirmation, once one is earned.
+   *
+   * The warning stays, in a softer form. A request is not a booking: the CRM
+   * files it as `requested` and a person confirms it, so telling a parent their
+   * visit is arranged would be a lie with a date attached.
+   */
+  function markDelivered(when: string) {
+    const badge = root.querySelector<HTMLElement>('.badge--demo');
+    if (badge) {
+      badge.textContent = 'Received by Tiny Stars';
+      badge.classList.remove('badge--demo');
+    }
+    const heading = root.querySelector<HTMLElement>('.done h3, h3');
+    if (heading) heading.textContent = 'We have your request';
+    const lede = root.querySelector<HTMLElement>('.done .lede, .lede');
+    if (lede) {
+      lede.innerHTML =
+        `Tiny Stars has your request for <strong>${esc(when || 'your chosen time')}</strong> ` +
+        `and will confirm by phone or email. You do not need to send it twice.`;
+    }
+    const warn = root.querySelector<HTMLElement>('.notice--warn span');
+    if (warn) {
+      warn.innerHTML =
+        `<strong>This is a request, not a confirmed booking.</strong> Someone will be in ` +
+        `touch to agree a time. If you would rather pick one yourself right now, the ` +
+        `30-minute calendar below books instantly.`;
+    }
+  }
 
   function renderReview() {
     const rows = FIELDS.map(({ key, label, step }) => {

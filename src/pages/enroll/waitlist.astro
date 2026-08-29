@@ -5,6 +5,7 @@ import Icon from '../../components/Icon.astro';
 import { programs } from '../../data/programs';
 import { site } from '../../data/site';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+import { crmConfigured } from '../../lib/crm/forward';
 
 const schema = [
   organizationSchema,
@@ -13,6 +14,15 @@ const schema = [
     { name: 'Waitlist', href: '/enroll/waitlist' },
   ]),
 ];
+
+/**
+ * Whether a CRM is actually wired up behind this page, decided at build time
+ * from the server-side environment. The form's own confirmation still waits for
+ * a real delivery before it claims one — this only decides which promise the
+ * page makes before you press anything. A page that says "nothing is sent"
+ * while quietly sending is the one failure mode worth spending a branch on.
+ */
+const live = crmConfigured();
 ---
 
 <Base
@@ -63,9 +73,19 @@ const schema = [
       <div class="notice notice--demo" data-reveal>
         <Icon name="sparkles" size={20} />
         <span>
-          <strong>Preview only.</strong>
-          Nothing here reaches Tiny Stars. To actually join the waitlist today, call
-          the director on {site.phone.label}.
+          {live ? (
+            <Fragment>
+              <strong>This adds you to the real waitlist.</strong>
+              Tiny Stars does not publish waitlist lengths or availability, so nothing here
+              will give you a date. To ask where you stand, call {site.phone.label}.
+            </Fragment>
+          ) : (
+            <Fragment>
+              <strong>Preview only.</strong>
+              Nothing here reaches Tiny Stars. To actually join the waitlist today, call
+              the director on {site.phone.label}.
+            </Fragment>
+          )}
         </span>
       </div>
 
@@ -217,6 +237,13 @@ const schema = [
       track('waitlist_complete', { program: data.program ?? '' });
       flow.clearDraft();
 
+      // NOT awaited: the confirmation is on screen immediately and the wording
+      // upgrades itself if the CRM accepted it. With no CRM configured the
+      // endpoint answers "not-configured" and the preview wording stands.
+      submitToCrm(data).then((delivered) => {
+        if (delivered) markDelivered();
+      });
+
       flow.finish(
         `<div class="done__icon">
            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
@@ -247,6 +274,55 @@ const schema = [
       );
     },
   });
+
+  /**
+   * Posts to our own /api/waitlist, which signs and forwards it to the private
+   * CRM. Returns false for every failure mode, so a submission problem can
+   * never turn into a broken confirmation screen for a parent.
+   */
+  async function submitToCrm(data: Record<string, string>): Promise<boolean> {
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          parentName: data.parentName,
+          email: data.email,
+          phone: data.phone,
+          program: flow.labelFor('program') || data.program,
+          startDate: data.startDate,
+        }),
+      });
+      const body = (await res.json()) as { delivered?: boolean };
+      return body.delivered === true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Swaps the preview wording for a real confirmation, once one is earned.
+   *
+   * The warning about timeframes stays exactly as it is. Being on the list is
+   * now true; a promise about how long it takes still is not, and delivery
+   * does not turn an unknown into a known.
+   */
+  function markDelivered() {
+    const badge = root.querySelector<HTMLElement>('.badge--demo');
+    if (badge) {
+      badge.textContent = 'Received by Tiny Stars';
+      badge.classList.remove('badge--demo');
+    }
+    const heading = root.querySelector<HTMLElement>('.done h3, h3');
+    if (heading) heading.textContent = 'You are on the list';
+    const lede = root.querySelector<HTMLElement>('.done .lede, .lede');
+    if (lede) {
+      lede.innerHTML =
+        `Tiny Stars has added <strong>${esc(flow.labelFor('parentName') || 'you')}</strong> to the ` +
+        `waitlist for <strong>${esc(flow.labelFor('program') || 'your chosen group')}</strong> and ` +
+        `will contact you when a place matching your dates comes free.`;
+    }
+  }
 
   function renderReview() {
     reviewEl.innerHTML =

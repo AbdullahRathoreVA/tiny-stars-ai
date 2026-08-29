@@ -4,10 +4,20 @@ import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
 import { site, policyFacts } from '../data/site';
 import { breadcrumbSchema, organizationSchema } from '../lib/schema';
+import { crmConfigured } from '../lib/crm/forward';
 
 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.mapsQuery)}`;
 const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(site.mapsQuery)}`;
 const closing = policyFacts.find((p) => p.id === 'closing-time')!;
+
+/**
+ * Whether a CRM is actually wired up behind this page, decided at build time
+ * from the server-side environment. The form's own confirmation still waits for
+ * a real delivery before it claims one — this only decides which promise the
+ * page makes before you press anything. A page that says "nothing is sent"
+ * while quietly sending is the one failure mode worth spending a branch on.
+ */
+const live = crmConfigured();
 ---
 
 <Base
@@ -178,9 +188,19 @@ const closing = policyFacts.find((p) => p.id === 'closing-time')!;
       <div class="notice notice--demo mt-m" data-reveal>
         <Icon name="sparkles" size={20} />
         <span>
-          <strong>Preview form — nothing is sent.</strong>
-          On the live site this posts to the Tiny Stars contact endpoint. Here it validates
-          and shows you what would happen, then stops.
+          {live ? (
+            <Fragment>
+              <strong>This sends a real message to the Tiny Stars team.</strong>
+              A person reads it and replies themselves — nothing here answers on their
+              behalf. If it is urgent, calling is faster.
+            </Fragment>
+          ) : (
+            <Fragment>
+              <strong>Preview form — nothing is sent.</strong>
+              On the live site this posts to the Tiny Stars contact endpoint. Here it validates
+              and shows you what would happen, then stops.
+            </Fragment>
+          )}
         </span>
       </div>
 
@@ -393,6 +413,13 @@ const closing = policyFacts.find((p) => p.id === 'closing-time')!;
 
     track('concierge_handoff', { via: 'contact-form' });
 
+    // NOT awaited: the confirmation shows immediately and the wording upgrades
+    // itself if the CRM accepted it. With no CRM configured the endpoint
+    // answers "not-configured" and the preview wording stands.
+    submitToCrm().then((delivered) => {
+      if (delivered) markDelivered();
+    });
+
     form.querySelectorAll('.field, .cform__foot').forEach((el) => ((el as HTMLElement).hidden = true));
     done.hidden = false;
     done.innerHTML = `
@@ -413,4 +440,50 @@ const closing = policyFacts.find((p) => p.id === 'closing-time')!;
     announce.textContent = 'Preview complete. Nothing was sent.';
     done.scrollIntoView({ block: 'center', behavior: 'smooth' });
   });
+
+  /**
+   * Posts to our own /api/contact, which signs and forwards it to the private
+   * CRM. The CRM files it and raises a notification; it never replies on its
+   * own. Returns false for every failure mode, so a submission problem cannot
+   * turn into a broken confirmation screen.
+   */
+  async function submitToCrm(): Promise<boolean> {
+    try {
+      const value = (n: string) =>
+        (form.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[name="${n}"]`)?.value ?? '').trim();
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          name: value('name'),
+          email: value('email'),
+          phone: value('phone'),
+          topic: value('topic'),
+          message: value('message'),
+        }),
+      });
+      const body = (await res.json()) as { delivered?: boolean };
+      return body.delivered === true;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Swaps the preview wording for a real confirmation, once one is earned. */
+  function markDelivered() {
+    const badge = done.querySelector<HTMLElement>('.badge--demo');
+    if (badge) {
+      badge.textContent = 'Received by Tiny Stars';
+      badge.classList.remove('badge--demo');
+    }
+    const heading = done.querySelector<HTMLElement>('h3');
+    if (heading) heading.textContent = 'Your message is with the Tiny Stars team';
+    const note = done.querySelector<HTMLElement>('p');
+    if (note) {
+      note.innerHTML =
+        'Someone will read it and reply themselves — nothing here answers on their behalf. ' +
+        'If it is urgent, calling <a href="tel:+17802301599">(780) 230-1599</a> is faster.';
+    }
+    announce.textContent = 'Message sent to Tiny Stars.';
+  }
 </script>

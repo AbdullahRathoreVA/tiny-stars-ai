@@ -5,6 +5,7 @@ import Icon from '../../components/Icon.astro';
 import { programs } from '../../data/programs';
 import { site, registrationSections } from '../../data/site';
 import { breadcrumbSchema, organizationSchema } from '../../lib/schema';
+import { crmConfigured } from '../../lib/crm/forward';
 
 const schema = [
   organizationSchema,
@@ -13,6 +14,15 @@ const schema = [
     { name: 'Registration', href: '/enroll/registration' },
   ]),
 ];
+
+/**
+ * Whether a CRM is actually wired up behind this page, decided at build time
+ * from the server-side environment. The form's own confirmation still waits for
+ * a real delivery before it claims one — this only decides which promise the
+ * page makes before you press anything. A page that says "nothing is sent"
+ * while quietly sending is the one failure mode worth spending a branch on.
+ */
+const live = crmConfigured();
 ---
 
 <Base
@@ -39,9 +49,19 @@ const schema = [
           <div class="notice notice--demo" data-reveal>
             <Icon name="sparkles" size={20} />
             <span>
-              <strong>Preview only — nothing is submitted.</strong>
-              The live version would carry these answers into Tiny Stars' real registration
-              package. Here, everything stays in your browser and clears when you close the tab.
+              {live ? (
+                <Fragment>
+                  <strong>This goes to Tiny Stars.</strong>
+                  Your answers are carried into the centre's enrolment records, so nobody
+                  has to ask you for them twice. A person reviews every enquiry.
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <strong>Preview only — nothing is submitted.</strong>
+                  The live version would carry these answers into Tiny Stars' real registration
+                  package. Here, everything stays in your browser and clears when you close the tab.
+                </Fragment>
+              )}
             </span>
           </div>
 
