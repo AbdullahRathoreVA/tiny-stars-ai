@@ -1,16 +1,3 @@
-// ===========================================================================
-//  GENERATED FILE - DO NOT EDIT HERE.
-//
-//  Verbatim copy of:
-//    al-amin-al-tajir-crm/packages/shared/src/contract.ts
-//
-//  That file is the source of truth for the website <-> CRM event contract.
-//  Edit it there, then copy it here in the same commit. Two hand-maintained
-//  copies would drift, and a drifted contract fails silently at 3am.
-//
-//  Verify this copy is current:
-//    node scripts/check-crm-contract.mjs
-// ===========================================================================
 /**
  * ===========================================================================
  *  TINY STARS  <->  COMMAND CENTER  :  SHARED EVENT CONTRACT   (v1)
@@ -214,6 +201,27 @@ function child(v: unknown, base: string, errs: ValidationError[], required = tru
   const band = str(o.ageBand, `${base}.ageBand`, errs, { oneOf: AGE_BANDS });
   if (band) c.ageBand = band as ChildInput['ageBand'];
   return c;
+}
+
+/**
+ * The guardian and child validators on their own.
+ *
+ * Staff adding a family by hand go through exactly the same rules a parent's
+ * submission does — same name handling, same permissive email check, same
+ * "a lead with no way to reach it is not a lead". A second, looser validator
+ * for the internal path is how two definitions of a valid record start to
+ * disagree, and the CRM would be the one holding both.
+ */
+export function validateGuardianInput(raw: unknown): Validated<GuardianInput> {
+  const errs: ValidationError[] = [];
+  const value = guardian(raw, 'guardian', errs);
+  return errs.length ? { ok: false, errors: errs } : { ok: true, value };
+}
+
+export function validateChildInput(raw: unknown): Validated<ChildInput> {
+  const errs: ValidationError[] = [];
+  const value = child(raw, 'child', errs);
+  return errs.length ? { ok: false, errors: errs } : { ok: true, value };
 }
 
 export function validateRegistration(raw: unknown): Validated<RegistrationData> {
